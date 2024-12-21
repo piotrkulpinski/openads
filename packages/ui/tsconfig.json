@@ -1,8 +1,10 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+  "extends": "@spotnest/tsconfig/react-library.json",
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
-    "outDir": "dist"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
 }

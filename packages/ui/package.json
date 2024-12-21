@@ -1,29 +1,27 @@
 {
-  "name": "@repo/ui",
+  "name": "@spotnest/ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
-  "exports": {
-    "./button": "./src/button.tsx",
-    "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
-  },
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component",
     "check-types": "tsc --noEmit"
   },
+  "dependencies": {
+    "cva": "^1.0.0-beta.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.5.5"
+  },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@spotnest/typescript-config": "*",
     "@turbo/gen": "^1.12.4",
     "@types/node": "^20.11.24",
     "@types/react": "18.3.0",
     "@types/react-dom": "18.3.1",
     "typescript": "5.5.4"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
   }
 }
