@@ -1,8 +1,11 @@
-import { Outlet, ScrollRestoration, createRootRoute } from "@tanstack/react-router"
+import type { QueryClient } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { Outlet, ScrollRestoration, createRootRouteWithContext } from "@tanstack/react-router"
+import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { Meta, Scripts } from "@tanstack/start"
 import type { ReactNode } from "react"
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       {
@@ -38,6 +41,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <TanStackRouterDevtools position="bottom-right" />
+        <ReactQueryDevtools buttonPosition="bottom-left" />
       </body>
     </html>
   )
