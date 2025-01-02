@@ -1,0 +1,18 @@
+model Booking {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  startsAt  DateTime
+  endsAt    DateTime
+
+  // Relations
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  spot        Spot      @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  spotId      String
+  meta        Meta[]
+
+  // Indexes
+  @@index([workspaceId])
+  @@index([spotId])
+}

@@ -4,22 +4,26 @@ import { Outlet, ScrollRestoration, createRootRouteWithContext } from "@tanstack
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { Meta, Scripts } from "@tanstack/start"
 import type { ReactNode } from "react"
+import { getWebRequest } from "vinxi/http"
+import { auth } from "~/lib/auth.server"
+import stylesCss from "~/styles.css?url"
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "TanStack Start Starter",
-      },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "TanStack Start Starter" },
     ],
+    links: [{ rel: "stylesheet", href: stylesCss }],
   }),
+  beforeLoad: async ({ context }) => {
+    const request = getWebRequest()
+    const session = (await auth.api.getSession({ headers: request.headers })) || null
+    console.log(session)
+
+    return { ...context, session }
+  },
   component: RootComponent,
 })
 

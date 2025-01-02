@@ -1,0 +1,46 @@
+enum FieldType {
+  Text
+  Textarea
+  Image
+  Url
+  Number
+  DateTime
+  Switch
+}
+
+model Field {
+  id          String    @id @default(cuid())
+  type        FieldType @default(Text)
+  name        String
+  slug        String
+  default     String?
+  placeholder String?
+  isRequired  Boolean?  @default(false)
+  order       Int?      @default(99)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  spot   Spot   @relation(fields: [spotId], references: [id], onDelete: Cascade)
+  spotId String
+  items  Meta[]
+
+  // Indexes
+  @@index([spotId])
+}
+
+model Meta {
+  id    String @id @default(cuid())
+  value Json?
+
+  // Relations
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId String
+  field     Field   @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  fieldId   String
+
+  // Indexes
+  @@unique([bookingId, fieldId])
+  @@index([bookingId])
+  @@index([fieldId])
+}
