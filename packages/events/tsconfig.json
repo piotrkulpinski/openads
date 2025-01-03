@@ -1,0 +1,5 @@
+{
+  "extends": "@openads/tsconfig/nextjs.json",
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

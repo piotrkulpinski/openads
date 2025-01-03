@@ -1,27 +1,28 @@
-import type { JSX } from "react"
+import type { ComponentProps } from "react"
+import { cx } from "../lib/utils"
 
-export function Card({
-  className,
-  title,
-  children,
-  href,
-}: {
-  className?: string
-  title: string
-  children: React.ReactNode
-  href: string
-}): JSX.Element {
-  return (
-    <a
-      className={className}
-      href={`${href}?utm_source=create-turbo&utm_medium=basic&utm_campaign=create-turbo"`}
-      rel="noopener noreferrer"
-      target="_blank"
-    >
-      <h2>
-        {title} <span>-&gt;</span>
-      </h2>
-      <p>{children}</p>
-    </a>
-  )
-}
+const Card = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("rounded-xl border bg-card text-card-foreground", className)} {...props} />
+)
+
+const CardHeader = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("flex flex-col space-y-1.5 p-6", className)} {...props} />
+)
+
+const CardTitle = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("font-semibold leading-none tracking-tight", className)} {...props} />
+)
+
+const CardDescription = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("text-sm text-muted-foreground", className)} {...props} />
+)
+
+const CardContent = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("p-6 pt-0", className)} {...props} />
+)
+
+const CardFooter = ({ className, ...props }: ComponentProps<"div">) => (
+  <div className={cx("flex items-center p-6 pt-0", className)} {...props} />
+)
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
