@@ -1,8 +1,8 @@
 export const siteConfig = {
-  name: "Spotnest",
-  tagline: "The easiest way to collect anything online",
+  name: "OpenAds",
+  tagline: "A platform for creating and managing ads for your business.",
   description:
-    "Putting together a directory website was time consuming. Spotnest lets you focus on the content and makes the entire process effortless.",
+    "OpenAds is a platform for creating and managing ads for your business. It's easy to use and helps you collect leads from your website.",
 
   // Command
   commandShortcuts: [{ key: "k", metaKey: true }] as const,

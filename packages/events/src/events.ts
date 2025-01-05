@@ -91,8 +91,8 @@ export const LogEvents = {
     name: "Decline Invite",
     channel: "invite",
   },
-  InviteTeamMembers: {
-    name: "Invite Team Member",
+  InviteWorkspaceMembers: {
+    name: "Invite Workspace Member",
     channel: "invite",
   },
   UserRoleChange: {
@@ -103,25 +103,25 @@ export const LogEvents = {
     name: "Delete User",
     channel: "user",
   },
-  ChangeTeam: {
-    name: "Change Team",
-    channel: "team",
+  ChangeWorkspace: {
+    name: "Change Workspace",
+    channel: "workspace",
   },
-  CreateTeam: {
-    name: "Create Team",
-    channel: "team",
+  CreateWorkspace: {
+    name: "Create Workspace",
+    channel: "workspace",
   },
-  LeaveTeam: {
-    name: "Leave Team",
-    channel: "team",
+  LeaveWorkspace: {
+    name: "Leave Workspace",
+    channel: "workspace",
   },
-  DeleteTeam: {
-    name: "Delete Team",
-    channel: "team",
+  DeleteWorkspace: {
+    name: "Delete Workspace",
+    channel: "workspace",
   },
-  DeleteTeamMember: {
-    name: "Delete Team Member",
-    channel: "team",
+  DeleteWorkspaceMember: {
+    name: "Delete Workspace Member",
+    channel: "workspace",
   },
   CreateAttachment: {
     name: "Create Attachment",
@@ -259,4 +259,4 @@ export const LogEvents = {
     name: "Reconnect Connection",
     channel: "bank",
   },
-};
+}

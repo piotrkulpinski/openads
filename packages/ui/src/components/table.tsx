@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Table = ({ className, ...props }: ComponentProps<"table">) => (
   <div className="relative w-full overflow-auto">

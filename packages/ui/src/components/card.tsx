@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Card = ({ className, ...props }: ComponentProps<"div">) => (
   <div className={cx("rounded-xl border bg-card text-card-foreground", className)} {...props} />

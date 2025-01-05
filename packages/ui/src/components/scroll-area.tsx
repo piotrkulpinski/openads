@@ -2,7 +2,7 @@
 
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const ScrollArea = ({
   className,

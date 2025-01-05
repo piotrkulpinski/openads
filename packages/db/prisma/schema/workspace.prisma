@@ -8,9 +8,10 @@ model Workspace {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  users    WorkspaceUser[]
-  spots    Spot[]
-  bookings Booking[]
+  users      WorkspaceUser[]
+  defaultFor User[]
+  spots      Spot[]
+  bookings   Booking[]
 
   // Indexes
   @@unique([name, slug])

@@ -1,7 +1,7 @@
 "use client"
 
 import { upperFirst } from "@curiousleaf/utils"
-import { Button, type ButtonProps } from "@openads/ui"
+import { Button, type ButtonProps } from "@openads/ui/button"
 import { LoaderIcon } from "lucide-react"
 import { signIn } from "~/lib/auth/client"
 import { cx } from "~/utils/cva"

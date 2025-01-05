@@ -10,7 +10,7 @@
     "db:generate": "prisma generate --no-hints",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:push": "prisma db push --skip-generate",
+    "db:push": "prisma db push",
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {

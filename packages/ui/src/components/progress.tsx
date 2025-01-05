@@ -2,7 +2,7 @@
 
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Progress = ({
   className,

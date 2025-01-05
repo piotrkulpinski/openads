@@ -3,7 +3,7 @@
 import { CheckIcon } from "@radix-ui/react-icons"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const RadioGroup = ({ className, ...props }: ComponentProps<typeof RadioGroupPrimitive.Root>) => (
   <RadioGroupPrimitive.Root className={cx("grid gap-2", className)} {...props} />

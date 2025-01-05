@@ -2,7 +2,7 @@
 
 import * as SwitchPrimitives from "@radix-ui/react-switch"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Switch = ({ className, ...props }: ComponentProps<typeof SwitchPrimitives.Root>) => (
   <SwitchPrimitives.Root

@@ -1,8 +1,9 @@
 "use client"
 
-import { Badge } from "@openads/ui"
-import { Button, type ButtonProps } from "@openads/ui"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui"
+import { Badge } from "@openads/ui/badge"
+import { Button, type ButtonProps } from "@openads/ui/button"
+import { useIsMobile } from "@openads/ui/hooks"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui/tooltip"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { ComponentProps, ReactNode } from "react"
@@ -14,12 +15,12 @@ type NavMainLink = ButtonProps & {
 }
 
 type NavMainProps = ComponentProps<"nav"> & {
-  isCollapsed: boolean
   links: NavMainLink[]
 }
 
-export const NavMain = ({ className, links, isCollapsed, ...props }: NavMainProps) => {
+export const NavMain = ({ className, links, ...props }: NavMainProps) => {
   const pathname = usePathname()
+  const isMobile = useIsMobile()
   const rootPath = "/admin"
 
   const getButtonVariant = (href: string) => {
@@ -36,7 +37,7 @@ export const NavMain = ({ className, links, isCollapsed, ...props }: NavMainProp
   return (
     <>
       {links.map(({ href, title, label, ...props }, index) =>
-        isCollapsed ? (
+        isMobile ? (
           <Tooltip key={index}>
             <TooltipTrigger asChild>
               <Button

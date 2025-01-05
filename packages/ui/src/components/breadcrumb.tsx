@@ -1,7 +1,7 @@
 import { ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { Slot } from "@radix-ui/react-slot"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Breadcrumb = (props: ComponentProps<"nav"> & { separator?: React.ReactNode }) => (
   <nav aria-label="breadcrumb" {...props} />

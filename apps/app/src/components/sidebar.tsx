@@ -1,45 +1,38 @@
-"use client"
-
-import { Separator, useIsMobile } from "@openads/ui"
+import { Button } from "@openads/ui/button"
+import { Separator } from "@openads/ui/separator"
 import {
   CopyrightIcon,
   GalleryHorizontalEndIcon,
   GemIcon,
   LayoutDashboardIcon,
-  LogOutIcon,
   ReplaceIcon,
 } from "lucide-react"
+import { Suspense } from "react"
+import { CreateWorkspaceDialog } from "~/components/create-workspace-dialog"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
-import { signOut } from "~/lib/auth/client"
-import { cx } from "~/utils/cva"
+import { SignOutButton } from "~/components/sign-out-button"
+import { WorkspaceMenu } from "~/components/workspace-menu"
 
 export const Sidebar = () => {
-  const isMobile = useIsMobile()
-
   return (
-    <div
-      className={cx("sticky top-0 h-dvh z-40 flex flex-col border-r", isMobile ? "w-12" : "w-48")}
-    >
+    <div className="sticky top-0 h-dvh z-40 flex flex-col border-r w-12 sm:w-48 lg:w-60">
       <Nav>
-        <NavMain
-          isCollapsed={isMobile}
-          links={[
-            {
-              title: "Dashboard",
-              href: "/admin",
-              prefix: <LayoutDashboardIcon />,
-            },
-          ]}
-        />
+        <Suspense>
+          <WorkspaceMenu />
+        </Suspense>
       </Nav>
 
       <Separator />
 
       <Nav>
         <NavMain
-          isCollapsed={isMobile}
           links={[
+            {
+              title: "Dashboard",
+              href: "/",
+              prefix: <LayoutDashboardIcon />,
+            },
             {
               title: "Tools",
               href: "/tools",
@@ -63,19 +56,12 @@ export const Sidebar = () => {
           ]}
         />
       </Nav>
+      <CreateWorkspaceDialog>
+        <Button>Create workspace</Button>
+      </CreateWorkspaceDialog>
 
       <Nav className="mt-auto">
-        <NavMain
-          isCollapsed={isMobile}
-          links={[
-            {
-              title: "Sign Out",
-              href: "#",
-              onClick: () => signOut(),
-              prefix: <LogOutIcon />,
-            },
-          ]}
-        />
+        <SignOutButton />
       </Nav>
     </div>
   )

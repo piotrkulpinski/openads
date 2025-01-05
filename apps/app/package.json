@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@curiousleaf/utils": "^1.0.41",
+    "@hookform/resolvers": "^3.9.1",
     "@openads/db": "workspace:*",
     "@openads/events": "workspace:*",
     "@openads/ui": "workspace:*",
@@ -19,6 +21,7 @@
     "next-safe-action": "^7.10.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
     "sonner": "^1.7.1",
     "zod": "^3.24.1"
   },

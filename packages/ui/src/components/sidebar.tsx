@@ -13,7 +13,7 @@ import {
   useState,
 } from "react"
 import { useIsMobile } from "../hooks/use-mobile"
-import { type VariantProps, cva, cx } from "../lib/utils"
+import { type VariantProps, cva, cx } from "../lib/cva"
 import { Button } from "./button"
 import { Input } from "./input"
 import { Separator } from "./separator"

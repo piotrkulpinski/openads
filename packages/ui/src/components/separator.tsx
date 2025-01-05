@@ -2,7 +2,7 @@
 
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Separator = ({
   className,

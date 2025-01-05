@@ -3,7 +3,7 @@
 import type { CSSProperties, ComponentProps, ComponentType, HTMLProps, ReactNode } from "react"
 import { createContext, useContext, useId, useMemo } from "react"
 import * as RechartsPrimitive from "recharts"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const

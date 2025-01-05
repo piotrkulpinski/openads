@@ -1,3 +1,4 @@
+import { db } from "@openads/db"
 import { setupAnalytics } from "@openads/events/server"
 import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from "next-safe-action"
 import { headers } from "next/headers"
@@ -5,7 +6,7 @@ import { z } from "zod"
 import { auth } from "~/lib/auth/server"
 
 export const actionClient = createSafeActionClient({
-  handleServerError(e) {
+  handleServerError: (e: Error) => {
     if (e instanceof Error) {
       return e.message
     }
@@ -15,7 +16,7 @@ export const actionClient = createSafeActionClient({
 })
 
 export const actionClientWithMeta = createSafeActionClient({
-  handleServerError(e) {
+  handleServerError: (e: Error) => {
     if (e instanceof Error) {
       return e.message
     }
@@ -23,7 +24,7 @@ export const actionClientWithMeta = createSafeActionClient({
     return DEFAULT_SERVER_ERROR_MESSAGE
   },
 
-  defineMetadataSchema() {
+  defineMetadataSchema: () => {
     return z.object({
       name: z.string(),
       track: z.object({ event: z.string(), channel: z.string() }).optional(),
@@ -32,6 +33,13 @@ export const actionClientWithMeta = createSafeActionClient({
 })
 
 export const authActionClient = actionClientWithMeta
+  // Database middleware
+  .use(async ({ next }) => {
+    return next({
+      ctx: { db },
+    })
+  })
+
   // Logger middleware
   .use(async ({ next, clientInput, metadata }) => {
     const result = await next()

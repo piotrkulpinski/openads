@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 export interface InputProps extends ComponentProps<"input"> {}
 

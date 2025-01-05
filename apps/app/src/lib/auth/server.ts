@@ -1,4 +1,5 @@
-import { prisma } from "@openads/db"
+import { db } from "@openads/db"
+import { WorkspaceUserRole } from "@openads/db/client"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { customSession } from "better-auth/plugins"
@@ -6,7 +7,7 @@ import { siteConfig } from "~/config/site"
 import { env } from "~/env"
 
 export const auth = betterAuth({
-  database: prismaAdapter(prisma, {
+  database: prismaAdapter(db, {
     provider: "postgresql",
   }),
 
@@ -46,20 +47,24 @@ export const auth = betterAuth({
 
   plugins: [
     customSession(async ({ user, session }) => {
-      // const workspace = await prisma.workspace.findFirst({
-      //   where: {
-      //     users: {
-      //       some: {
-      //         workspaceId: user.defaultWorkspaceId,
-      //         userId: user.id,
-      //         role: { in: [WorkspaceUserRole.Owner, WorkspaceUserRole.Manager] },
-      //       },
-      //     },
-      //   },
-      // })
+      const workspace = await db.workspace.findFirst({
+        where: {
+          defaultFor: {
+            some: {
+              id: user.id,
+            },
+          },
+          users: {
+            some: {
+              userId: user.id,
+              role: { in: [WorkspaceUserRole.Owner, WorkspaceUserRole.Manager] },
+            },
+          },
+        },
+      })
 
       return {
-        // workspace,
+        workspace,
         user,
         session,
       }

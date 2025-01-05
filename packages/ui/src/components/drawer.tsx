@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
-import { cx } from "../lib/utils"
+import { cx } from "../lib/cva"
 
 const Drawer = ({
   shouldScaleBackground = true,

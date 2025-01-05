@@ -1,7 +1,7 @@
 import { ChevronDownIcon } from "@radix-ui/react-icons"
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu"
 import type { ComponentProps } from "react"
-import { cva, cx } from "../lib/utils"
+import { cva, cx } from "../lib/cva"
 
 const NavigationMenu = ({
   className,
