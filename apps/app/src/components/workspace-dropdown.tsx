@@ -12,34 +12,33 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useIsMobile } from "@openads/ui/hooks"
+import { Skeleton } from "@openads/ui/skeleton"
 import { ChevronsUpDown, Plus } from "lucide-react"
-import { changeWorkspaceAction } from "~/actions/workspace/change-workspace"
+import { useParams, useRouter } from "next/navigation"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 
 type WorkspaceDropdownProps = {
   workspaces: Workspace[]
-  defaultWorkspace: Workspace | null
 }
 
-export const WorkspaceDropdown = ({ workspaces, defaultWorkspace }: WorkspaceDropdownProps) => {
+const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
   const isMobile = useIsMobile()
+  const params = useParams()
+  const router = useRouter()
+  const activeWorkspace = workspaces.find(w => w.slug === params.workspace)
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-        >
+        <Button size="sm" variant="outline">
           <Avatar className="size-6">
-            <AvatarImage src={defaultWorkspace?.faviconUrl ?? undefined} />
-            <AvatarFallback>{defaultWorkspace?.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={activeWorkspace?.faviconUrl ?? undefined} />
+            <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{defaultWorkspace?.name}</span>
-            {/* <span className="truncate text-xs">{defaultWorkspace?.plan}</span> */}
+            <span className="truncate font-semibold">{activeWorkspace?.name}</span>
+            {/* <span className="truncate text-xs">{activeWorkspace?.plan}</span> */}
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </Button>
@@ -56,9 +55,9 @@ export const WorkspaceDropdown = ({ workspaces, defaultWorkspace }: WorkspaceDro
         {workspaces.map(workspace => (
           <DropdownMenuItem
             key={workspace.name}
-            onClick={() => changeWorkspaceAction({ workspaceId: workspace.id, redirectTo: "/" })}
+            onClick={() => router.push(`/${workspace.slug}`)}
             className="gap-2 p-2"
-            disabled={workspace.id === defaultWorkspace?.id}
+            disabled={workspace.id === activeWorkspace?.id}
           >
             <Avatar className="size-6">
               <AvatarImage src={workspace.faviconUrl ?? undefined} />
@@ -83,3 +82,19 @@ export const WorkspaceDropdown = ({ workspaces, defaultWorkspace }: WorkspaceDro
     </DropdownMenu>
   )
 }
+
+const WorkspaceDropdownSkeleton = () => {
+  return (
+    <Button size="sm" variant="outline" disabled>
+      <Skeleton className="size-6 rounded-full" />
+
+      <div className="grid flex-1 text-left text-sm leading-tight">
+        <Skeleton className="h-4 w-24" />
+      </div>
+
+      <ChevronsUpDown className="ml-auto size-4" />
+    </Button>
+  )
+}
+
+export { WorkspaceDropdown, WorkspaceDropdownSkeleton }

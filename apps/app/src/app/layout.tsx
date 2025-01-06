@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import type { PropsWithChildren } from "react"
 import { siteConfig } from "~/config/site"
 import "./styles.css"
+import { Toaster } from "~/components/toaster"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body className="flex flex-col min-h-dvh font-sans antialiased">
         {children}
         <Analytics />
+        <Toaster />
       </body>
     </html>
   )

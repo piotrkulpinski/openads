@@ -9,6 +9,7 @@ import { Input } from "@openads/ui/input"
 import { useAction } from "next-safe-action/hooks"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import type { z } from "zod"
 import { createWorkspaceAction } from "~/actions/workspace/create-workspace"
 import { createWorkspaceSchema } from "~/schemas/workspace"
@@ -22,14 +23,19 @@ export const CreateWorkspaceForm = ({
   className,
   onSuccess,
 }: CreateWorkspaceFormProps) => {
-  const createWorkspace = useAction(createWorkspaceAction, { onSuccess })
+  const createWorkspace = useAction(createWorkspaceAction, {
+    onSuccess,
+
+    onError: ({ error }) => {
+      toast.error(error.serverError)
+    },
+  })
 
   const form = useForm<z.infer<typeof createWorkspaceSchema>>({
     resolver: zodResolver(createWorkspaceSchema),
     defaultValues: {
       name: "",
       websiteUrl: "",
-      // redirectTo: "/",
     },
   })
 
@@ -87,20 +93,17 @@ export const CreateWorkspaceForm = ({
           )}
         />
 
-        <div className="mt-6">
-          <DialogFooter>
-            <div className="space-x-4">
-              <Button
-                type="submit"
-                className="w-full"
-                isPending={createWorkspace.status === "executing"}
-                disabled={createWorkspace.status === "executing"}
-              >
-                Create Workspace
-              </Button>
-            </div>
-          </DialogFooter>
-        </div>
+        <DialogFooter className="mt-6">
+          {children}
+
+          <Button
+            type="submit"
+            isPending={createWorkspace.status === "executing"}
+            disabled={createWorkspace.status === "executing"}
+          >
+            Create Workspace
+          </Button>
+        </DialogFooter>
       </form>
     </Form>
   )

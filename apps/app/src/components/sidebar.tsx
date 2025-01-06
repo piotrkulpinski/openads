@@ -10,13 +10,14 @@ import { Suspense } from "react"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { SignOutButton } from "~/components/sign-out-button"
+import { WorkspaceDropdownSkeleton } from "~/components/workspace-dropdown"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 
 export const Sidebar = () => {
   return (
     <div className="sticky top-0 h-dvh z-40 flex flex-col border-r w-12 sm:w-48 lg:w-60">
       <Nav>
-        <Suspense>
+        <Suspense fallback={<WorkspaceDropdownSkeleton />}>
           <WorkspaceMenu />
         </Suspense>
       </Nav>
