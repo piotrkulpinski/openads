@@ -10,16 +10,15 @@ export async function middleware({ url, nextUrl, headers }: NextRequest) {
 
   const session = (await sessionResponse.json()) as Session | null
 
-  if (!session && nextUrl.pathname !== "/login") {
-    const encodedSearchParams = `${nextUrl.pathname.substring(1)}${nextUrl.search}`
-
-    const loginUrl = new URL("/login", url)
-
-    if (encodedSearchParams) {
-      loginUrl.searchParams.append("return_to", encodedSearchParams)
+  // If the user is not authenticated, redirect to the login page
+  if (!session) {
+    if (nextUrl.pathname !== "/login") {
+      const loginUrl = new URL("/login", url)
+      loginUrl.searchParams.append("callbackURL", nextUrl.href)
+      return NextResponse.redirect(loginUrl)
     }
 
-    return NextResponse.redirect(loginUrl)
+    return NextResponse.next()
   }
 
   return NextResponse.next()

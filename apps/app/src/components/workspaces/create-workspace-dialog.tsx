@@ -17,7 +17,7 @@ import { useAction } from "next-safe-action/hooks"
 import { type PropsWithChildren, useState } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
-import { createWorkspaceAction } from "~/actions/create-workspace-action"
+import { createWorkspaceAction } from "~/actions/workspace/create-workspace"
 import { createWorkspaceSchema } from "~/schemas/workspace"
 
 export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {

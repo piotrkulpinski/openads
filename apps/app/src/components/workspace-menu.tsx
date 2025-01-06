@@ -6,15 +6,10 @@ import { auth } from "~/lib/auth/server"
 export const WorkspaceMenu = async () => {
   const session = await auth.api.getSession({ headers: await headers() })
 
-  const workspaces = await db.workspace.findMany({
-    where: {
-      users: {
-        some: {
-          userId: session?.user.id,
-        },
-      },
-    },
-  })
+  const [workspaces, defaultWorkspace] = await Promise.all([
+    db.workspace.findMany({ where: { users: { some: { userId: session?.user.id } } } }),
+    db.workspace.findFirst({ where: { defaultFor: { some: { id: session?.user.id } } } }),
+  ])
 
-  return <WorkspaceDropdown workspaces={workspaces} />
+  return <WorkspaceDropdown workspaces={workspaces} defaultWorkspace={defaultWorkspace} />
 }

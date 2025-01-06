@@ -4,6 +4,7 @@ import { DEFAULT_SERVER_ERROR_MESSAGE, createSafeActionClient } from "next-safe-
 import { headers } from "next/headers"
 import { z } from "zod"
 import { auth } from "~/lib/auth/server"
+import { redis } from "~/services/redis"
 
 export const actionClient = createSafeActionClient({
   handleServerError: (e: Error) => {
@@ -25,10 +26,12 @@ export const actionClientWithMeta = createSafeActionClient({
   },
 
   defineMetadataSchema: () => {
-    return z.object({
-      name: z.string(),
-      track: z.object({ event: z.string(), channel: z.string() }).optional(),
-    })
+    return z
+      .object({
+        name: z.string(),
+        track: z.object({ event: z.string(), channel: z.string() }).optional(),
+      })
+      .optional()
   },
 })
 
@@ -36,7 +39,7 @@ export const authActionClient = actionClientWithMeta
   // Database middleware
   .use(async ({ next }) => {
     return next({
-      ctx: { db },
+      ctx: { db, redis },
     })
   })
 

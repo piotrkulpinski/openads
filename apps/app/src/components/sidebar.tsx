@@ -1,4 +1,3 @@
-import { Button } from "@openads/ui/button"
 import { Separator } from "@openads/ui/separator"
 import {
   CopyrightIcon,
@@ -8,7 +7,6 @@ import {
   ReplaceIcon,
 } from "lucide-react"
 import { Suspense } from "react"
-import { CreateWorkspaceDialog } from "~/components/create-workspace-dialog"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { SignOutButton } from "~/components/sign-out-button"
@@ -56,9 +54,6 @@ export const Sidebar = () => {
           ]}
         />
       </Nav>
-      <CreateWorkspaceDialog>
-        <Button>Create workspace</Button>
-      </CreateWorkspaceDialog>
 
       <Nav className="mt-auto">
         <SignOutButton />

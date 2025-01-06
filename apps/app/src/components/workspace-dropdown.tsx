@@ -1,8 +1,5 @@
 "use client"
 
-import { ChevronsUpDown, Plus } from "lucide-react"
-import { useState } from "react"
-
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
@@ -12,19 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useIsMobile } from "@openads/ui/hooks"
-import { CreateWorkspaceDialog } from "~/components/create-workspace-dialog"
+import { ChevronsUpDown, Plus } from "lucide-react"
+import { changeWorkspaceAction } from "~/actions/workspace/change-workspace"
+import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 
 type WorkspaceDropdownProps = {
   workspaces: Workspace[]
+  defaultWorkspace: Workspace | null
 }
 
-export const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
+export const WorkspaceDropdown = ({ workspaces, defaultWorkspace }: WorkspaceDropdownProps) => {
   const isMobile = useIsMobile()
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | undefined>(workspaces[0])
 
   return (
     <DropdownMenu>
@@ -35,13 +33,13 @@ export const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
           <Avatar className="size-6">
-            <AvatarImage src={activeWorkspace?.faviconUrl ?? undefined} />
-            <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={defaultWorkspace?.faviconUrl ?? undefined} />
+            <AvatarFallback>{defaultWorkspace?.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{activeWorkspace?.name}</span>
-            {/* <span className="truncate text-xs">{activeWorkspace?.plan}</span> */}
+            <span className="truncate font-semibold">{defaultWorkspace?.name}</span>
+            {/* <span className="truncate text-xs">{defaultWorkspace?.plan}</span> */}
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </Button>
@@ -55,18 +53,19 @@ export const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
       >
         <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
 
-        {workspaces.map((workspace, index) => (
+        {workspaces.map(workspace => (
           <DropdownMenuItem
             key={workspace.name}
-            onClick={() => setActiveWorkspace(workspace)}
+            onClick={() => changeWorkspaceAction({ workspaceId: workspace.id, redirectTo: "/" })}
             className="gap-2 p-2"
+            disabled={workspace.id === defaultWorkspace?.id}
           >
             <Avatar className="size-6">
               <AvatarImage src={workspace.faviconUrl ?? undefined} />
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
             {workspace.name}
-            <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+            {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
           </DropdownMenuItem>
         ))}
 
@@ -75,7 +74,7 @@ export const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
         <CreateWorkspaceDialog>
           <DropdownMenuItem className="gap-2 p-2" onSelect={e => e.preventDefault()}>
             <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-              <Plus className="size-4" />
+              <Plus />
             </div>
             Create workspace
           </DropdownMenuItem>

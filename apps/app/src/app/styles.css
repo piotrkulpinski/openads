@@ -8,7 +8,7 @@
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
   --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(0 0% 3.9%);
+  --color-foreground: hsl(107 24% 15%);
   --color-border: hsl(0 0% 89.8%);
   --color-input: hsl(0 0% 89.8%);
   --color-ring: hsl(0 0% 75.9%);
@@ -19,8 +19,8 @@
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(0 0% 3.9%);
 
-  --color-primary: hsl(0 0% 9%);
-  --color-primary-foreground: hsl(0 0% 98%);
+  --color-primary: hsl(107 24% 15%);
+  --color-primary-foreground: hsl(93 82% 97.5%);
 
   --color-secondary: hsl(0 0% 96.1%);
   --color-secondary-foreground: hsl(0 0% 9%);
@@ -29,7 +29,7 @@
   --color-muted-foreground: hsl(0 0% 45.1%);
 
   --color-accent: hsl(0 0% 96.1%);
-  --color-accent-foreground: hsl(0 0% 9%);
+  --color-accent-foreground: hsl(107 24% 15%);
 
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(0 0% 98%);
@@ -144,10 +144,6 @@
   input[type="search"]::-ms-clear {
     display: none;
   }
-}
-
-svg.lucide:not([class*="stroke"]) {
-  @apply stroke-[1.75]!;
 }
 
 svg.lucide:not([class*="size-"]):not([class*="h-"]) {

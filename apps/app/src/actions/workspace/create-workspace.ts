@@ -38,5 +38,5 @@ export const createWorkspaceAction = authActionClient
     //   redirect(redirectTo)
     // }
 
-    return workspace.id
+    return workspace.slug
   })

@@ -6,3 +6,10 @@ export const createWorkspaceSchema = z.object({
 })
 
 export type CreateWorkspaceSchema = z.infer<typeof createWorkspaceSchema>
+
+export const changeWorkspaceSchema = z.object({
+  workspaceId: z.string().min(1, { message: "Workspace ID is required" }),
+  redirectTo: z.string(),
+})
+
+export type ChangeWorkspaceSchema = z.infer<typeof changeWorkspaceSchema>

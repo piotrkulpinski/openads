@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}>
-      <body className="font-sans antialiased">
+      <body className="flex flex-col min-h-dvh font-sans antialiased">
         {children}
         <Analytics />
       </body>
