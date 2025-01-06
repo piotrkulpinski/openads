@@ -8,6 +8,7 @@ export const WorkspaceMenu = async () => {
 
   const workspaces = await db.workspace.findMany({
     where: { users: { some: { userId: session?.user.id } } },
+    orderBy: { createdAt: "asc" },
   })
 
   return <WorkspaceDropdown workspaces={workspaces} />

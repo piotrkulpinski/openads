@@ -1,10 +1,10 @@
 import { Separator } from "@openads/ui/separator"
 import {
-  CopyrightIcon,
-  GalleryHorizontalEndIcon,
-  GemIcon,
+  CalendarDays,
+  ChartSpline,
   LayoutDashboardIcon,
-  ReplaceIcon,
+  Megaphone,
+  MousePointer2,
 } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
@@ -43,24 +43,24 @@ export const Sidebar = () => {
               prefix: <LayoutDashboardIcon />,
             },
             {
-              title: "Tools",
-              href: "/tools",
-              prefix: <GemIcon />,
+              title: "Ad Spots",
+              href: "#cc",
+              prefix: <MousePointer2 />,
             },
             {
-              title: "Alternatives",
-              href: "/alternatives",
-              prefix: <ReplaceIcon />,
+              title: "Bookings",
+              href: "#",
+              prefix: <CalendarDays />,
             },
             {
-              title: "Categories",
-              href: "/categories",
-              prefix: <GalleryHorizontalEndIcon />,
+              title: "Advertisers",
+              href: "#",
+              prefix: <Megaphone />,
             },
             {
-              title: "Licenses",
-              href: "/licenses",
-              prefix: <CopyrightIcon />,
+              title: "Analytics",
+              href: "#",
+              prefix: <ChartSpline />,
             },
           ]}
         />

@@ -1,5 +1,6 @@
 "use client"
 
+import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
@@ -9,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useIsMobile } from "@openads/ui/hooks"
@@ -28,16 +30,23 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
   const router = useRouter()
   const activeWorkspace = workspaces.find(w => w.slug === params.workspace)
 
+  useHotkeys(
+    workspaces.map((workspace, index) => [
+      `mod+${index + 1}`,
+      () => router.push(`/${workspace.slug}`),
+    ]),
+  )
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="outline">
-          <Avatar className="size-6">
+        <Button size="sm" variant="outline" className="px-4 py-2.5">
+          <Avatar className="size-4">
             <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
             <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
-          <div className="grid flex-1 text-left text-sm leading-tight">
+          <div className="grid flex-1 text-left text-sm leading-none">
             <span className="truncate font-semibold">{activeWorkspace?.name}</span>
             {/* <span className="truncate text-xs">{activeWorkspace?.plan}</span> */}
           </div>
@@ -53,7 +62,7 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
       >
         <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
 
-        {workspaces.map(workspace => (
+        {workspaces.map((workspace, index) => (
           <DropdownMenuItem
             key={workspace.name}
             onClick={() => router.push(`/${workspace.slug}`)}
@@ -65,7 +74,7 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
             {workspace.name}
-            {/* <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut> */}
+            <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
           </DropdownMenuItem>
         ))}
 
@@ -86,8 +95,8 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
 
 const WorkspaceDropdownSkeleton = () => {
   return (
-    <Button size="sm" variant="outline" disabled>
-      <Skeleton className="size-6 rounded-full" />
+    <Button size="sm" variant="outline" className="px-4 py-2.5" disabled>
+      <Skeleton className="size-4 rounded-full" />
 
       <div className="grid flex-1 text-left text-sm leading-tight">
         <Skeleton className="h-4 w-24" />

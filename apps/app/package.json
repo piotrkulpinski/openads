@@ -11,6 +11,7 @@
   "dependencies": {
     "@curiousleaf/utils": "^1.0.41",
     "@hookform/resolvers": "^3.9.1",
+    "@mantine/hooks": "^7.15.2",
     "@openads/db": "workspace:*",
     "@openads/events": "workspace:*",
     "@openads/ui": "workspace:*",
