@@ -16,6 +16,7 @@ import { Skeleton } from "@openads/ui/skeleton"
 import { ChevronsUpDown, Plus } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
+import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 type WorkspaceDropdownProps = {
   workspaces: Workspace[]
@@ -32,7 +33,7 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
       <DropdownMenuTrigger asChild>
         <Button size="sm" variant="outline">
           <Avatar className="size-6">
-            <AvatarImage src={activeWorkspace?.faviconUrl ?? undefined} />
+            <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
             <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
@@ -60,7 +61,7 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
             disabled={workspace.id === activeWorkspace?.id}
           >
             <Avatar className="size-6">
-              <AvatarImage src={workspace.faviconUrl ?? undefined} />
+              <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
             {workspace.name}
