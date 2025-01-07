@@ -4,9 +4,17 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "hono": "^4.6.15"
+    "@hono/trpc-server": "^0.1.0",
+    "@hono/zod-validator": "^0.1.11",
+    "@openads/db": "workspace:*",
+    "@t3-oss/env-core": "^0.11.1",
+    "@trpc/server": "^10.45.0",
+    "better-auth": "latest",
+    "hono": "^4.6.15",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@openads/tsconfig": "workspace:*",
     "@types/bun": "latest"
   }
 }

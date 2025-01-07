@@ -1,7 +1,7 @@
 {
+  "extends": "@openads/tsconfig/react-library.json",
   "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "paths": { "~/*": ["./src/*"] }
   }
 }
