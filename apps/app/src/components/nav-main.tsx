@@ -5,7 +5,7 @@ import { Button, type ButtonProps } from "@openads/ui/button"
 import { useIsMobile } from "@openads/ui/hooks"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui/tooltip"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import type { ComponentProps, ReactNode } from "react"
 
 type NavMainLink = ButtonProps & {
@@ -21,7 +21,8 @@ type NavMainProps = ComponentProps<"nav"> & {
 export const NavMain = ({ className, links, ...props }: NavMainProps) => {
   const pathname = usePathname()
   const isMobile = useIsMobile()
-  const rootPath = "/admin"
+  const { workspace } = useParams()
+  const rootPath = `/${workspace}`
 
   const getButtonVariant = (href: string) => {
     if (

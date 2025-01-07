@@ -5,6 +5,7 @@ import {
   LayoutDashboardIcon,
   Megaphone,
   MousePointer2,
+  Settings,
 } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
@@ -15,7 +16,11 @@ import { UserMenu } from "~/components/user-menu"
 import { WorkspaceDropdownSkeleton } from "~/components/workspace-dropdown"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 
-export const Sidebar = () => {
+type SidebarProps = {
+  workspace: string
+}
+
+export const Sidebar = ({ workspace }: SidebarProps) => {
   return (
     <div className="sticky top-0 h-dvh z-40 flex flex-col border-r w-12 sm:w-48 lg:w-60">
       <Nav className="flex-row justify-between px-6">
@@ -39,28 +44,33 @@ export const Sidebar = () => {
           links={[
             {
               title: "Dashboard",
-              href: "/",
+              href: `/${workspace}`,
               prefix: <LayoutDashboardIcon />,
             },
             {
               title: "Ad Spots",
-              href: "#cc",
+              href: `/${workspace}/spots`,
               prefix: <MousePointer2 />,
             },
             {
               title: "Bookings",
-              href: "#",
+              href: `/${workspace}/bookings`,
               prefix: <CalendarDays />,
             },
             {
               title: "Advertisers",
-              href: "#",
+              href: `/${workspace}/advertisers`,
               prefix: <Megaphone />,
             },
             {
               title: "Analytics",
-              href: "#",
+              href: `/${workspace}/analytics`,
               prefix: <ChartSpline />,
+            },
+            {
+              title: "Settings",
+              href: `/${workspace}/settings`,
+              prefix: <Settings />,
             },
           ]}
         />
