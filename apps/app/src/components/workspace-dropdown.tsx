@@ -34,7 +34,7 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
   const changeWorkspace = (workspace?: Workspace) => {
     if (!workspace || workspace.slug === params.workspace) return
 
-    router.push(`/${workspace.slug}${pathname.replace(`/${params.workspace}`, "")}`)
+    router.push(pathname.replace(`/${params.workspace}`, `/${workspace.slug}`))
   }
 
   useHotkeys(
