@@ -153,8 +153,8 @@ const DropdownMenuSeparator = ({
   />
 )
 
-const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<"span">) => (
-  <span
+const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<"kbd">) => (
+  <kbd
     className={cx("ml-auto text-xs tracking-widest tabular-nums opacity-60", className)}
     {...props}
   />

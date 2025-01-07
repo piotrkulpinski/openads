@@ -16,7 +16,7 @@ import {
 import { useIsMobile } from "@openads/ui/hooks"
 import { Skeleton } from "@openads/ui/skeleton"
 import { ChevronsUpDown, Plus } from "lucide-react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, usePathname, useRouter } from "next/navigation"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
@@ -28,27 +28,34 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
   const isMobile = useIsMobile()
   const params = useParams()
   const router = useRouter()
+  const pathname = usePathname()
   const activeWorkspace = workspaces.find(w => w.slug === params.workspace)
 
+  const changeWorkspace = (workspace?: Workspace) => {
+    if (!workspace || workspace.slug === params.workspace) return
+
+    router.push(`/${workspace.slug}${pathname.replace(`/${params.workspace}`, "")}`)
+  }
+
   useHotkeys(
-    workspaces.map((workspace, index) => [
+    [...Array(9).keys()].map(index => [
       `mod+${index + 1}`,
-      () => router.push(`/${workspace.slug}`),
+      e => changeWorkspace(workspaces[Number.parseInt(e.key) - 1]),
     ]),
   )
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="outline" className="px-4 py-2.5">
-          <Avatar className="size-4">
+        <Button size="sm" variant="outline" className="gap-2">
+          <Avatar className="size-7">
             <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
             <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
           </Avatar>
 
-          <div className="grid flex-1 text-left text-sm leading-none">
-            <span className="truncate font-semibold">{activeWorkspace?.name}</span>
-            {/* <span className="truncate text-xs">{activeWorkspace?.plan}</span> */}
+          <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
+            <span className="truncate font-medium">{activeWorkspace?.name}</span>
+            <span className="truncate text-xs text-muted-foreground/75 font-normal">Free</span>
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </Button>
@@ -65,16 +72,21 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
         {workspaces.map((workspace, index) => (
           <DropdownMenuItem
             key={workspace.name}
-            onClick={() => router.push(`/${workspace.slug}`)}
+            onClick={() => changeWorkspace(workspace)}
             className="gap-2 p-2"
             disabled={workspace.id === activeWorkspace?.id}
           >
-            <Avatar className="size-6">
+            <Avatar className="size-7">
               <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
-            {workspace.name}
-            <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+
+            <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
+              <span className="truncate font-medium">{workspace.name}</span>
+              <span className="truncate text-xs text-muted-foreground/75 font-normal">Free</span>
+            </div>
+
+            {index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
           </DropdownMenuItem>
         ))}
 
@@ -95,11 +107,12 @@ const WorkspaceDropdown = ({ workspaces }: WorkspaceDropdownProps) => {
 
 const WorkspaceDropdownSkeleton = () => {
   return (
-    <Button size="sm" variant="outline" className="px-4 py-2.5" disabled>
-      <Skeleton className="size-4 rounded-full" />
+    <Button size="sm" variant="outline" className="gap-2" disabled>
+      <Skeleton className="size-7 rounded-full" />
 
-      <div className="grid flex-1 text-left text-sm leading-tight">
+      <div className="grid gap-0.5 flex-1 text-left text-sm leading-tight">
         <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-3.5 w-16" />
       </div>
 
       <ChevronsUpDown className="ml-auto size-4" />
