@@ -27,4 +27,12 @@ export const auth = betterAuth({
       maxAge: 5 * 60,
     },
   },
+
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+    },
+  },
+
+  trustedOrigins: ["http://localhost:5173"],
 })

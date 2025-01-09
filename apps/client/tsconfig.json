@@ -1,7 +1,7 @@
 {
   "extends": "@openads/tsconfig/react-library.json",
+  "references": [{ "path": "../api" }],
   "compilerOptions": {
-    "jsxImportSource": "hono/jsx",
     "composite": true,
     "incremental": true,
     "paths": { "~/*": ["./src/*"] }
