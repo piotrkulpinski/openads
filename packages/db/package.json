@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./index.ts",
-    "./client": "./client.ts"
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts",
+    "./schema": "./src/schema/index.ts"
   },
   "scripts": {
     "db:generate": "prisma generate --no-hints",
@@ -14,7 +15,8 @@
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@prisma/client": "^6.2.0"
+    "@prisma/client": "^6.2.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",

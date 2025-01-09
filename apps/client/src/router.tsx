@@ -1,4 +1,5 @@
 import { Provider as Analytics } from "@openads/events/client"
+import { TooltipProvider } from "@openads/ui/tooltip"
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router"
 import { Toaster } from "~/components/toaster"
 import { env } from "~/env"
@@ -21,26 +22,30 @@ const Layout = () => {
     return <Navigate to="/login" replace />
   }
 
-  return <Outlet />
+  return (
+    <TRPCProvider>
+      <TooltipProvider delayDuration={250}>
+        <Outlet />
+      </TooltipProvider>
+    </TRPCProvider>
+  )
 }
 
 export default function Router() {
   return (
     <BrowserRouter>
-      <TRPCProvider>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route element={<AuthLayout />}>
-              <Route path="/login" element={<LoginPage />} />
-            </Route>
-
-            <Route element={<DashboardLayout />}>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-            </Route>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<LoginPage />} />
           </Route>
-        </Routes>
-      </TRPCProvider>
+
+          <Route element={<DashboardLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
+        </Route>
+      </Routes>
 
       <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
       <Toaster />

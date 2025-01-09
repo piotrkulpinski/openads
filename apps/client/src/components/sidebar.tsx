@@ -8,7 +8,7 @@ import {
   MousePointer2,
   Settings,
 } from "lucide-react"
-import type { ComponentProps } from "react"
+import type { HTMLProps } from "react"
 import { Link } from "react-router"
 import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
@@ -16,7 +16,7 @@ import { NavMain } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 
-export const Sidebar = ({ className, ...props }: ComponentProps<"div">) => {
+export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   return (
     <div
       className={cx(

@@ -5,7 +5,7 @@ import { trpc } from "../lib/trpc"
 
 export default function DashboardPage() {
   const { data: session } = useSession()
-  const { data: userData, isLoading } = trpc.user.me.useQuery()
+  const { data: userId, isLoading } = trpc.user.me.useQuery()
 
   if (!session?.user) {
     return <Navigate to="/login" replace />
@@ -26,10 +26,7 @@ export default function DashboardPage() {
             <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
             <div className="space-y-2">
               <p>
-                <strong>ID:</strong> {userData?.id}
-              </p>
-              <p>
-                <strong>Email:</strong> {userData?.email}
+                <strong>ID:</strong> {userId}
               </p>
             </div>
           </div>
