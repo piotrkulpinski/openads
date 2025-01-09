@@ -4,9 +4,6 @@
 @source "../../../packages/ui/src/components";
 
 @theme {
-  --font-system: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-
   --color-background: hsl(0 0% 100%);
   --color-foreground: hsl(107 24% 15%);
   --color-border: hsl(0 0% 89.8%);
@@ -40,9 +37,9 @@
   --color-chart-4: hsl(43 74% 66%);
   --color-chart-5: hsl(27 87% 67%);
 
-  --font-sans: var(--font-geist-sans), var(--font-system);
-  --font-display: var(--font-geist-sans), var(--font-system);
-  --font-mono: var(--font-geist-mono), var(--font-system);
+  --font-sans: "Geist", sans-serif;
+  --font-display: "Geist", sans-serif;
+  --font-mono: "Geist Mono", monospace;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;

@@ -1,5 +1,6 @@
 import { Navigate } from "react-router"
-import { signIn, useSession } from "../lib/auth"
+import { LoginButton } from "~/components/auth/login-button"
+import { useSession } from "../lib/auth"
 
 export default function LoginPage() {
   const { data: session } = useSession()
@@ -13,9 +14,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full p-6">
         <h1 className="text-2xl font-bold mb-6">Sign In</h1>
 
-        <button type="button" onClick={() => signIn.social({ provider: "google" })}>
-          Sign in with Google
-        </button>
+        <LoginButton provider="google" />
       </div>
     </div>
   )
