@@ -3,7 +3,7 @@ import { protectedProcedure, router } from "~/trpc"
 
 export const userRouter = router({
   me: protectedProcedure.query(({ ctx }) => {
-    return ctx.user
+    return ctx.userId
   }),
 
   update: protectedProcedure
@@ -14,7 +14,7 @@ export const userRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.user.update({
-        where: { id: ctx.user.id },
+        where: { id: ctx.userId },
         data: input,
       })
     }),

@@ -8,7 +8,7 @@ model Workspace {
   updatedAt  DateTime @updatedAt
 
   // Relations
-  users      WorkspaceUser[]
+  members    WorkspaceMember[]
   defaultFor User[]
   spots      Spot[]
   bookings   Booking[]
@@ -17,16 +17,16 @@ model Workspace {
   @@unique([name, slug])
 }
 
-enum WorkspaceUserRole {
+enum WorkspaceMemberRole {
   Owner
   Manager
   Advertiser
 }
 
-model WorkspaceUser {
+model WorkspaceMember {
   userId      String
   workspaceId String
-  role        WorkspaceUserRole @default(Owner)
+  role        WorkspaceMemberRole @default(Owner)
 
   // Relations
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)

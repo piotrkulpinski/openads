@@ -14,6 +14,7 @@ import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
+import { WorkspaceMenu } from "~/components/workspace-menu"
 
 export const Sidebar = ({ className, ...props }: ComponentProps<"div">) => {
   return (
@@ -34,11 +35,9 @@ export const Sidebar = ({ className, ...props }: ComponentProps<"div">) => {
 
       <Separator />
 
-      {/* <Nav>
-        <Suspense fallback={<WorkspaceDropdownSkeleton />}>
-          <WorkspaceMenu />
-        </Suspense>
-      </Nav> */}
+      <Nav>
+        <WorkspaceMenu />
+      </Nav>
 
       <Nav>
         <NavMain
