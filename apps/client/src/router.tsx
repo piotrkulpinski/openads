@@ -30,6 +30,7 @@ export default function Router() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<LoginPage />} />
             </Route>
+
             <Route element={<DashboardLayout />}>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />

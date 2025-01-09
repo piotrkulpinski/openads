@@ -2,9 +2,10 @@ import { Provider as Analytics } from "@openads/events/client"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import type { PropsWithChildren } from "react"
-import { siteConfig } from "~/config/site"
-import "./styles.css"
 import { Toaster } from "~/components/toaster"
+import { siteConfig } from "~/config/site"
+
+import "./styles.css"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
