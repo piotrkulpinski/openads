@@ -1,19 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { workspaceSchema } from "@openads/db/schema"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { useAction } from "next-safe-action/hooks"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import type { z } from "zod"
-import { createWorkspaceAction } from "~/actions/workspace/create-workspace"
-import { createWorkspaceSchema } from "~/schemas/workspace"
+import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { getDefaults } from "~/lib/zod"
 
 type CreateWorkspaceFormProps = HTMLProps<HTMLFormElement> & {
-  onSuccess?: (data: Awaited<ReturnType<typeof createWorkspaceAction>>) => void
+  onSuccess?: (data: RouterOutputs["workspace"]["create"]) => void
 }
 
 export const CreateWorkspaceForm = ({
@@ -21,26 +20,31 @@ export const CreateWorkspaceForm = ({
   className,
   onSuccess,
 }: CreateWorkspaceFormProps) => {
-  const createWorkspace = useAction(createWorkspaceAction, {
-    onSuccess,
+  const apiUtils = trpc.useUtils()
 
-    onError: ({ error }) => {
-      toast.error(error.serverError)
-    },
+  const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
+    onSuccess,
+    //   handleSuccess({
+    //     redirect: `/app/${slug}`,
+    //     success: "Workspace created successfully",
+    //   })
+
+    //   // Invalidate the workspaces cache
+    //   await apiUtils.workspace.getAll.invalidate()
+    // },
+
+    // onError: error => handleError({ error, form }),
   })
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
-    defaultValues: {
-      name: "",
-      websiteUrl: "",
-    },
+  const form = useForm<z.infer<typeof workspaceSchema>>({
+    resolver: zodResolver(workspaceSchema),
+    values: getDefaults(workspaceSchema),
   })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(createWorkspace.execute)}
+        onSubmit={form.handleSubmit(data => createWorkspace(data))}
         className={cx("space-y-4", className)}
         noValidate
       >
@@ -94,11 +98,7 @@ export const CreateWorkspaceForm = ({
         <DialogFooter className="mt-6">
           {children}
 
-          <Button
-            type="submit"
-            isPending={createWorkspace.status === "executing"}
-            disabled={createWorkspace.status === "executing"}
-          >
+          <Button type="submit" isPending={isPending} disabled={isPending}>
             Create Workspace
           </Button>
         </DialogFooter>

@@ -6,11 +6,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Skeleton } from "@openads/ui/skeleton"
-import { ChevronsUpDown } from "lucide-react"
+import { ChevronsUpDown, Plus } from "lucide-react"
+import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { trpc } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
@@ -98,7 +100,7 @@ export const WorkspaceMenu = () => {
           </DropdownMenuItem>
         ))}
 
-        {/* <DropdownMenuSeparator />
+        <DropdownMenuSeparator />
 
         <CreateWorkspaceDialog>
           <DropdownMenuItem className="gap-2 p-2" onSelect={e => e.preventDefault()}>
@@ -107,7 +109,7 @@ export const WorkspaceMenu = () => {
             </div>
             Create workspace
           </DropdownMenuItem>
-        </CreateWorkspaceDialog> */}
+        </CreateWorkspaceDialog>
       </DropdownMenuContent>
     </DropdownMenu>
   )
