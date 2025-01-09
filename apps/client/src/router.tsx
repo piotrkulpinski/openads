@@ -1,4 +1,7 @@
+import { Provider as Analytics } from "@openads/events/client"
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router"
+import { Toaster } from "~/components/toaster"
+import { env } from "~/env"
 import AuthLayout from "~/layouts/auth"
 import DashboardLayout from "~/layouts/dashboard"
 import { useSession } from "~/lib/auth"
@@ -38,6 +41,9 @@ export default function Router() {
           </Route>
         </Routes>
       </TRPCProvider>
+
+      <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
+      <Toaster />
     </BrowserRouter>
   )
 }

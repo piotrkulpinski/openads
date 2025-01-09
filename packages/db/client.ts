@@ -1,2 +1,2 @@
 export * from "@prisma/client"
-export { WorkspaceUserRole, FieldType, Prisma } from "@prisma/client"
+export { WorkspaceMemberRole, FieldType, Prisma } from "@prisma/client"

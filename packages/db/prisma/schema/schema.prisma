@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["fullTextSearchPostgres", "driverAdapters", "prismaSchemaFolder", "omitApi"]
+  previewFeatures = ["fullTextSearchPostgres", "driverAdapters", "prismaSchemaFolder"]
 }
 
 datasource db {
@@ -22,7 +22,7 @@ model User {
   accounts     Account[]
   sessions     Session[]
   subscription Subscription?
-  workspaces   WorkspaceUser[]
+  workspaces   WorkspaceMember[]
 
   defaultWorkspaceId String? // id of the user's default workspace
   defaultWorkspace   Workspace? @relation(fields: [defaultWorkspaceId], references: [id])

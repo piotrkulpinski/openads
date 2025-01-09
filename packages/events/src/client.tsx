@@ -2,9 +2,9 @@ import { OpenPanelComponent, type PostEventPayload, useOpenPanel } from "@openpa
 
 const isProd = process.env.NODE_ENV === "production"
 
-const Provider = () => (
+const Provider = ({ clientId }: { clientId: string }) => (
   <OpenPanelComponent
-    clientId={process.env.NEXT_PUBLIC_OPENPANEL_CLIENT_ID ?? ""}
+    clientId={clientId}
     trackAttributes={true}
     trackScreenViews={isProd}
     trackOutgoingLinks={isProd}

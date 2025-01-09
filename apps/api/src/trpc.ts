@@ -32,7 +32,7 @@ export const protectedProcedure = publicProcedure.use(
     return next({
       ctx: {
         ...ctx,
-        user: ctx.auth.user,
+        userId: ctx.auth.user.id,
       },
     })
   }),
