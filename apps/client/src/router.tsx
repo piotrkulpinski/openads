@@ -1,10 +1,12 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "react-router"
+import AuthLayout from "~/layouts/auth"
+import DashboardLayout from "~/layouts/dashboard"
 import { useSession } from "~/lib/auth"
 import DashboardPage from "./app/dashboard"
 import LoginPage from "./app/login"
 import { TRPCProvider } from "./providers/app"
 
-const AuthLayout = () => {
+const Layout = () => {
   const { data: auth, isPending } = useSession()
   const { pathname } = useLocation()
 
@@ -19,15 +21,19 @@ const AuthLayout = () => {
   return <Outlet />
 }
 
-export default function App() {
+export default function Router() {
   return (
     <BrowserRouter>
       <TRPCProvider>
         <Routes>
-          <Route element={<AuthLayout />}>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/" element={<DashboardPage />} />
+          <Route element={<Layout />}>
+            <Route element={<AuthLayout />}>
+              <Route path="/login" element={<LoginPage />} />
+            </Route>
+            <Route element={<DashboardLayout />}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+            </Route>
           </Route>
         </Routes>
       </TRPCProvider>
