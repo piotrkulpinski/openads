@@ -13,10 +13,9 @@ export const userRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // TODO: Implement user update logic
-      return {
-        ...ctx.user,
-        ...input,
-      }
+      return ctx.db.user.update({
+        where: { id: ctx.user.id },
+        data: input,
+      })
     }),
 })

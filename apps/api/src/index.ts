@@ -1,20 +1,23 @@
 import { trpcServer } from "@hono/trpc-server"
 import { Hono } from "hono"
-import { cors } from "hono/cors"
 import { showRoutes } from "hono/dev"
+import { logger } from "hono/logger"
 import { env } from "~/env"
 import { auth } from "~/lib/auth"
+import { corsMiddleware } from "~/middleware/cors"
+import { onError } from "~/middleware/on-error"
+import { createContext } from "~/trpc"
 import { appRouter } from "~/trpc/index"
 
 const app = new Hono()
 
-app.use("*", cors())
 app.get("/", c => c.text("OpenAds API"))
-app.use("/trpc/*", trpcServer({ router: appRouter }))
+app.use("*", logger())
+app.use("*", corsMiddleware)
+app.use("/trpc/*", trpcServer({ router: appRouter, createContext }))
+app.on(["POST", "GET"], "/api/auth/**", c => auth.handler(c.req.raw))
 
-app.on(["POST", "GET"], "/auth/**", c => {
-  return auth.handler(c.req.raw)
-})
+app.onError(onError)
 
 if (env.NODE_ENV === "development") {
   showRoutes(app, { verbose: true, colorize: true })
