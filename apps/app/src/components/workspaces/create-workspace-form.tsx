@@ -1,21 +1,21 @@
-"use client"
-
+import { slugify } from "@curiousleaf/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { workspaceSchema } from "@openads/db/schema"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { useAction } from "next-safe-action/hooks"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import type { z } from "zod"
-import { createWorkspaceAction } from "~/actions/workspace/create-workspace"
-import { createWorkspaceSchema } from "~/schemas/workspace"
+import { useComputedField } from "~/hooks/use-computed-field"
+import { useMutationHandler } from "~/hooks/use-mutation-handler"
+import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { getDefaults } from "~/lib/zod"
 
 type CreateWorkspaceFormProps = HTMLProps<HTMLFormElement> & {
-  onSuccess?: (data: Awaited<ReturnType<typeof createWorkspaceAction>>) => void
+  onSuccess?: (data: RouterOutputs["workspace"]["create"]) => void
 }
 
 export const CreateWorkspaceForm = ({
@@ -23,27 +23,38 @@ export const CreateWorkspaceForm = ({
   className,
   onSuccess,
 }: CreateWorkspaceFormProps) => {
-  const createWorkspace = useAction(createWorkspaceAction, {
-    onSuccess,
+  const apiUtils = trpc.useUtils()
+  const { handleError } = useMutationHandler()
 
-    onError: ({ error }) => {
-      toast.error(error.serverError)
+  const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
+    onSuccess: async data => {
+      onSuccess?.(data)
+
+      // Invalidate the workspaces cache
+      await apiUtils.workspace.getAll.invalidate()
     },
+
+    onError: error => handleError({ error, form }),
   })
 
-  const form = useForm<z.infer<typeof createWorkspaceSchema>>({
-    resolver: zodResolver(createWorkspaceSchema),
-    defaultValues: {
-      name: "",
-      websiteUrl: "",
-    },
+  const form = useForm<z.infer<typeof workspaceSchema>>({
+    resolver: zodResolver(workspaceSchema),
+    values: getDefaults(workspaceSchema),
+  })
+
+  // Set the slug based on the name
+  useComputedField({
+    form,
+    sourceField: "name",
+    computedField: "slug",
+    callback: slugify,
   })
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(createWorkspace.execute)}
-        className={cx("space-y-4", className)}
+        onSubmit={form.handleSubmit(data => createWorkspace(data))}
+        className={cx("grid gap-4 sm:grid-cols-2", className)}
         noValidate
       >
         <FormField
@@ -72,20 +83,12 @@ export const CreateWorkspaceForm = ({
 
         <FormField
           control={form.control}
-          name="websiteUrl"
+          name="slug"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Website URL:</FormLabel>
+              <FormLabel>Slug:</FormLabel>
               <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://acme.com"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck="false"
-                  {...field}
-                />
+                <Input placeholder="acme" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -93,14 +96,25 @@ export const CreateWorkspaceForm = ({
           )}
         />
 
-        <DialogFooter className="mt-6">
+        <FormField
+          control={form.control}
+          name="websiteUrl"
+          render={({ field }) => (
+            <FormItem className="col-span-full">
+              <FormLabel>Website URL:</FormLabel>
+              <FormControl>
+                <Input type="url" placeholder="https://acme.com" {...field} />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <DialogFooter className="mt-2 col-span-full">
           {children}
 
-          <Button
-            type="submit"
-            isPending={createWorkspace.status === "executing"}
-            disabled={createWorkspace.status === "executing"}
-          >
+          <Button type="submit" isPending={isPending} disabled={isPending}>
             Create Workspace
           </Button>
         </DialogFooter>

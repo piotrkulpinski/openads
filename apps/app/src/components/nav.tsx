@@ -1,5 +1,5 @@
+import { cx } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
-import { cx } from "~/utils/cva"
 
 export const Nav = ({ className, ...props }: ComponentProps<"nav">) => {
   return (

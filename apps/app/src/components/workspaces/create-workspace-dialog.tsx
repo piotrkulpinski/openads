@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@openads/ui/button"
 import {
   Dialog,
@@ -31,7 +29,7 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
         <CreateWorkspaceForm
           onSuccess={() => {
             onOpenChange(false)
-            toast.success("Workspace created")
+            toast.success("Workspace created successfully")
           }}
         >
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

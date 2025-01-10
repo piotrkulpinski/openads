@@ -1,4 +1,5 @@
 export const siteConfig = {
+  url: "https://openads.co",
   name: "OpenAds",
   tagline: "A platform for creating and managing ads for your business.",
   description:
