@@ -1,5 +1,6 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
 import { workspaceSchema } from "@openads/db/schema"
+import { generateId } from "~/lib/ids"
 import { protectedProcedure, router } from "~/trpc"
 
 export const workspaceRouter = router({
@@ -17,6 +18,7 @@ export const workspaceRouter = router({
       const workspace = await db.workspace.create({
         data: {
           ...data,
+          id: generateId("workspace"),
           members: { create: { userId, role: WorkspaceMemberRole.Owner } },
         },
       })

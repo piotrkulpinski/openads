@@ -1,6 +1,5 @@
-import { Button } from "@openads/ui/button"
 import { Navigate } from "react-router"
-import { signOut, useSession } from "../lib/auth"
+import { useSession } from "../lib/auth"
 import { trpc } from "../lib/trpc"
 
 export default function DashboardPage() {
@@ -11,27 +10,5 @@ export default function DashboardPage() {
     return <Navigate to="/login" replace />
   }
 
-  return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <Button onClick={() => signOut()}>Sign Out</Button>
-        </div>
-
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
-            <div className="space-y-2">
-              <p>
-                <strong>ID:</strong> {userId}
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
+  return "Dashboard"
 }

@@ -9,8 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@curiousleaf/utils": "^1.0.41",
     "@hookform/resolvers": "^3.9.1",
     "@mantine/hooks": "^7.15.2",
+    "@openads/api": "workspace:*",
     "@openads/events": "workspace:*",
     "@openads/ui": "workspace:*",
     "@t3-oss/env-core": "^0.11.1",

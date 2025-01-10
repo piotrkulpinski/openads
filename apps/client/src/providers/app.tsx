@@ -11,7 +11,7 @@ const queryClientConfig: QueryClientConfig = {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       retry: false,
-      staleTime: 30_000, // 30 seconds
+      // staleTime: 30_000, // 30 seconds
     },
   },
 }

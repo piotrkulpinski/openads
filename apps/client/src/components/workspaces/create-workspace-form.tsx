@@ -1,3 +1,4 @@
+import { slugify } from "@curiousleaf/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { workspaceSchema } from "@openads/db/schema"
 import { Button } from "@openads/ui/button"
@@ -8,6 +9,8 @@ import { Input } from "@openads/ui/input"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
+import { useComputedField } from "~/hooks/useComputedField"
+import { useMutationHandler } from "~/hooks/useMutationHandler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
 
@@ -21,19 +24,21 @@ export const CreateWorkspaceForm = ({
   onSuccess,
 }: CreateWorkspaceFormProps) => {
   const apiUtils = trpc.useUtils()
+  const { handleSuccess, handleError } = useMutationHandler()
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
-    onSuccess,
-    //   handleSuccess({
-    //     redirect: `/app/${slug}`,
-    //     success: "Workspace created successfully",
-    //   })
+    onSuccess: async data => {
+      onSuccess?.(data)
 
-    //   // Invalidate the workspaces cache
-    //   await apiUtils.workspace.getAll.invalidate()
-    // },
+      handleSuccess({
+        success: "Workspace created successfully",
+      })
 
-    // onError: error => handleError({ error, form }),
+      // Invalidate the workspaces cache
+      await apiUtils.workspace.getAll.invalidate()
+    },
+
+    onError: error => handleError({ error, form }),
   })
 
   const form = useForm<z.infer<typeof workspaceSchema>>({
@@ -41,11 +46,19 @@ export const CreateWorkspaceForm = ({
     values: getDefaults(workspaceSchema),
   })
 
+  // Set the slug based on the name
+  useComputedField({
+    form,
+    sourceField: "name",
+    computedField: "slug",
+    callback: slugify,
+  })
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(data => createWorkspace(data))}
-        className={cx("space-y-4", className)}
+        className={cx("grid gap-4 sm:grid-cols-2", className)}
         noValidate
       >
         <FormField
@@ -74,20 +87,12 @@ export const CreateWorkspaceForm = ({
 
         <FormField
           control={form.control}
-          name="websiteUrl"
+          name="slug"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Website URL:</FormLabel>
+              <FormLabel>Slug:</FormLabel>
               <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://acme.com"
-                  autoComplete="off"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  spellCheck="false"
-                  {...field}
-                />
+                <Input placeholder="acme" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -95,7 +100,22 @@ export const CreateWorkspaceForm = ({
           )}
         />
 
-        <DialogFooter className="mt-6">
+        <FormField
+          control={form.control}
+          name="websiteUrl"
+          render={({ field }) => (
+            <FormItem className="col-span-full">
+              <FormLabel>Website URL:</FormLabel>
+              <FormControl>
+                <Input type="url" placeholder="https://acme.com" {...field} />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <DialogFooter className="mt-6 col-span-full">
           {children}
 
           <Button type="submit" isPending={isPending} disabled={isPending}>

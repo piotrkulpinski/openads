@@ -65,7 +65,9 @@ export const WorkspaceMenu = () => {
 
           <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
             <span className="truncate font-medium">{workspaces[0]?.name}</span>
-            <span className="truncate text-xs text-muted-foreground/75 font-normal">Free</span>
+            <span className="truncate text-xs text-muted-foreground/75 font-normal">
+              {workspaces[0]?.plan}
+            </span>
           </div>
           <ChevronsUpDown className="ml-auto size-4" />
         </Button>
@@ -81,7 +83,7 @@ export const WorkspaceMenu = () => {
 
         {workspaces.map((workspace, index) => (
           <DropdownMenuItem
-            key={workspace.name}
+            key={workspace.id}
             // onClick={() => changeWorkspace(workspace)}
             className="gap-2 p-2"
             // disabled={workspace.id === activeWorkspace?.id}
@@ -93,7 +95,9 @@ export const WorkspaceMenu = () => {
 
             <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
               <span className="truncate font-medium">{workspace.name}</span>
-              <span className="truncate text-xs text-muted-foreground/75 font-normal">Free</span>
+              <span className="truncate text-xs text-muted-foreground/75 font-normal">
+                {workspace.plan}
+              </span>
             </div>
 
             {index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
