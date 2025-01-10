@@ -1,5 +1,5 @@
+import type { AppRouter, RouterInputs, RouterOutputs } from "@openads/api/trpc"
 import { createTRPCReact } from "@trpc/react-query"
-import type { AppRouter, RouterInputs, RouterOutputs } from "../../../api/src/trpc/index"
 
 export const trpc = createTRPCReact<AppRouter>()
 
