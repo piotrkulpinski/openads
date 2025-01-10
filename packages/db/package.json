@@ -15,14 +15,18 @@
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@prisma/client": "^6.2.0",
+    "@prisma/client": "^6.2.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "@types/node": "^22.10.2",
-    "prisma": "^6.2.0",
+    "@types/node": "^22.10.5",
+    "prisma": "^6.2.1",
     "typescript": "5.7.2"
   },
-  "trustedDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+  "trustedDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma"
+  ]
 }
