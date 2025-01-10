@@ -1,0 +1,14 @@
+{
+  "name": "@openads/utils",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "@openads/tsconfig": "workspace:*",
+    "typescript": "^5.7.2",
+    "zod": "^3.24.1"
+  }
+}

@@ -1,10 +1,11 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
 import { workspaceSchema } from "@openads/db/schema"
+import { z } from "zod"
 import { generateId } from "~/lib/ids"
-import { protectedProcedure, router } from "~/trpc"
+import { authProcedure, router } from "~/trpc"
 
 export const workspaceRouter = router({
-  getAll: protectedProcedure.query(async ({ ctx: { db, userId } }) => {
+  getAll: authProcedure.query(async ({ ctx: { db, userId } }) => {
     return await db.workspace.findMany({
       where: { members: { some: { userId } } },
       // include: { subscription: true },
@@ -12,7 +13,7 @@ export const workspaceRouter = router({
     })
   }),
 
-  create: protectedProcedure
+  create: authProcedure
     .input(workspaceSchema)
     .mutation(async ({ ctx: { db, userId }, input: { ...data } }) => {
       const workspace = await db.workspace.create({
@@ -21,6 +22,17 @@ export const workspaceRouter = router({
           id: generateId("workspace"),
           members: { create: { userId, role: WorkspaceMemberRole.Owner } },
         },
+      })
+
+      return workspace
+    }),
+
+  changeDefault: authProcedure
+    .input(z.object({ workspaceId: z.string() }))
+    .mutation(async ({ ctx: { db, userId }, input: { workspaceId } }) => {
+      const workspace = await db.workspace.update({
+        where: { id: workspaceId },
+        data: { defaultFor: { connect: { id: userId } } },
       })
 
       return workspace

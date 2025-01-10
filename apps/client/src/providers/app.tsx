@@ -3,7 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { httpBatchLink } from "@trpc/client"
 import { type PropsWithChildren, useMemo, useState } from "react"
 import superjson from "superjson"
-import { getBaseUrl, trpc } from "../lib/trpc"
+import { getBaseUrl, trpc } from "~/lib/trpc"
 
 const queryClientConfig: QueryClientConfig = {
   defaultOptions: {

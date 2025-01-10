@@ -2,7 +2,6 @@
   "extends": "@openads/tsconfig/react-library.json",
   "references": [{ "path": "../api" }],
   "compilerOptions": {
-    "composite": true,
     "incremental": true,
     "paths": { "~/*": ["./src/*"] }
   }
