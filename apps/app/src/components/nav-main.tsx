@@ -1,12 +1,9 @@
-"use client"
-
 import { Badge } from "@openads/ui/badge"
 import { Button, type ButtonProps } from "@openads/ui/button"
 import { useIsMobile } from "@openads/ui/hooks"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui/tooltip"
-import Link from "next/link"
-import { useParams, usePathname } from "next/navigation"
 import type { ComponentProps, ReactNode } from "react"
+import { Link, useLocation } from "react-router"
 
 type NavMainLink = ButtonProps & {
   title: string
@@ -19,10 +16,9 @@ type NavMainProps = ComponentProps<"nav"> & {
 }
 
 export const NavMain = ({ className, links, ...props }: NavMainProps) => {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const isMobile = useIsMobile()
-  const { workspace } = useParams()
-  const rootPath = `/${workspace}`
+  const rootPath = ""
 
   const getButtonVariant = (href: string) => {
     if (
@@ -48,7 +44,7 @@ export const NavMain = ({ className, links, ...props }: NavMainProps) => {
                 asChild
                 {...props}
               >
-                <Link href={href} />
+                <Link to={href} />
               </Button>
             </TooltipTrigger>
 
@@ -72,7 +68,7 @@ export const NavMain = ({ className, links, ...props }: NavMainProps) => {
             asChild
             {...props}
           >
-            <Link href={href}>{title}</Link>
+            <Link to={href}>{title}</Link>
           </Button>
         ),
       )}

@@ -1,9 +1,8 @@
 {
-  "extends": "@openads/tsconfig/nextjs.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
+  "extends": "@openads/tsconfig/react-library.json",
+  "references": [{ "path": "../api" }],
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "incremental": true,
     "paths": { "~/*": ["./src/*"] }
   }
 }

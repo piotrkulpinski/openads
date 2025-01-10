@@ -1,23 +1,32 @@
-import { db } from "@openads/db"
-import { headers } from "next/headers"
-import { redirect } from "next/navigation"
-import { auth } from "~/lib/auth/server"
+import { Navigate } from "react-router"
+import { trpc } from "~/lib/trpc"
 
-export default async function Page() {
-  const session = await auth.api.getSession({ headers: await headers() })
+export default function HomePage() {
+  const utils = trpc.useUtils()
+  const [user, workspaces] = trpc.useQueries(t => [t.user.me(), t.workspace.getAll()])
 
-  if (!session) {
-    redirect("/login")
-  }
-
-  // check if user has a workspace, if not, redirect to the onboarding page
-  const workspaces = await db.workspace.findMany({
-    where: { users: { some: { userId: session.user.id } } },
+  const changeDefaultWorkspace = trpc.workspace.changeDefault.useMutation({
+    onSuccess: () => {
+      utils.user.me.invalidate()
+    },
   })
 
-  if (workspaces.length === 0) {
-    redirect("/onboarding")
+  // Wait for both queries to complete
+  if (!user.isSuccess || !workspaces.isSuccess) {
+    return null
   }
 
-  redirect(`/${workspaces[0]?.slug}`)
+  // If user has default workspace, redirect to it
+  if (user.data.defaultWorkspace) {
+    return <Navigate to={`/${user.data.defaultWorkspace.slug}`} replace />
+  }
+
+  // If user has workspaces but no default, set the first one as default
+  if (workspaces.data[0]) {
+    changeDefaultWorkspace.mutate({ workspaceId: workspaces.data[0].id })
+    return <Navigate to={`/${workspaces.data[0].slug}`} replace />
+  }
+
+  // No workspaces, redirect to onboarding
+  return <Navigate to="/onboarding" replace />
 }

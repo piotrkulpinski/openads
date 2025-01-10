@@ -1,3 +1,4 @@
+import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import {
   CalendarDays,
@@ -7,24 +8,25 @@ import {
   MousePointer2,
   Settings,
 } from "lucide-react"
-import Link from "next/link"
-import { Suspense } from "react"
+import type { HTMLProps } from "react"
+import { Link } from "react-router"
 import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
-import { WorkspaceDropdownSkeleton } from "~/components/workspace-dropdown"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 
-type SidebarProps = {
-  workspace: string
-}
-
-export const Sidebar = ({ workspace }: SidebarProps) => {
+export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
   return (
-    <div className="sticky top-0 h-dvh z-40 flex flex-col border-r w-12 sm:w-48 lg:w-60">
+    <div
+      className={cx(
+        "sticky top-0 h-dvh z-40 flex flex-col border-r w-12 sm:w-48 lg:w-60",
+        className,
+      )}
+      {...props}
+    >
       <Nav className="flex-row justify-between px-6">
-        <Link href="/">
+        <Link to="/">
           <Logo className="h-5 w-auto" />
         </Link>
 
@@ -34,9 +36,7 @@ export const Sidebar = ({ workspace }: SidebarProps) => {
       <Separator />
 
       <Nav>
-        <Suspense fallback={<WorkspaceDropdownSkeleton />}>
-          <WorkspaceMenu />
-        </Suspense>
+        <WorkspaceMenu />
       </Nav>
 
       <Nav>
@@ -44,32 +44,32 @@ export const Sidebar = ({ workspace }: SidebarProps) => {
           links={[
             {
               title: "Dashboard",
-              href: `/${workspace}`,
+              href: "/",
               prefix: <LayoutDashboardIcon />,
             },
             {
               title: "Ad Spots",
-              href: `/${workspace}/spots`,
+              href: "/spots",
               prefix: <MousePointer2 />,
             },
             {
               title: "Bookings",
-              href: `/${workspace}/bookings`,
+              href: "/bookings",
               prefix: <CalendarDays />,
             },
             {
               title: "Advertisers",
-              href: `/${workspace}/advertisers`,
+              href: "/advertisers",
               prefix: <Megaphone />,
             },
             {
               title: "Analytics",
-              href: `/${workspace}/analytics`,
+              href: "/analytics",
               prefix: <ChartSpline />,
             },
             {
               title: "Settings",
-              href: `/${workspace}/settings`,
+              href: "/settings",
               prefix: <Settings />,
             },
           ]}

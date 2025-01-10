@@ -1,7 +1,6 @@
 import type { ComponentProps } from "react"
-import { cx } from "~/utils/cva"
 
-export const LogoSymbol = ({ className, ...props }: ComponentProps<"svg">) => {
+export const LogoSymbol = ({ ...props }: ComponentProps<"svg">) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +10,6 @@ export const LogoSymbol = ({ className, ...props }: ComponentProps<"svg">) => {
       role="img"
       aria-label="Logo"
       fill="none"
-      className={cx("h-6", className)}
       {...props}
     >
       <path

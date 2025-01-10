@@ -1,6 +1,6 @@
+import { type VariantProps, cva, cx } from "@openads/ui/cva"
 import { Slot } from "@radix-ui/react-slot"
 import { type ElementType, type HTMLProps, isValidElement } from "react"
-import { type VariantProps, cva, cx } from "~/utils/cva"
 
 const headingVariants = cva({
   base: "font-display font-medium",
