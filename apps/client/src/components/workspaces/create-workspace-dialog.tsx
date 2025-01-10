@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "@openads/ui/dialog"
 import { type PropsWithChildren, useState } from "react"
+import { toast } from "sonner"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 
 export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
@@ -25,7 +26,12 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
           </DialogDescription>
         </DialogHeader>
 
-        <CreateWorkspaceForm onSuccess={() => onOpenChange(false)}>
+        <CreateWorkspaceForm
+          onSuccess={() => {
+            onOpenChange(false)
+            toast.success("Workspace created successfully")
+          }}
+        >
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

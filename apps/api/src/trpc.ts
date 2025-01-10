@@ -1,11 +1,12 @@
 import { db } from "@openads/db"
-import { Prisma } from "@openads/db/client"
+import { Prisma, WorkspaceMemberRole } from "@openads/db/client"
 import { TRPCError, initTRPC } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import { ZodError } from "zod"
+import { ZodError, z } from "zod"
 import type { typeToFlattenedError } from "zod"
 import { auth as betterAuth } from "~/lib/auth"
+import { redis } from "~/services/redis"
 
 /**
  * This is the actual context you'll use in your router. It will be used to
@@ -15,7 +16,7 @@ import { auth as betterAuth } from "~/lib/auth"
 export const createContext = async (ctx: FetchCreateContextFnOptions) => {
   const auth = await betterAuth.api.getSession({ headers: ctx.req.headers })
 
-  return { ...ctx, auth, db }
+  return { ...ctx, auth, db, redis }
 }
 
 const t = initTRPC.context<typeof createContext>().create({
@@ -60,9 +61,10 @@ const t = initTRPC.context<typeof createContext>().create({
 
 export const router = t.router
 
-export const publicProcedure = t.procedure
+export const procedure = t.procedure
 
-export const protectedProcedure = publicProcedure.use(
+// Procedure that checks if a user is authenticated
+export const authProcedure = procedure.use(
   t.middleware(async ({ ctx, next }) => {
     if (!ctx.auth) {
       throw new TRPCError({ code: "UNAUTHORIZED" })
@@ -76,3 +78,23 @@ export const protectedProcedure = publicProcedure.use(
     })
   }),
 )
+
+// procedure that checks if a user is a member of a specific workspace
+export const workspaceProcedure = authProcedure
+  .input(z.object({ workspace: z.string() }))
+  .use(async ({ ctx: { db, userId }, input: { workspace: slug }, next }) => {
+    const allowedRoles = [WorkspaceMemberRole.Owner, WorkspaceMemberRole.Manager]
+
+    const workspace = await db.workspace.findFirst({
+      where: {
+        slug,
+        members: { some: { userId, role: { in: allowedRoles } } },
+      },
+    })
+
+    if (!workspace) {
+      throw new TRPCError({ code: "FORBIDDEN" })
+    }
+
+    return next({ ctx: { workspaceId: workspace.id } })
+  })

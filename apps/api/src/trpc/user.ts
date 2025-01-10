@@ -1,12 +1,15 @@
 import { z } from "zod"
-import { protectedProcedure, router } from "~/trpc"
+import { authProcedure, router } from "~/trpc"
 
 export const userRouter = router({
-  me: protectedProcedure.query(({ ctx }) => {
-    return ctx.userId
+  me: authProcedure.query(async ({ ctx: { db, userId } }) => {
+    return await db.user.findUniqueOrThrow({
+      where: { id: userId },
+      include: { defaultWorkspace: true },
+    })
   }),
 
-  update: protectedProcedure
+  update: authProcedure
     .input(
       z.object({
         email: z.string().email().optional(),

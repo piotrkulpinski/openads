@@ -9,8 +9,8 @@ import { Input } from "@openads/ui/input"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
-import { useComputedField } from "~/hooks/useComputedField"
-import { useMutationHandler } from "~/hooks/useMutationHandler"
+import { useComputedField } from "~/hooks/use-computed-field"
+import { useMutationHandler } from "~/hooks/use-mutation-handler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
 
@@ -24,15 +24,11 @@ export const CreateWorkspaceForm = ({
   onSuccess,
 }: CreateWorkspaceFormProps) => {
   const apiUtils = trpc.useUtils()
-  const { handleSuccess, handleError } = useMutationHandler()
+  const { handleError } = useMutationHandler()
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
     onSuccess: async data => {
       onSuccess?.(data)
-
-      handleSuccess({
-        success: "Workspace created successfully",
-      })
 
       // Invalidate the workspaces cache
       await apiUtils.workspace.getAll.invalidate()
@@ -115,7 +111,7 @@ export const CreateWorkspaceForm = ({
           )}
         />
 
-        <DialogFooter className="mt-6 col-span-full">
+        <DialogFooter className="mt-2 col-span-full">
           {children}
 
           <Button type="submit" isPending={isPending} disabled={isPending}>

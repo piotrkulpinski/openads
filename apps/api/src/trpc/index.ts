@@ -1,11 +1,15 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import { router } from "~/trpc"
+import { onboardingRouter } from "~/trpc/onboarding"
+import { spotRouter } from "~/trpc/spot"
 import { userRouter } from "~/trpc/user"
 import { workspaceRouter } from "~/trpc/workspace"
 
 export const appRouter = router({
   user: userRouter,
+  onboarding: onboardingRouter,
   workspace: workspaceRouter,
+  spot: spotRouter,
 })
 
 export type AppRouter = typeof appRouter
