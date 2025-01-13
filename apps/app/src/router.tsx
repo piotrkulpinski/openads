@@ -4,7 +4,9 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from "rea
 import LoginPage from "~/app/auth/login/page"
 import DashboardLayout from "~/app/dashboard/layout"
 import DashboardPage from "~/app/dashboard/page"
-import SpotsPage from "~/app/dashboard/spots/page"
+import SpotsIndexPage from "~/app/dashboard/spots"
+import SpotsEditPage from "~/app/dashboard/spots/edit"
+import SpotsNewPage from "~/app/dashboard/spots/new"
 import AppLayout from "~/app/layout"
 import NotFound from "~/app/not-found"
 import OnboardingPage from "~/app/onboarding/page"
@@ -47,7 +49,11 @@ export default function Router() {
           {/* Dashboard route group */}
           <Route path=":workspace" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route path="spots" element={<SpotsPage />} />
+
+            {/* Spots */}
+            <Route path="spots" element={<SpotsIndexPage />} />
+            <Route path="spots/new" element={<SpotsNewPage />} />
+            <Route path="spots/:spotId" element={<SpotsEditPage />} />
           </Route>
 
           <Route element={<AppLayout />}>

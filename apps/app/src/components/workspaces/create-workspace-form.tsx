@@ -1,7 +1,6 @@
 import { slugify } from "@curiousleaf/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { workspaceSchema } from "@openads/db/schema"
-import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
@@ -9,6 +8,7 @@ import { Input } from "@openads/ui/input"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
 import type { z } from "zod"
+import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { useMutationHandler } from "~/hooks/use-mutation-handler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
@@ -114,9 +114,7 @@ export const CreateWorkspaceForm = ({
         <DialogFooter className="mt-2 col-span-full">
           {children}
 
-          <Button type="submit" isPending={isPending} disabled={isPending}>
-            Create Workspace
-          </Button>
+          <FormButton>Create Workspace</FormButton>
         </DialogFooter>
       </form>
     </Form>

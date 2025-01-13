@@ -1,3 +1,4 @@
+import { spotSchema } from "@openads/db/schema"
 import { router, workspaceProcedure } from "~/trpc"
 
 export const spotRouter = router({
@@ -8,15 +9,13 @@ export const spotRouter = router({
     })
   }),
 
-  // create: workspaceProcedure
-  //   .input(spotSchema)
-  //   .mutation(async ({ ctx: { db }, input: { ...data } }) => {
-  //     const spot = await db.spot.create({
-  //       data: {
-  //         ...data,
-  //       },
-  //     })
+  create: workspaceProcedure
+    .input(spotSchema)
+    .mutation(async ({ ctx: { db }, input: { ...data } }) => {
+      const spot = await db.spot.create({
+        data: { ...data },
+      })
 
-  //     return spot
-  //   }),
+      return spot
+    }),
 })
