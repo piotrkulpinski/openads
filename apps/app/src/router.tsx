@@ -8,11 +8,11 @@ import SpotsPage from "~/app/dashboard/spots/page"
 import AppLayout from "~/app/layout"
 import NotFound from "~/app/not-found"
 import OnboardingPage from "~/app/onboarding/page"
+import OnboardingSpotPage from "~/app/onboarding/spot/page"
 import OnboardingWorkspacePage from "~/app/onboarding/workspace/page"
 import HomePage from "~/app/page"
 import { Toaster } from "~/components/toaster"
 import { env } from "~/env"
-import Layout from "~/layouts/layout"
 import { useSession } from "~/lib/auth"
 import { TRPCProvider } from "~/providers/app"
 
@@ -21,7 +21,7 @@ const Providers = () => {
   const { pathname } = useLocation()
 
   if (isPending) {
-    return <Layout>Loading...</Layout>
+    return null
   }
 
   if (!auth && pathname !== "/login") {
@@ -55,6 +55,7 @@ export default function Router() {
             <Route path="onboarding">
               <Route index element={<OnboardingPage />} />
               <Route path="workspace" element={<OnboardingWorkspacePage />} />
+              <Route path="spot" element={<OnboardingSpotPage />} />
             </Route>
 
             <Route path="login" element={<LoginPage />} />

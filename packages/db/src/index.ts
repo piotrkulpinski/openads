@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client"
+import { customIdExtension, workspaceFilterExtension } from "./extensions"
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  return new PrismaClient().$extends(customIdExtension).$extends(workspaceFilterExtension)
 }
 
 declare const globalThis: {

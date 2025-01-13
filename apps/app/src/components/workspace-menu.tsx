@@ -24,7 +24,7 @@ export const WorkspaceMenu = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  const { data: workspaces, isPending } = trpc.workspace.getAll.useQuery(undefined, {
+  const { data: workspaces, isFetching } = trpc.workspace.getAll.useQuery(undefined, {
     initialData: [],
   })
 
@@ -43,7 +43,7 @@ export const WorkspaceMenu = () => {
     ]),
   )
 
-  if (isPending) {
+  if (isFetching) {
     return (
       <Button size="sm" variant="outline" className="gap-2" disabled>
         <Skeleton className="size-7 rounded-full" />

@@ -9,7 +9,7 @@ import {
   Settings,
 } from "lucide-react"
 import type { HTMLProps } from "react"
-import { Link } from "react-router"
+import { Link, useParams } from "react-router"
 import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
@@ -17,6 +17,8 @@ import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 
 export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
+  const { workspace } = useParams() as { workspace: string }
+
   return (
     <div
       className={cx(
@@ -44,32 +46,33 @@ export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
           links={[
             {
               title: "Dashboard",
-              href: "/",
+              to: `/${workspace}`,
               prefix: <LayoutDashboardIcon />,
+              end: true,
             },
             {
               title: "Ad Spots",
-              href: "/spots",
+              to: `/${workspace}/spots`,
               prefix: <MousePointer2 />,
             },
             {
               title: "Bookings",
-              href: "/bookings",
+              to: `/${workspace}/bookings`,
               prefix: <CalendarDays />,
             },
             {
               title: "Advertisers",
-              href: "/advertisers",
+              to: `/${workspace}/advertisers`,
               prefix: <Megaphone />,
             },
             {
               title: "Analytics",
-              href: "/analytics",
+              to: `/${workspace}/analytics`,
               prefix: <ChartSpline />,
             },
             {
               title: "Settings",
-              href: "/settings",
+              to: `/${workspace}/settings`,
               prefix: <Settings />,
             },
           ]}

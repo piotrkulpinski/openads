@@ -9,7 +9,7 @@ export default function NotFound() {
     <Intro alignment="center">
       <IntroTitle>404 Not Found</IntroTitle>
 
-      <IntroDescription>
+      <IntroDescription className="max-w-md">
         We're sorry, but the page `{pathname}` could not be found. You may have mistyped the address
         or the page may have moved.
       </IntroDescription>

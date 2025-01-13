@@ -1,15 +1,13 @@
-import { H3 } from "~/components/heading"
+import { StepPage } from "~/app/onboarding/step-page"
+import { OnboardingLaterButton } from "~/components/onboarding/later-button"
 
-export default function Spot() {
+export default function OnboardingSpotPage() {
   return (
-    <>
-      <H3 as="h1">Create your first spot</H3>
-
-      <p className="mt-2 text-muted-foreground">
-        For example, you can use the name of your company or department.
-      </p>
-
-      {/* <WorkspaceForm className="w-full mt-10" /> */}
-    </>
+    <StepPage
+      title="Create your first ad spot"
+      description="For example, you can use the name of your company or department."
+    >
+      <OnboardingLaterButton next="plan" />
+    </StepPage>
   )
 }

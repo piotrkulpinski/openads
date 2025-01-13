@@ -1,5 +1,5 @@
 import { db } from "@openads/db"
-import { Prisma, WorkspaceMemberRole } from "@openads/db/client"
+import { Prisma } from "@openads/db/client"
 import { TRPCError, initTRPC } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
@@ -81,20 +81,15 @@ export const authProcedure = procedure.use(
 
 // procedure that checks if a user is a member of a specific workspace
 export const workspaceProcedure = authProcedure
-  .input(z.object({ workspace: z.string() }))
-  .use(async ({ ctx: { db, userId }, input: { workspace: slug }, next }) => {
-    const allowedRoles = [WorkspaceMemberRole.Owner, WorkspaceMemberRole.Manager]
-
+  .input(z.object({ workspaceId: z.string() }))
+  .use(async ({ ctx: { db, userId }, input: { workspaceId }, next }) => {
     const workspace = await db.workspace.findFirst({
-      where: {
-        slug,
-        members: { some: { userId, role: { in: allowedRoles } } },
-      },
+      where: { AND: [{ id: workspaceId }, db.workspace.belongsTo(userId)] },
     })
 
     if (!workspace) {
       throw new TRPCError({ code: "FORBIDDEN" })
     }
 
-    return next({ ctx: { workspaceId: workspace.id } })
+    return next()
   })

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
+    "nanoid": "^5.0.9",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -24,9 +25,5 @@
     "prisma": "^6.2.1",
     "typescript": "5.7.2"
   },
-  "trustedDependencies": [
-    "@prisma/client",
-    "@prisma/engines",
-    "prisma"
-  ]
+  "trustedDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
 }

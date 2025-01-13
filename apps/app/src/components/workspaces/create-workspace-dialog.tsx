@@ -8,10 +8,12 @@ import {
   DialogTrigger,
 } from "@openads/ui/dialog"
 import { type PropsWithChildren, useState } from "react"
+import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 
 export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
+  const navigate = useNavigate()
   const [isOpen, onOpenChange] = useState(false)
 
   return (
@@ -27,9 +29,9 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
         </DialogHeader>
 
         <CreateWorkspaceForm
-          onSuccess={() => {
-            onOpenChange(false)
+          onSuccess={({ slug }) => {
             toast.success("Workspace created successfully")
+            navigate(`/${slug}`)
           }}
         >
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -1,10 +1,11 @@
-import { useParams } from "react-router"
+import { use } from "react"
 import { H3, H4 } from "~/components/heading"
+import { WorkspaceContext } from "~/contexts/workspace-context"
 import { trpc } from "~/lib/trpc"
 
 export default function SpotsPage() {
-  const { workspace } = useParams() as { workspace: string }
-  const { data: spots } = trpc.spot.getAll.useQuery({ workspace }, { initialData: [] })
+  const { id: workspaceId } = use(WorkspaceContext)
+  const { data: spots } = trpc.spot.getAll.useQuery({ workspaceId }, { initialData: [] })
 
   return (
     <>

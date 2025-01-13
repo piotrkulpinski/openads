@@ -1,4 +1,4 @@
-import type { Workspace } from "../../../../packages/db/src/client"
+import type { Workspace } from "@openads/db/client"
 
 export const getWorkspaceFaviconUrl = (workspace: Workspace | undefined) => {
   if (!workspace) return undefined
