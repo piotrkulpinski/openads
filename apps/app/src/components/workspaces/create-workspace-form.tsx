@@ -23,7 +23,7 @@ export const CreateWorkspaceForm = ({
   className,
   onSuccess,
 }: CreateWorkspaceFormProps) => {
-  const apiUtils = trpc.useUtils()
+  const utils = trpc.useUtils()
   const { handleError } = useMutationHandler()
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
@@ -31,7 +31,7 @@ export const CreateWorkspaceForm = ({
       onSuccess?.(data)
 
       // Invalidate the workspaces cache
-      await apiUtils.workspace.getAll.invalidate()
+      await utils.workspace.getAll.invalidate()
     },
 
     onError: error => handleError({ error, form }),
