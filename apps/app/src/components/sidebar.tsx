@@ -1,5 +1,6 @@
 import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
+import { Link } from "@tanstack/react-router"
 import {
   CalendarDays,
   ChartSpline,
@@ -9,15 +10,15 @@ import {
   Settings,
 } from "lucide-react"
 import type { HTMLProps } from "react"
-import { Link, useParams } from "react-router"
 import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
+import { useWorkspace } from "~/contexts/workspace-context"
 
 export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
-  const { workspace } = useParams() as { workspace: string }
+  const { slug: workspaceSlug } = useWorkspace()
 
   return (
     <div
@@ -46,33 +47,33 @@ export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
           links={[
             {
               title: "Dashboard",
-              to: `/${workspace}`,
+              to: `/${workspaceSlug}`,
               prefix: <LayoutDashboardIcon />,
-              end: true,
+              activeOptions: { exact: true },
             },
             {
               title: "Ad Spots",
-              to: `/${workspace}/spots`,
+              to: `/${workspaceSlug}/spots`,
               prefix: <MousePointer2 />,
             },
             {
               title: "Bookings",
-              to: `/${workspace}/bookings`,
+              to: `/${workspaceSlug}/bookings`,
               prefix: <CalendarDays />,
             },
             {
               title: "Advertisers",
-              to: `/${workspace}/advertisers`,
+              to: `/${workspaceSlug}/advertisers`,
               prefix: <Megaphone />,
             },
             {
               title: "Analytics",
-              to: `/${workspace}/analytics`,
+              to: `/${workspaceSlug}/analytics`,
               prefix: <ChartSpline />,
             },
             {
               title: "Settings",
-              to: `/${workspace}/settings`,
+              to: `/${workspaceSlug}/settings`,
               prefix: <Settings />,
             },
           ]}

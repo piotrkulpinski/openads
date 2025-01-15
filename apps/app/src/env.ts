@@ -4,10 +4,10 @@ import { z } from "zod"
 export const env = createEnv({
   server: {
     MODE: z.enum(["development", "production"]).default("development"),
-    BASE_URL: z.string().url(),
   },
 
   client: {
+    VITE_BASE_URL: z.string(),
     VITE_OPENPANEL_CLIENT_ID: z.string().min(1),
   },
 

@@ -23,7 +23,7 @@ export const CreateSpotForm = ({ children, className }: HTMLProps<HTMLFormElemen
     onSuccess: async () => {
       handleSuccess({
         success: "Spot successfully created",
-        redirect: `/${workspace.slug}/spots`,
+        redirect: { to: "/$workspace/spots", params: { workspace: workspace.slug } },
       })
 
       // Invalidate the spots cache
@@ -37,8 +37,6 @@ export const CreateSpotForm = ({ children, className }: HTMLProps<HTMLFormElemen
     resolver: zodResolver(spotSchema),
     values: getDefaults(spotSchema),
   })
-
-  console.log(form.formState.errors)
 
   return (
     <Form {...form}>
@@ -54,7 +52,16 @@ export const CreateSpotForm = ({ children, className }: HTMLProps<HTMLFormElemen
             <FormItem>
               <FormLabel>Name:</FormLabel>
               <FormControl>
-                <Input placeholder="Banner Ad" {...field} />
+                <Input
+                  autoFocus
+                  placeholder="Banner Ad"
+                  autoComplete="off"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
+                  data-1p-ignore
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />
@@ -109,7 +116,7 @@ export const CreateSpotForm = ({ children, className }: HTMLProps<HTMLFormElemen
         <DialogFooter className="mt-2 col-span-full">
           {children}
 
-          <FormButton>Create Spot</FormButton>
+          <FormButton isPending={isPending}>Create Spot</FormButton>
         </DialogFooter>
       </form>
     </Form>

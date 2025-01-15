@@ -12,28 +12,26 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Skeleton } from "@openads/ui/skeleton"
+import { useNavigate } from "@tanstack/react-router"
 import { ChevronsUpDown, Plus } from "lucide-react"
-import { useLocation, useNavigate, useParams } from "react-router"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
+import { useWorkspace } from "~/contexts/workspace-context"
 import { trpc } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 export const WorkspaceMenu = () => {
   const isMobile = useMediaQuery("(max-width: 768px)")
-  const params = useParams() as { workspace: string }
+  const activeWorkspace = useWorkspace()
   const navigate = useNavigate()
-  const { pathname } = useLocation()
 
   const { data: workspaces, isFetching } = trpc.workspace.getAll.useQuery(undefined, {
     initialData: [],
   })
 
-  const activeWorkspace = workspaces.find(w => w.slug === params.workspace)
-
   const changeWorkspace = (workspace?: Workspace) => {
-    if (!workspace || workspace.slug === params.workspace) return
+    if (!workspace || workspace.slug === activeWorkspace.slug) return
 
-    navigate(pathname.replaceAll(`/${params.workspace}`, `/${workspace.slug}`))
+    navigate({ to: "/$workspace", params: { workspace: workspace.slug } })
   }
 
   useHotkeys(
@@ -90,7 +88,7 @@ export const WorkspaceMenu = () => {
             key={workspace.id}
             onClick={() => changeWorkspace(workspace)}
             className="gap-2 p-2"
-            disabled={workspace.slug === params.workspace}
+            disabled={workspace.slug === activeWorkspace.slug}
           >
             <Avatar className="size-7">
               <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />

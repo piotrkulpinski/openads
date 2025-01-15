@@ -14,7 +14,7 @@ export const workspaceRouter = router({
   getBySlug: authProcedure
     .input(workspaceSchema.pick({ slug: true }))
     .query(async ({ ctx: { db, userId }, input: { slug } }) => {
-      return await db.workspace.findFirstOrThrow({
+      return await db.workspace.findFirst({
         where: { AND: [{ slug }, db.workspace.belongsTo(userId)] },
       })
     }),

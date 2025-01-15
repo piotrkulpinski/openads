@@ -7,8 +7,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
+import { useNavigate } from "@tanstack/react-router"
 import { LogOutIcon } from "lucide-react"
-import { useNavigate } from "react-router"
 import { signOut, useSession } from "~/lib/auth"
 
 export const UserMenu = () => {
@@ -43,7 +43,7 @@ export const UserMenu = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
-          onClick={() => signOut({ fetchOptions: { onSuccess: () => navigate("/") } })}
+          onClick={() => signOut({ fetchOptions: { onSuccess: () => navigate({ to: "/" }) } })}
         >
           <LogOutIcon className="size-4" />
           Logout

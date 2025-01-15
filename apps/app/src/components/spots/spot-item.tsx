@@ -1,5 +1,5 @@
+import { Link } from "@tanstack/react-router"
 import type { HTMLProps } from "react"
-import { Link } from "react-router"
 import { H5 } from "~/components/heading"
 import type { RouterOutputs } from "~/lib/trpc"
 

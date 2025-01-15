@@ -2,10 +2,10 @@ import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { useIsMobile } from "@openads/ui/hooks"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui/tooltip"
-import type { ReactNode } from "react"
-import { NavLink, type NavLinkProps } from "react-router"
+import { Link } from "@tanstack/react-router"
+import type { ComponentProps, ReactNode } from "react"
 
-type NavMainLink = Omit<NavLinkProps, "prefix"> & {
+type NavMainLink = Omit<ComponentProps<typeof Link>, "prefix"> & {
   prefix?: ReactNode
   label?: string
 }
@@ -24,7 +24,7 @@ export const NavMain = ({ links }: NavMainProps) => {
           <Tooltip key={index}>
             <TooltipTrigger asChild>
               <Button size="sm" variant="ghost" aria-label={title} prefix={prefix} asChild>
-                <NavLink {...props} />
+                <Link activeProps={{ className: "bg-accent" }} {...props} />
               </Button>
             </TooltipTrigger>
 
@@ -48,7 +48,9 @@ export const NavMain = ({ links }: NavMainProps) => {
             className="justify-start"
             asChild
           >
-            <NavLink {...props}>{title}</NavLink>
+            <Link activeProps={{ className: "bg-accent" }} {...props}>
+              {title}
+            </Link>
           </Button>
         ),
       )}

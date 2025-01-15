@@ -1,21 +1,20 @@
 import { upperFirst } from "@curiousleaf/utils"
 import { Button, type ButtonProps } from "@openads/ui/button"
 import { LoaderIcon } from "lucide-react"
-import { useSearchParams } from "react-router"
 import { signIn } from "~/lib/auth"
 
 type LoginButtonProps = ButtonProps & {
   provider: "google" | "github"
+  callbackURL?: string
 }
 
 export const LoginButton = ({
   provider,
   variant = "outline",
   prefix,
+  callbackURL,
   ...props
 }: LoginButtonProps) => {
-  const [searchParams] = useSearchParams()
-  const callbackURL = searchParams.get("callbackURL") ?? undefined
   const isLoading = false
 
   return (

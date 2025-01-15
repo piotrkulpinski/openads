@@ -114,7 +114,7 @@ export const CreateWorkspaceForm = ({
         <DialogFooter className="mt-2 col-span-full">
           {children}
 
-          <FormButton>Create Workspace</FormButton>
+          <FormButton isPending={isPending}>Create Workspace</FormButton>
         </DialogFooter>
       </form>
     </Form>

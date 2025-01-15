@@ -1,5 +1,7 @@
+import { env } from "~/env"
+
 export const siteConfig = {
-  url: "https://openads.co",
+  url: env.VITE_BASE_URL,
   name: "OpenAds",
   tagline: "A platform for creating and managing ads for your business.",
   description:

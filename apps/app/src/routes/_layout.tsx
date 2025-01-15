@@ -1,8 +1,9 @@
-import { Outlet } from "react-router"
+import { createFileRoute } from "@tanstack/react-router"
+import { Outlet } from "@tanstack/react-router"
 import { Logo } from "~/components/logo"
 
-export default function AppLayout() {
-  return (
+export const Route = createFileRoute("/_layout")({
+  component: () => (
     <div className="relative min-h-dvh w-full bg-primary-foreground/50">
       <div className="absolute top-0 left-1/2 h-64 w-2/3 rounded-lg overflow-clip blur-2xl pointer-events-none -translate-x-1/2">
         <div className="-mt-20 size-full -rotate-12 bg-primary/15 rounded-full" />
@@ -18,5 +19,5 @@ export default function AppLayout() {
         </div>
       </div>
     </div>
-  )
-}
+  ),
+})

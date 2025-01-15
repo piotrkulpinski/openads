@@ -1,27 +1,26 @@
 import { publishEscape } from "@curiousleaf/utils"
 import type { AppRouter } from "@openads/api/trpc"
+import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
-import { useNavigate } from "react-router"
 import { toast } from "sonner"
+import type { createRouter } from "~/router"
+
+type RedirectOptions = NavigateOptions<ReturnType<typeof createRouter>>
 
 export const useMutationHandler = () => {
   const navigate = useNavigate()
 
   type HandleSuccess = {
-    redirect?: string
-    refresh?: boolean
+    redirect?: RedirectOptions
     close?: boolean
     success?: string
     error?: string
   }
 
-  const handleSuccess = ({ redirect, refresh, close, success, error }: HandleSuccess) => {
+  const handleSuccess = ({ redirect, close, success, error }: HandleSuccess) => {
     // If we have a redirect, navigate to it
     redirect && navigate(redirect)
-
-    // If we have a refresh, refresh the page
-    refresh && navigate(0)
 
     // If closing panels, trigger escape
     close && publishEscape()
