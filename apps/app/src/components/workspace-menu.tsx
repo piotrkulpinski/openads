@@ -16,7 +16,7 @@ import { useNavigate } from "@tanstack/react-router"
 import { ChevronsUpDown, Plus } from "lucide-react"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
-import { trpc } from "~/lib/trpc"
+import { trpc, trpcUtils } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 export const WorkspaceMenu = () => {
@@ -28,9 +28,16 @@ export const WorkspaceMenu = () => {
     initialData: [],
   })
 
+  const changeDefaultWorkspace = trpc.workspace.changeDefault.useMutation({
+    onSuccess: () => {
+      trpcUtils.user.me.invalidate()
+    },
+  })
+
   const changeWorkspace = (workspace?: Workspace) => {
     if (!workspace || workspace.slug === activeWorkspace.slug) return
 
+    changeDefaultWorkspace.mutate({ workspaceId: workspace.id })
     navigate({ to: "/$workspace", params: { workspace: workspace.slug } })
   }
 

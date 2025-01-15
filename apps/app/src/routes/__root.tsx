@@ -6,7 +6,7 @@ import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
 import { env } from "~/env"
-import type { trpcUtils } from "~/router"
+import type { trpcUtils } from "~/lib/trpc"
 
 export type RouterAppContext = {
   trpcUtils: typeof trpcUtils
