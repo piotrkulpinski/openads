@@ -3,9 +3,9 @@ import { env } from "~/env"
 export const siteConfig = {
   url: env.VITE_BASE_URL,
   name: "OpenAds",
-  tagline: "A platform for creating and managing ads for your business.",
+  tagline: "Automate ad spot management, increase revenue and make advertisers happy.",
   description:
-    "OpenAds is a platform for creating and managing ads for your business. It's easy to use and helps you collect leads from your website.",
+    "OpenAds is an ad spot management platform, crafted to simplify the process of selling ad spots on your websites.",
 
   // Command
   commandShortcuts: [{ key: "k", metaKey: true }] as const,

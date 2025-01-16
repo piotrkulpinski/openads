@@ -24,9 +24,15 @@ export const CreateWorkspaceForm = ({
   children,
   className,
   onSuccess,
+  ...props
 }: CreateWorkspaceFormProps) => {
   const utils = trpc.useUtils()
   const handleError = useMutationErrorHandler()
+
+  const form = useForm<WorkspaceSchema>({
+    resolver: zodResolver(workspaceSchema),
+    defaultValues: getDefaults(workspaceSchema),
+  })
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
     onSuccess: async data => {
@@ -37,11 +43,6 @@ export const CreateWorkspaceForm = ({
     },
 
     onError: error => handleError({ error, form }),
-  })
-
-  const form = useForm<WorkspaceSchema>({
-    resolver: zodResolver(workspaceSchema),
-    values: getDefaults(workspaceSchema),
   })
 
   // Set the slug based on the name
@@ -58,6 +59,7 @@ export const CreateWorkspaceForm = ({
         onSubmit={form.handleSubmit(data => createWorkspace(data))}
         className={cx("grid gap-4 sm:grid-cols-2", className)}
         noValidate
+        {...props}
       >
         <FormField
           control={form.control}

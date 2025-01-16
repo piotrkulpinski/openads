@@ -12,16 +12,16 @@ import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 import { trpc } from "~/lib/trpc"
 
-export const Route = createFileRoute("/onboarding/$step")({
+export const Route = createFileRoute("/_layout/onboarding/$step")({
   params: {
-    parse: p => z.object({ step: z.enum(ONBOARDING_STEPS) }).parse(p),
+    parse: (p) => z.object({ step: z.enum(ONBOARDING_STEPS) }).parse(p),
   },
 
   validateSearch: z.object({
     workspace: z.string().optional(),
   }),
 
-  onError: error => {
+  onError: (error) => {
     if (error?.routerCode === "PARSE_PARAMS") {
       throw notFound()
     }
@@ -35,14 +35,17 @@ function OnboardingStepPage() {
   const { workspace: slug } = Route.useSearch()
   const { continueTo } = useOnboardingProgress()
 
-  const query = trpc.workspace.getBySlug.useQuery({ slug: slug! }, { enabled: !!slug })
+  const query = trpc.workspace.getBySlug.useQuery(
+    { slug: slug! },
+    { enabled: !!slug },
+  )
 
   switch (step) {
     case "welcome":
       return (
         <OnboardingStep
           title={`Welcome to ${siteConfig.name}`}
-          description={`${siteConfig.name} is an ad spot management platform, crafted to simplify the process of selling ad spots on your websites.`}
+          description={siteConfig.description}
         >
           <OnboardingNextButton
             step="workspace"
@@ -60,7 +63,9 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("spot", slug)} />
+          <CreateWorkspaceForm
+            onSuccess={({ slug }) => continueTo("spot", slug)}
+          />
         </OnboardingStep>
       )
 
@@ -73,9 +78,16 @@ function OnboardingStepPage() {
           <QueryCell
             query={query}
             pending={() => <LoaderIcon className="mx-auto animate-spin" />}
-            empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
+            empty={() => (
+              <p className="text-red-500">
+                There was an error loading the workspace.
+              </p>
+            )}
             success={({ data }) => (
-              <SpotForm workspaceId={data?.id} onSuccess={() => continueTo("completed", slug)}>
+              <SpotForm
+                workspaceId={data?.id}
+                onSuccess={() => continueTo("completed", slug)}
+              >
                 <OnboardingLaterButton step="completed" slug={slug} />
               </SpotForm>
             )}

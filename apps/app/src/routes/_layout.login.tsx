@@ -8,7 +8,7 @@ type LoginSearch = {
   callbackURL?: string
 }
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/_layout/login")({
   validateSearch: z.object({
     callbackURL: z.string().optional().default("/"),
   }),
@@ -27,10 +27,7 @@ export const Route = createFileRoute("/login")({
     return (
       <Intro alignment="center">
         <IntroTitle>Login to {siteConfig.name}.</IntroTitle>
-
-        <IntroDescription>
-          Automate financial tasks, stay organized, and make informed decisions effortlessly.
-        </IntroDescription>
+        <IntroDescription>{siteConfig.tagline}</IntroDescription>
 
         <LoginButton
           provider="google"
