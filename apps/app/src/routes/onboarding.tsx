@@ -1,7 +1,15 @@
-import { Outlet, createFileRoute } from "@tanstack/react-router"
+import { Outlet, createFileRoute, redirect } from "@tanstack/react-router"
 import { Logo } from "~/components/logo"
 
 export const Route = createFileRoute("/onboarding")({
+  beforeLoad: async ({ context: { trpcUtils } }) => {
+    const step = await trpcUtils.onboarding.getProgress.fetch()
+
+    if (step === "completed") {
+      return redirect({ to: "/" })
+    }
+  },
+
   component: RouteComponent,
 })
 

@@ -10,12 +10,12 @@ type LaterButtonProps = ComponentProps<"button"> & {
 }
 
 export function OnboardingLaterButton({ children, step, slug, ...props }: LaterButtonProps) {
-  const { continueTo, finish, isPending } = useOnboardingProgress()
+  const { continueTo, isPending } = useOnboardingProgress()
 
   return (
     <button
       type="button"
-      onClick={() => (step === "completed" ? finish({ slug }) : continueTo(step, { slug }))}
+      onClick={() => continueTo(step, slug)}
       disabled={isPending}
       className="flex items-center gap-2 order-last mx-auto text-sm text-muted-foreground hover:text-foreground"
       {...props}

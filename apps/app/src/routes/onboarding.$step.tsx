@@ -31,7 +31,7 @@ export const Route = createFileRoute("/onboarding/$step")({
 function OnboardingStepPage() {
   const { step } = Route.useParams()
   const { workspace: slug } = Route.useSearch()
-  const { continueTo, finish } = useOnboardingProgress()
+  const { continueTo } = useOnboardingProgress()
 
   const query = trpc.workspace.getBySlug.useQuery({ slug: slug! }, { enabled: !!slug })
 
@@ -42,7 +42,7 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("spot", { slug })} />
+          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("spot", slug)} />
         </OnboardingStep>
       )
 
@@ -57,7 +57,7 @@ function OnboardingStepPage() {
             pending={() => <LoaderIcon className="mx-auto animate-spin" />}
             empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
             success={({ data }) => (
-              <SpotForm workspaceId={data?.id} onSuccess={() => finish({ slug })}>
+              <SpotForm workspaceId={data?.id} onSuccess={() => continueTo("completed", slug)}>
                 <OnboardingLaterButton step="completed" slug={slug} />
               </SpotForm>
             )}

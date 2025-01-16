@@ -12,9 +12,13 @@ function OnboardingPage() {
   return (
     <OnboardingStep
       title={`Welcome to ${siteConfig.name}`}
-      description={`${siteConfig.name} gives you marketing superpowers with short links that stand out.`}
+      description={`${siteConfig.name} is an ad spot management platform, crafted to simplify the process of selling ad spots on your websites.`}
     >
-      <OnboardingNextButton step="workspace" suffix={<ArrowRightIcon />}>
+      <OnboardingNextButton
+        step="workspace"
+        suffix={<ArrowRightIcon />}
+        className="text-base min-w-2/3"
+      >
         Get started
       </OnboardingNextButton>
     </OnboardingStep>

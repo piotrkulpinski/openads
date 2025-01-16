@@ -4,10 +4,6 @@ import { useCallback } from "react"
 import { toast } from "sonner"
 import { trpc } from "~/lib/trpc"
 
-type ContinueToParams = {
-  slug?: string
-}
-
 export function useOnboardingProgress() {
   const navigate = useNavigate()
   const preWorkspaceSteps = ["workspace"]
@@ -20,42 +16,36 @@ export function useOnboardingProgress() {
   })
 
   const continueTo = useCallback(
-    async (step: OnboardingStep, { slug }: ContinueToParams = {}) => {
-      const workspaceParam = preWorkspaceSteps.includes(step) ? undefined : slug
-
+    async (step: OnboardingStep, slug?: string) => {
+      // Update the onboarding progress
       await mutateAsync({ step })
+
+      // If we're on the last step, navigate to the workspace
+      if (step === "completed") {
+        // If we have a workspace, navigate to it
+        if (slug) {
+          return navigate({
+            to: "/$workspace",
+            params: { workspace: slug },
+            search: { onboarded: true },
+          })
+        }
+
+        // Otherwise, navigate to the root route
+        return navigate({ to: "/" })
+      }
 
       return navigate({
         to: "/onboarding/$step",
         params: { step },
-        search: { workspace: workspaceParam },
+        search: { workspace: preWorkspaceSteps.includes(step) ? undefined : slug },
       })
-    },
-    [mutate, navigate],
-  )
-
-  const finish = useCallback(
-    async ({ slug }: ContinueToParams = {}) => {
-      await mutateAsync({ step: "completed" })
-
-      // If we have a workspace, navigate to it
-      if (slug) {
-        return navigate({
-          to: "/$workspace",
-          params: { workspace: slug },
-          search: { onboarded: true },
-        })
-      }
-
-      // Otherwise, navigate to the root route
-      return navigate({ to: "/" })
     },
     [mutateAsync, navigate],
   )
 
   return {
     continueTo,
-    finish,
     isPending,
     isSuccess,
   }
