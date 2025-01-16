@@ -5,16 +5,17 @@ import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 
 type LaterButtonProps = ComponentProps<typeof Button> & {
   next: OnboardingStep | "finish"
+  slug?: string
 }
 
-export function OnboardingLaterButton({ next, children, ...props }: LaterButtonProps) {
+export function OnboardingLaterButton({ children, next, slug, ...props }: LaterButtonProps) {
   const { continueTo, finish, isPending, isSuccess } = useOnboardingProgress()
 
   return (
     <Button
       type="button"
       variant="outline"
-      onClick={() => (next === "finish" ? finish() : continueTo(next))}
+      onClick={() => (next === "finish" ? finish({ slug }) : continueTo(next, { slug }))}
       isPending={isPending}
       disabled={isPending || isSuccess}
       {...props}

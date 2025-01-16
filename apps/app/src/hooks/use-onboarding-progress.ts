@@ -1,20 +1,18 @@
 import type { OnboardingStep } from "@openads/utils"
+import { useNavigate } from "@tanstack/react-router"
 import { useCallback } from "react"
-import { useNavigate, useSearchParams } from "react-router"
 import { toast } from "sonner"
 import { trpc } from "~/lib/trpc"
 
-const PRE_WORKSPACE_STEPS = ["workspace"]
+type ContinueToParams = {
+  slug?: string
+}
 
 export function useOnboardingProgress() {
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const slug = searchParams.get("workspace")
+  const preWorkspaceSteps = ["workspace"]
 
   const { mutate, mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
-    onSuccess: () => {
-      console.log("Onboarding progress updated")
-    },
     onError: ({ data }) => {
       toast.error("Failed to update onboarding progress. Please try again.")
       console.error("Failed to update onboarding progress", data)
@@ -22,23 +20,29 @@ export function useOnboardingProgress() {
   })
 
   const continueTo = useCallback(
-    async (step: OnboardingStep, { slug: providedSlug }: { slug?: string } = {}) => {
+    async (step: OnboardingStep, { slug }: ContinueToParams = {}) => {
+      const workspaceParam = preWorkspaceSteps.includes(step) ? undefined : slug
+
       mutate({ step })
 
-      const queryParams = PRE_WORKSPACE_STEPS.includes(step)
-        ? ""
-        : `?workspace=${providedSlug || slug}`
-
-      navigate(`/onboarding/${step}${queryParams}`)
+      navigate({
+        to: "/onboarding/$step",
+        params: { step },
+        search: { workspace: workspaceParam },
+      })
     },
-    [mutate, navigate, slug],
+    [mutate, navigate],
   )
 
-  const finish = useCallback(async () => {
-    await mutateAsync({ step: "completed" })
+  const finish = useCallback(
+    async ({ slug }: ContinueToParams = {}) => {
+      await mutateAsync({ step: "completed" })
 
-    navigate(slug ? `/${slug}?onboarded=true` : "/")
-  }, [mutateAsync, navigate, slug])
+      // If we have a workspace, navigate to it, otherwise navigate to the root route
+      navigate(slug ? { to: "/$workspace", params: { workspace: slug } } : { to: "/" })
+    },
+    [mutateAsync, navigate],
+  )
 
   return {
     continueTo,

@@ -4,7 +4,7 @@ import { authProcedure, router } from "~/trpc"
 
 export const onboardingRouter = router({
   setProgress: authProcedure
-    .input(z.object({ step: z.enum(ONBOARDING_STEPS).nullable() }))
+    .input(z.object({ step: z.enum(ONBOARDING_STEPS) }))
     .mutation(async ({ ctx: { redis, userId }, input: { step } }) => {
       try {
         await redis.set(`onboarding-step:${userId}`, step)

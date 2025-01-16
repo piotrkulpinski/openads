@@ -1,20 +1,22 @@
 import { slugify } from "@curiousleaf/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { workspaceSchema } from "@openads/db/schema"
+import { type WorkspaceSchema, workspaceSchema } from "@openads/db/schema"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
-import type { z } from "zod"
 import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
-import { useMutationHandler } from "~/hooks/use-mutation-handler"
+import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
 
 type CreateWorkspaceFormProps = HTMLProps<HTMLFormElement> & {
+  /**
+   * A callback to call when the mutation is successful
+   */
   onSuccess?: (data: RouterOutputs["workspace"]["create"]) => void
 }
 
@@ -24,7 +26,7 @@ export const CreateWorkspaceForm = ({
   onSuccess,
 }: CreateWorkspaceFormProps) => {
   const utils = trpc.useUtils()
-  const { handleError } = useMutationHandler()
+  const handleError = useMutationErrorHandler()
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
     onSuccess: async data => {
@@ -37,7 +39,7 @@ export const CreateWorkspaceForm = ({
     onError: error => handleError({ error, form }),
   })
 
-  const form = useForm<z.infer<typeof workspaceSchema>>({
+  const form = useForm<WorkspaceSchema>({
     resolver: zodResolver(workspaceSchema),
     values: getDefaults(workspaceSchema),
   })

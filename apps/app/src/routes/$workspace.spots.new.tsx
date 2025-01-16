@@ -7,10 +7,16 @@ export const Route = createFileRoute("/$workspace/spots/new")({
 })
 
 function SpotsNewPage() {
+  const { workspace } = Route.useRouteContext()
+
   return (
     <>
       <H3>New Ad Spot</H3>
-      <SpotForm className="mt-4" nextUrl={{ from: Route.fullPath, to: ".." }} />
+      <SpotForm
+        workspaceId={workspace.id}
+        nextUrl={{ from: Route.fullPath, to: ".." }}
+        className="mt-4"
+      />
     </>
   )
 }

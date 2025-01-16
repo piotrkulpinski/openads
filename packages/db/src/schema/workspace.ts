@@ -6,9 +6,7 @@ export const workspaceSchema = z.object({
   slug: slugSchema
     .min(3, { message: "Slug is too short" })
     .refine(isAllowedSlug, { message: "This slug is reserved" }),
-  websiteUrl: z
-    .string()
-    .trim()
-    .min(1, { message: "URL is required" })
-    .url({ message: "Invalid URL" }),
+  websiteUrl: z.string().trim().min(1, { message: "URL is required" }).url(),
 })
+
+export type WorkspaceSchema = z.infer<typeof workspaceSchema>

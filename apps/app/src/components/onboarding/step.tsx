@@ -2,18 +2,18 @@ import { cx } from "@openads/ui/cva"
 import type { ComponentProps, ReactNode } from "react"
 import { Intro, IntroDescription, IntroTitle } from "~/components/intro"
 
-type OnboardingStepPageProps = ComponentProps<typeof Intro> & {
+type OnboardingStepProps = ComponentProps<typeof Intro> & {
   title: ReactNode
   description: ReactNode
 }
 
-export const OnboardingStepPage = ({
+export const OnboardingStep = ({
   children,
   className,
   title,
   description,
   ...props
-}: OnboardingStepPageProps) => {
+}: OnboardingStepProps) => {
   return (
     <Intro alignment="center" className={cx(className)} {...props}>
       <IntroTitle>{title}</IntroTitle>

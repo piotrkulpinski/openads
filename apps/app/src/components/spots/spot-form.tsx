@@ -6,13 +6,13 @@ import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Textarea } from "@openads/ui/textarea"
-import type { NavigateOptions } from "@tanstack/react-router"
+import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
-import { useWorkspace } from "~/contexts/workspace-context"
-import { useMutationHandler } from "~/hooks/use-mutation-handler"
+import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { nullsToUndefined } from "~/lib/helpers"
 import { trpc } from "~/lib/trpc"
 import type { RouterOutputs } from "~/lib/trpc"
@@ -20,18 +20,36 @@ import { getDefaults } from "~/lib/zod"
 import type { createRouter } from "~/router"
 
 type SpotFormProps = HTMLProps<HTMLFormElement> & {
+  workspaceId: string
+
+  /**
+   * The spot to edit
+   */
   spot?: RouterOutputs["spot"]["getAll"][number]
 
   /**
    * Allows to redirect to a url after the mutation is successful
    */
   nextUrl?: NavigateOptions<ReturnType<typeof createRouter>>
+
+  /**
+   * A callback to call when the mutation is successful
+   */
+  onSuccess?: (data: RouterOutputs["spot"]["create"]) => void
 }
 
-export const SpotForm = ({ children, className, spot, nextUrl, ...props }: SpotFormProps) => {
+export const SpotForm = ({
+  children,
+  className,
+  workspaceId,
+  spot,
+  nextUrl,
+  onSuccess: onSuccessCallback,
+  ...props
+}: SpotFormProps) => {
   const utils = trpc.useUtils()
-  const { id: workspaceId } = useWorkspace()
-  const { handleSuccess, handleError } = useMutationHandler()
+  const navigate = useNavigate()
+  const handleError = useMutationErrorHandler()
   const isEditing = !!spot?.id
 
   const form = useForm<SpotSchema>({
@@ -40,11 +58,12 @@ export const SpotForm = ({ children, className, spot, nextUrl, ...props }: SpotF
     defaultValues: getDefaults(spotSchema),
   })
 
-  const onSuccess = async () => {
-    handleSuccess({
-      redirect: nextUrl,
-      success: `Spot ${isEditing ? "updated" : "created"} successfully`,
-    })
+  const onSuccess = async (data: RouterOutputs["spot"]["create"]) => {
+    // If we have a nextUrl, navigate to it
+    nextUrl && navigate(nextUrl)
+
+    // Show a success toast
+    toast.success(`Spot ${isEditing ? "updated" : "created"} successfully`)
 
     // Invalidate the spots cache
     await utils.spot.getAll.invalidate({ workspaceId })
@@ -52,6 +71,9 @@ export const SpotForm = ({ children, className, spot, nextUrl, ...props }: SpotF
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
+
+    // Call the callback if provided
+    onSuccessCallback?.(data)
   }
 
   const onError = (error: TRPCClientErrorLike<AppRouter>) => {

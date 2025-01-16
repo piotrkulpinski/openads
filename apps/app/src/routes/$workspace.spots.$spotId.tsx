@@ -33,7 +33,12 @@ function SpotsEditPage() {
   return (
     <>
       <H3>Edit Ad Spot</H3>
-      <SpotForm className="mt-4" spot={spot} nextUrl={{ from: Route.fullPath, to: ".." }} />
+      <SpotForm
+        workspaceId={workspace.id}
+        spot={spot}
+        nextUrl={{ from: Route.fullPath, to: ".." }}
+        className="mt-4"
+      />
     </>
   )
 }
