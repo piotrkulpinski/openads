@@ -9,12 +9,12 @@ type OnboardingNextButtonProps = ComponentProps<typeof Button> & {
 }
 
 export function OnboardingNextButton({ step, slug, ...props }: OnboardingNextButtonProps) {
-  const { continueTo, isPending, isSuccess } = useOnboardingProgress()
+  const { continueTo, finish, isPending, isSuccess } = useOnboardingProgress()
 
   return (
     <Button
       size="lg"
-      onClick={() => continueTo(step, { slug })}
+      onClick={() => (step === "completed" ? finish({ slug }) : continueTo(step, { slug }))}
       isPending={isPending || isSuccess}
       {...props}
     />

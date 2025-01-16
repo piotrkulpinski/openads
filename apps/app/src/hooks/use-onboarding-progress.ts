@@ -23,9 +23,9 @@ export function useOnboardingProgress() {
     async (step: OnboardingStep, { slug }: ContinueToParams = {}) => {
       const workspaceParam = preWorkspaceSteps.includes(step) ? undefined : slug
 
-      mutate({ step })
+      await mutateAsync({ step })
 
-      navigate({
+      return navigate({
         to: "/onboarding/$step",
         params: { step },
         search: { workspace: workspaceParam },
@@ -38,8 +38,17 @@ export function useOnboardingProgress() {
     async ({ slug }: ContinueToParams = {}) => {
       await mutateAsync({ step: "completed" })
 
-      // If we have a workspace, navigate to it, otherwise navigate to the root route
-      navigate(slug ? { to: "/$workspace", params: { workspace: slug } } : { to: "/" })
+      // If we have a workspace, navigate to it
+      if (slug) {
+        return navigate({
+          to: "/$workspace",
+          params: { workspace: slug },
+          search: { onboarded: true },
+        })
+      }
+
+      // Otherwise, navigate to the root route
+      return navigate({ to: "/" })
     },
     [mutateAsync, navigate],
   )

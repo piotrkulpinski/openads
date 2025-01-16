@@ -1,14 +1,14 @@
 "use client"
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
-import type { ComponentProps } from "react"
+import type { ComponentProps, ReactNode } from "react"
 import { cx } from "../lib/cva"
 
 const TooltipProvider = TooltipPrimitive.Provider
-
-const Tooltip = TooltipPrimitive.Root
-
+const TooltipRoot = TooltipPrimitive.Root
 const TooltipTrigger = TooltipPrimitive.Trigger
+const TooltipPortal = TooltipPrimitive.Portal
+const TooltipArrow = TooltipPrimitive.Arrow
 
 const TooltipContent = ({
   className,
@@ -29,4 +29,39 @@ const TooltipContent = ({
   )
 }
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> &
+  ComponentProps<typeof TooltipContent> & {
+    tooltip: ReactNode
+  }
+
+const TooltipBase = ({ children, className, delayDuration, tooltip, ...rest }: TooltipProps) => {
+  if (!tooltip) {
+    return children
+  }
+
+  return (
+    <TooltipRoot delayDuration={delayDuration}>
+      <TooltipTrigger className={className} asChild>
+        {children}
+      </TooltipTrigger>
+
+      <TooltipPortal>
+        <TooltipContent {...rest}>
+          {tooltip}
+          <TooltipArrow className="fill-foreground" />
+        </TooltipContent>
+      </TooltipPortal>
+    </TooltipRoot>
+  )
+}
+
+const Tooltip = Object.assign(TooltipBase, {
+  Provider: TooltipProvider,
+  Root: TooltipRoot,
+  Trigger: TooltipTrigger,
+  Portal: TooltipPortal,
+  Content: TooltipContent,
+  Arrow: TooltipArrow,
+})
+
+export { Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, TooltipProvider }

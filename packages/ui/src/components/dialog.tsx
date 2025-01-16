@@ -54,7 +54,10 @@ const DialogHeader = ({ className, ...props }: ComponentProps<"div">) => (
 
 const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
   <div
-    className={cx("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+    className={cx(
+      "flex flex-col-reverse flex-wrap gap-x-2 gap-y-4 sm:flex-row sm:justify-end",
+      className,
+    )}
     {...props}
   />
 )

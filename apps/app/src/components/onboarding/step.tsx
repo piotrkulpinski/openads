@@ -18,7 +18,7 @@ export const OnboardingStep = ({
     <Intro alignment="center" className={cx(className)} {...props}>
       <IntroTitle>{title}</IntroTitle>
       <IntroDescription>{description}</IntroDescription>
-      <div className="mt-8 w-full">{children}</div>
+      <div className="mt-8 w-full max-w-sm">{children}</div>
     </Intro>
   )
 }

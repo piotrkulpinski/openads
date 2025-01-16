@@ -1,7 +1,7 @@
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { useIsMobile } from "@openads/ui/hooks"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@openads/ui/tooltip"
+import { TooltipContent, TooltipRoot, TooltipTrigger } from "@openads/ui/tooltip"
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps, ReactNode } from "react"
 
@@ -21,7 +21,7 @@ export const NavMain = ({ links }: NavMainProps) => {
     <>
       {links.map(({ title, label, prefix, ...props }, index) =>
         isMobile ? (
-          <Tooltip key={index}>
+          <TooltipRoot key={index}>
             <TooltipTrigger asChild>
               <Button size="sm" variant="ghost" aria-label={title} prefix={prefix} asChild>
                 <Link activeProps={{ className: "bg-accent" }} {...props} />
@@ -32,7 +32,7 @@ export const NavMain = ({ links }: NavMainProps) => {
               {title}
               {label && <span className="opacity-60">{label}</span>}
             </TooltipContent>
-          </Tooltip>
+          </TooltipRoot>
         ) : (
           <Button
             key={index}

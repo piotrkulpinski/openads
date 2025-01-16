@@ -19,7 +19,7 @@ import { Input } from "./input"
 import { Separator } from "./separator"
 import { Sheet, SheetContent, SheetTitle } from "./sheet"
 import { Skeleton } from "./skeleton"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip"
+import { TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger } from "./tooltip"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -460,7 +460,7 @@ const SidebarMenuButton = ({
   }
 
   return (
-    <Tooltip>
+    <TooltipRoot>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
         side="right"
@@ -468,7 +468,7 @@ const SidebarMenuButton = ({
         hidden={state !== "collapsed" || isMobile}
         {...tooltip}
       />
-    </Tooltip>
+    </TooltipRoot>
   )
 }
 

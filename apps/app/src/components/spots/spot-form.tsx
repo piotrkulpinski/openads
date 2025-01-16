@@ -6,12 +6,15 @@ import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Textarea } from "@openads/ui/textarea"
+import { Tooltip } from "@openads/ui/tooltip"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
+import { HelpCircleIcon } from "lucide-react"
 import type { HTMLProps } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
+import { Stack } from "~/components/stack"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { nullsToUndefined } from "~/lib/helpers"
 import { trpc } from "~/lib/trpc"
@@ -106,10 +109,10 @@ export const SpotForm = ({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name:</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
-                  autoFocus
+                  autoFocus={!isEditing}
                   placeholder="Banner Ad"
                   autoComplete="off"
                   autoCapitalize="none"
@@ -130,7 +133,7 @@ export const SpotForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description:</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea {...field} />
               </FormControl>
@@ -145,7 +148,14 @@ export const SpotForm = ({
           name="previewUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Preview URL:</FormLabel>
+              <Stack size="xs">
+                <FormLabel>Preview URL</FormLabel>
+
+                <Tooltip tooltip="This is a tooltip">
+                  <HelpCircleIcon className="size-4 text-muted-foreground" />
+                </Tooltip>
+              </Stack>
+
               <FormControl>
                 <Input placeholder="https://example.com/banner.png" {...field} />
               </FormControl>
@@ -160,7 +170,7 @@ export const SpotForm = ({
           name="price"
           render={({ field }) => (
             <FormItem className="col-span-full">
-              <FormLabel>Price:</FormLabel>
+              <FormLabel>Price</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="100" min={0} {...field} />
               </FormControl>

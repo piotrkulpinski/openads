@@ -1,12 +1,7 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router"
-import { z } from "zod"
 import { Logo } from "~/components/logo"
 
 export const Route = createFileRoute("/onboarding")({
-  validateSearch: z.object({
-    onboarded: z.boolean().optional(),
-  }),
-
   component: RouteComponent,
 })
 

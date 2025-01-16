@@ -64,7 +64,7 @@ export const CreateWorkspaceForm = ({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name:</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
                   autoFocus
@@ -88,7 +88,7 @@ export const CreateWorkspaceForm = ({
           name="slug"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Slug:</FormLabel>
+              <FormLabel>Slug</FormLabel>
               <FormControl>
                 <Input placeholder="acme" {...field} />
               </FormControl>
@@ -103,7 +103,7 @@ export const CreateWorkspaceForm = ({
           name="websiteUrl"
           render={({ field }) => (
             <FormItem className="col-span-full">
-              <FormLabel>Website URL:</FormLabel>
+              <FormLabel>Website URL</FormLabel>
               <FormControl>
                 <Input type="url" placeholder="https://acme.com" {...field} />
               </FormControl>
