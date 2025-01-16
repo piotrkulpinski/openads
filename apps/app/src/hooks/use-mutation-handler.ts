@@ -6,13 +6,11 @@ import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
 import type { createRouter } from "~/router"
 
-type RedirectOptions = NavigateOptions<ReturnType<typeof createRouter>>
-
 export const useMutationHandler = () => {
   const navigate = useNavigate()
 
   type HandleSuccess = {
-    redirect?: RedirectOptions
+    redirect?: NavigateOptions<ReturnType<typeof createRouter>>
     close?: boolean
     success?: string
     error?: string

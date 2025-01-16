@@ -6,3 +6,5 @@ export const spotSchema = z.object({
   previewUrl: z.string().trim().url().optional(),
   price: z.coerce.number().int().nonnegative().default(0),
 })
+
+export type SpotSchema = z.infer<typeof spotSchema>

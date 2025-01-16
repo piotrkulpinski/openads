@@ -1,23 +1,39 @@
-import { createFileRoute } from "@tanstack/react-router"
-import { useParams } from "react-router"
+import { createFileRoute, notFound } from "@tanstack/react-router"
 import { H3 } from "~/components/heading"
-import { CreateSpotForm } from "~/components/spots/create-spot-form"
-import { useWorkspace } from "~/contexts/workspace-context"
+import { SpotForm } from "~/components/spots/spot-form"
 import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspace/spots/$spotId")({
+  loader: async ({ context: { trpcUtils, workspace }, params: { spotId } }) => {
+    const spot = await trpcUtils.spot.getById.ensureData({ id: spotId, workspaceId: workspace.id })
+
+    if (!spot) {
+      throw notFound()
+    }
+
+    return
+  },
+
   component: SpotsEditPage,
 })
 
 function SpotsEditPage() {
-  const { id: workspaceId } = useWorkspace()
-  const { id } = useParams() as { id: string }
-  const { data: spot } = trpc.spot.getById.useQuery({ id, workspaceId }, { enabled: !!id })
+  const { workspace } = Route.useRouteContext()
+  const { spotId } = Route.useParams()
+
+  const { data: spot } = trpc.spot.getById.useQuery(
+    { id: spotId, workspaceId: workspace.id },
+    { enabled: !!spotId },
+  )
+
+  if (!spot) {
+    throw notFound()
+  }
 
   return (
     <>
       <H3>Edit Ad Spot</H3>
-      <CreateSpotForm className="mt-4" />
+      <SpotForm className="mt-4" spot={spot} nextUrl={{ from: Route.fullPath, to: ".." }} />
     </>
   )
 }
