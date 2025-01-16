@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { H3 } from "~/components/heading"
 import { SpotForm } from "~/components/spots/spot-form"
+import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspace/spots/new")({
   component: SpotsNewPage,

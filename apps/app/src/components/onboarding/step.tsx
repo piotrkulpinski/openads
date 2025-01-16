@@ -1,6 +1,6 @@
 import { cx } from "@openads/ui/cva"
 import type { ComponentProps, ReactNode } from "react"
-import { Intro, IntroDescription, IntroTitle } from "~/components/intro"
+import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 
 type OnboardingStepProps = ComponentProps<typeof Intro> & {
   title: ReactNode

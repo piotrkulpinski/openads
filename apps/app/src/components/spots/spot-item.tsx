@@ -1,7 +1,7 @@
 import { cx } from "@openads/ui/cva"
 import { Link } from "@tanstack/react-router"
 import type { HTMLProps } from "react"
-import { H5 } from "~/components/heading"
+import { H5 } from "~/components/ui/heading"
 import type { RouterOutputs } from "~/lib/trpc"
 
 type SpotItemProps = HTMLProps<HTMLDivElement> & {

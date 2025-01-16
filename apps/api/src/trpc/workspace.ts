@@ -1,6 +1,5 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
-import { workspaceSchema } from "@openads/db/schema"
-import { z } from "zod"
+import { idSchema, workspaceSchema } from "@openads/db/schema"
 import { authProcedure, router } from "~/trpc"
 
 export const workspaceRouter = router({
@@ -33,13 +32,21 @@ export const workspaceRouter = router({
     }),
 
   changeDefault: authProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .mutation(async ({ ctx: { db, userId }, input: { workspaceId } }) => {
+    .input(idSchema)
+    .mutation(async ({ ctx: { db, userId }, input: { id } }) => {
       const workspace = await db.workspace.update({
-        where: { id: workspaceId },
+        where: { id, AND: [db.workspace.belongsTo(userId)] },
         data: { defaultFor: { connect: { id: userId } } },
       })
 
       return workspace
     }),
+
+  delete: authProcedure.input(idSchema).mutation(async ({ ctx: { db, userId }, input: { id } }) => {
+    const workspace = await db.workspace.delete({
+      where: { id, AND: [db.workspace.belongsTo(userId)] },
+    })
+
+    return workspace
+  }),
 })

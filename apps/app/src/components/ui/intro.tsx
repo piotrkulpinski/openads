@@ -1,6 +1,6 @@
 import { type VariantProps, cva, cx } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
-import { Heading, type HeadingProps } from "~/components/heading"
+import { Heading, type HeadingProps } from "~/components/ui/heading"
 
 const introVariants = cva({
   base: "flex w-full flex-col gap-y-2",

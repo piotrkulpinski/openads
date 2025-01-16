@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { z } from "zod"
-import { H3 } from "~/components/heading"
+import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspace/")({
   validateSearch: z.object({

@@ -46,7 +46,8 @@
     "./toggle": "./src/components/toggle.tsx",
     "./tooltip": "./src/components/tooltip.tsx",
     "./hooks": "./src/hooks/index.ts",
-    "./cva": "./src/lib/cva.ts"
+    "./cva": "./src/lib/cva.ts",
+    "./helpers": "./src/lib/helpers.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.2",

@@ -10,9 +10,9 @@ import {
   Settings,
 } from "lucide-react"
 import type { HTMLProps } from "react"
-import { Logo } from "~/components/logo"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
+import { Logo } from "~/components/ui/logo"
 import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 import { useWorkspace } from "~/contexts/workspace-context"

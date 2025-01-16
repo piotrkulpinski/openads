@@ -1,6 +1,6 @@
 import { Button } from "@openads/ui/button"
 import { Link, useLocation } from "@tanstack/react-router"
-import { Intro, IntroDescription, IntroTitle } from "~/components/intro"
+import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 
 export const NotFound = () => {
   const { pathname } = useLocation()

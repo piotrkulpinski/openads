@@ -5,7 +5,7 @@ export const Route = createFileRoute("/_layout/onboarding")({
     const step = await trpcUtils.onboarding.getProgress.fetch()
 
     if (step === "completed") {
-      return redirect({ to: "/" })
+      throw redirect({ to: "/" })
     }
   },
 })

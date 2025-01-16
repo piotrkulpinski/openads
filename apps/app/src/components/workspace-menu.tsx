@@ -37,7 +37,7 @@ export const WorkspaceMenu = () => {
   const changeWorkspace = (workspace?: Workspace) => {
     if (!workspace || workspace.slug === activeWorkspace.slug) return
 
-    changeDefaultWorkspace.mutate({ workspaceId: workspace.id })
+    changeDefaultWorkspace.mutate({ id: workspace.id })
     navigate({ to: "/$workspace", params: { workspace: workspace.slug } })
   }
 

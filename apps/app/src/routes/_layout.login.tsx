@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { z } from "zod"
 import { LoginButton } from "~/components/auth/login-button"
-import { Intro, IntroDescription, IntroTitle } from "~/components/intro"
+import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 import { siteConfig } from "~/config/site"
 
 type LoginSearch = {
