@@ -3,11 +3,6 @@ import { Sidebar } from "~/components/sidebar"
 import { WorkspaceContext } from "~/contexts/workspace-context"
 
 export const Route = createFileRoute("/$workspace")({
-  // TODO: Remove if not needed
-  // validateSearch: z.object({
-  //   onboarded: z.boolean().optional(),
-  // }),
-
   beforeLoad: async ({ context, params: { workspace: slug } }) => {
     const workspace = await context.trpcUtils.workspace.getBySlug.fetch({
       slug,

@@ -5,7 +5,10 @@ import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspace/spots/$spotId")({
   loader: async ({ context: { trpcUtils, workspace }, params: { spotId } }) => {
-    const spot = await trpcUtils.spot.getById.ensureData({ id: spotId, workspaceId: workspace.id })
+    const spot = await trpcUtils.spot.getById.ensureData({
+      id: spotId,
+      workspaceId: workspace.id,
+    })
 
     if (!spot) {
       throw notFound()
