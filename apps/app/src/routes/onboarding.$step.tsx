@@ -1,12 +1,14 @@
 import { ONBOARDING_STEPS } from "@openads/utils"
 import { createFileRoute, notFound } from "@tanstack/react-router"
-import { LoaderIcon } from "lucide-react"
+import { ArrowRightIcon, LoaderIcon } from "lucide-react"
 import { z } from "zod"
 import { OnboardingLaterButton } from "~/components/onboarding/later-button"
+import { OnboardingNextButton } from "~/components/onboarding/next-button"
 import { OnboardingStep } from "~/components/onboarding/step"
 import { QueryCell } from "~/components/query-cell"
 import { SpotForm } from "~/components/spots/spot-form"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
+import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 import { trpc } from "~/lib/trpc"
 
@@ -36,6 +38,22 @@ function OnboardingStepPage() {
   const query = trpc.workspace.getBySlug.useQuery({ slug: slug! }, { enabled: !!slug })
 
   switch (step) {
+    case "welcome":
+      return (
+        <OnboardingStep
+          title={`Welcome to ${siteConfig.name}`}
+          description={`${siteConfig.name} is an ad spot management platform, crafted to simplify the process of selling ad spots on your websites.`}
+        >
+          <OnboardingNextButton
+            step="workspace"
+            suffix={<ArrowRightIcon />}
+            className="text-base min-w-2/3"
+          >
+            Get started
+          </OnboardingNextButton>
+        </OnboardingStep>
+      )
+
     case "workspace":
       return (
         <OnboardingStep
