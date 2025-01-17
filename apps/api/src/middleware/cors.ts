@@ -1,7 +1,8 @@
 import { cors } from "hono/cors"
+import { env } from "~/env"
 
 export const corsMiddleware = cors({
-  origin: ["http://localhost:5174"],
+  origin: [env.APP_URL],
   credentials: true,
   allowHeaders: ["Content-Type", "Authorization"],
   exposeHeaders: ["Set-Cookie"],

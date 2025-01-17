@@ -1,63 +1,61 @@
-import { WorkspaceMemberRole } from "@openads/db/client"
+import { Prisma, WorkspaceMemberRole } from "@openads/db/client"
 import { workspaceSchema } from "@openads/db/schema"
-import { authProcedure, router } from "~/trpc"
+import { env } from "~/env"
+import { authProcedure, router, workspaceProcedure } from "~/trpc"
 
 export const workspaceRouter = router({
-  getAll: authProcedure.query(async ({ ctx: { db, userId } }) => {
+  getAll: authProcedure.query(async ({ ctx: { db, user } }) => {
     return await db.workspace.findMany({
-      where: db.workspace.belongsTo(userId),
+      where: db.workspace.belongsTo(user.id),
       orderBy: { createdAt: "asc" },
     })
   }),
 
   getBySlug: authProcedure
     .input(workspaceSchema.pick({ slug: true }))
-    .query(async ({ ctx: { db, userId }, input: { slug } }) => {
+    .query(async ({ ctx: { db, user }, input: { slug } }) => {
       return await db.workspace.findFirst({
-        where: { AND: [{ slug }, db.workspace.belongsTo(userId)] },
+        where: { AND: [{ slug }, db.workspace.belongsTo(user.id)] },
       })
     }),
 
   create: authProcedure
     .input(workspaceSchema)
-    .mutation(async ({ ctx: { db, userId }, input: { ...data } }) => {
+    .mutation(async ({ ctx: { db, user }, input: { ...data } }) => {
       const workspace = await db.workspace.create({
         data: {
           ...data,
-          members: { create: { userId, role: WorkspaceMemberRole.Owner } },
+          members: { create: { userId: user.id, role: WorkspaceMemberRole.Owner } },
         },
       })
 
       return workspace
     }),
 
-  update: authProcedure
+  update: workspaceProcedure
     .input(workspaceSchema)
-    .mutation(async ({ ctx: { db, userId }, input: { id, ...data } }) => {
+    .mutation(async ({ ctx: { db }, input: { workspaceId, ...data } }) => {
       const workspace = await db.workspace.update({
-        where: { id, AND: [db.workspace.belongsTo(userId)] },
+        where: { id: workspaceId },
         data,
       })
 
       return workspace
     }),
 
-  delete: authProcedure
-    .input(workspaceSchema.pick({ id: true }))
-    .mutation(async ({ ctx: { db, userId }, input: { id } }) => {
-      const workspace = await db.workspace.delete({
-        where: { id, AND: [db.workspace.belongsTo(userId)] },
-      })
+  delete: workspaceProcedure.mutation(async ({ ctx: { db }, input: { workspaceId } }) => {
+    const workspace = await db.workspace.delete({
+      where: { id: workspaceId },
+    })
 
-      return workspace
-    }),
+    return workspace
+  }),
 
-  changeDefault: authProcedure
-    .input(workspaceSchema.pick({ id: true }))
-    .mutation(async ({ ctx: { db, userId }, input: { id } }) => {
+  changeDefault: workspaceProcedure.mutation(
+    async ({ ctx: { db, user }, input: { workspaceId } }) => {
       const workspace = await db.workspace.update({
-        where: { id, AND: [db.workspace.belongsTo(userId)] },
-        data: { defaultFor: { connect: { id: userId } } },
+        where: { id: workspaceId },
+        data: { defaultFor: { connect: { id: user.id } } },
       })
 
       return workspace

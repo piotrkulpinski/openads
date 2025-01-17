@@ -65,16 +65,13 @@ export const procedure = t.procedure
 
 // Procedure that checks if a user is authenticated
 export const authProcedure = procedure.use(
-  t.middleware(async ({ ctx, next }) => {
-    if (!ctx.auth) {
+  t.middleware(async ({ ctx: { auth }, next }) => {
+    if (!auth) {
       throw new TRPCError({ code: "UNAUTHORIZED" })
     }
 
     return next({
-      ctx: {
-        ...ctx,
-        userId: ctx.auth.user.id,
-      },
+      ctx: { user: auth.user },
     })
   }),
 )
@@ -82,14 +79,16 @@ export const authProcedure = procedure.use(
 // procedure that checks if a user is a member of a specific workspace
 export const workspaceProcedure = authProcedure
   .input(z.object({ workspaceId: z.string() }))
-  .use(async ({ ctx: { db, userId }, input: { workspaceId }, next }) => {
+  .use(async ({ ctx: { db, user }, input: { workspaceId }, next }) => {
     const workspace = await db.workspace.findFirst({
-      where: { AND: [{ id: workspaceId }, db.workspace.belongsTo(userId)] },
+      where: { AND: [{ id: workspaceId }, db.workspace.belongsTo(user.id)] },
     })
 
     if (!workspace) {
       throw new TRPCError({ code: "FORBIDDEN" })
     }
 
-    return next()
+    return next({
+      ctx: { workspace },
+    })
   })
