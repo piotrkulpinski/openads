@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { Section } from "~/components/ui/section"
-// import { SettingsProvider } from "~/providers/SettingsProvider"
+import { DeleteForm } from "~/routes/$workspace/settings/general/-components/delete-form"
+import { GeneralForm } from "~/routes/$workspace/settings/general/-components/general-form"
+import { IdForm } from "~/routes/$workspace/settings/general/-components/id-form"
 
 export const Route = createFileRoute("/$workspace/settings/general/")({
   component: SettingsGeneralPage,
@@ -9,16 +11,9 @@ export const Route = createFileRoute("/$workspace/settings/general/")({
 function SettingsGeneralPage() {
   return (
     <Section>
-      {/* <SettingsProvider>
-        <GeneralForm />
-      </SettingsProvider>
-
-      <SettingsProvider>
-        <AppearanceForm />
-      </SettingsProvider>
-
-      <DeleteForm /> */}
-      settings
+      <GeneralForm />
+      <IdForm />
+      <DeleteForm />
     </Section>
   )
 }

@@ -23,4 +23,4 @@ const Section = ({ className, asChild = false, ...props }: SectionProps) => {
   return <Component className={cx(sectionVariants({ className }))} {...props} />
 }
 
-export { Section }
+export { Section, sectionVariants }

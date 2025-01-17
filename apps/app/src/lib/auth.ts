@@ -1,7 +1,7 @@
 import { createAuthClient } from "better-auth/react"
-import { getBaseUrl } from "./trpc"
+import { env } from "~/env"
 
 export const { signIn, signOut, useSession } = createAuthClient({
-  baseURL: `${getBaseUrl()}/api/auth`,
+  baseURL: `${env.VITE_API_URL}/api/auth`,
   credentials: "include",
 })

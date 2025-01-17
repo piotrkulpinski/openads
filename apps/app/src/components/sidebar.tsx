@@ -1,14 +1,7 @@
 import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import { Link } from "@tanstack/react-router"
-import {
-  CalendarDays,
-  ChartSpline,
-  LayoutDashboardIcon,
-  Megaphone,
-  MousePointer2,
-  Settings,
-} from "lucide-react"
+import { CalendarDays, LayoutDashboardIcon, Megaphone, MousePointer2, Settings } from "lucide-react"
 import type { HTMLProps } from "react"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
@@ -65,11 +58,6 @@ export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
               title: "Advertisers",
               to: `/${workspaceSlug}/advertisers`,
               prefix: <Megaphone />,
-            },
-            {
-              title: "Analytics",
-              to: `/${workspaceSlug}/analytics`,
-              prefix: <ChartSpline />,
             },
             {
               title: "Settings",

@@ -1,5 +1,5 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
-import { idSchema, workspaceSchema } from "@openads/db/schema"
+import { workspaceSchema } from "@openads/db/schema"
 import { authProcedure, router } from "~/trpc"
 
 export const workspaceRouter = router({
@@ -31,8 +31,29 @@ export const workspaceRouter = router({
       return workspace
     }),
 
+  update: authProcedure
+    .input(workspaceSchema)
+    .mutation(async ({ ctx: { db, userId }, input: { id, ...data } }) => {
+      const workspace = await db.workspace.update({
+        where: { id, AND: [db.workspace.belongsTo(userId)] },
+        data,
+      })
+
+      return workspace
+    }),
+
+  delete: authProcedure
+    .input(workspaceSchema.pick({ id: true }))
+    .mutation(async ({ ctx: { db, userId }, input: { id } }) => {
+      const workspace = await db.workspace.delete({
+        where: { id, AND: [db.workspace.belongsTo(userId)] },
+      })
+
+      return workspace
+    }),
+
   changeDefault: authProcedure
-    .input(idSchema)
+    .input(workspaceSchema.pick({ id: true }))
     .mutation(async ({ ctx: { db, userId }, input: { id } }) => {
       const workspace = await db.workspace.update({
         where: { id, AND: [db.workspace.belongsTo(userId)] },
@@ -41,12 +62,4 @@ export const workspaceRouter = router({
 
       return workspace
     }),
-
-  delete: authProcedure.input(idSchema).mutation(async ({ ctx: { db, userId }, input: { id } }) => {
-    const workspace = await db.workspace.delete({
-      where: { id, AND: [db.workspace.belongsTo(userId)] },
-    })
-
-    return workspace
-  }),
 })

@@ -3,12 +3,9 @@ import { QueryClient } from "@tanstack/react-query"
 import { httpBatchLink } from "@trpc/client"
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
+import { env } from "~/env"
 
 export const trpc = createTRPCReact<AppRouter>()
-
-export function getBaseUrl() {
-  return "http://localhost:3001"
-}
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,7 +21,7 @@ export const queryClient = new QueryClient({
 export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
-      url: `${getBaseUrl()}/trpc`,
+      url: `${env.VITE_API_URL}/trpc`,
       fetch: (url, options) => fetch(url, { ...options, credentials: "include" }),
       transformer: superjson,
     }),

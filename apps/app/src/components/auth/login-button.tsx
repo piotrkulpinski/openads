@@ -1,4 +1,3 @@
-import { upperFirst } from "@curiousleaf/utils"
 import { Button, type ButtonProps } from "@openads/ui/button"
 import { LoaderIcon } from "lucide-react"
 import { signIn } from "~/lib/auth"
@@ -25,7 +24,7 @@ export const LoginButton = ({
       disabled={isLoading}
       {...props}
     >
-      Sign in with {upperFirst(provider)}
+      Sign in with {provider}
     </Button>
   )
 }
