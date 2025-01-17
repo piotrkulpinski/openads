@@ -64,7 +64,6 @@ export const GeneralForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
                     <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input
-                        autoFocus
                         placeholder="Acme Co"
                         autoComplete="off"
                         autoCapitalize="none"

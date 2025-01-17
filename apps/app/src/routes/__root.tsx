@@ -29,7 +29,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   },
 
   component: () => (
-    <TooltipProvider delayDuration={250}>
+    <TooltipProvider delayDuration={100}>
       <Outlet />
 
       <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />

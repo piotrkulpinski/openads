@@ -1,4 +1,8 @@
+import { useClipboard } from "@mantine/hooks"
+import { Button } from "@openads/ui/button"
 import { Input } from "@openads/ui/input"
+import { Tooltip } from "@openads/ui/tooltip"
+import { CheckIcon, CopyIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
 import { Card } from "~/components/ui/card"
 import { Header } from "~/components/ui/header"
@@ -8,6 +12,7 @@ import { useWorkspace } from "~/contexts/workspace-context"
 
 export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
   const workspace = useWorkspace()
+  const clipboard = useClipboard({ timeout: 3000 })
 
   return (
     <Card {...props}>
@@ -17,7 +22,26 @@ export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
           description={`Unique ID of your workspace on ${siteConfig.name}.`}
         />
 
-        <Input readOnly className="max-w-xl" value={workspace.id} />
+        <div className="relative max-w-xl">
+          <Input readOnly value={workspace.id} />
+
+          <Tooltip tooltip={clipboard.copied ? "Copied to clipboard" : "Copy to clipboard"}>
+            <Button
+              size="sm"
+              variant="ghost"
+              prefix={
+                clipboard.copied ? (
+                  <CheckIcon className="size-4 text-green-500" />
+                ) : (
+                  <CopyIcon className="size-4" />
+                )
+              }
+              onClick={() => clipboard.copy(workspace.id)}
+              aria-label="Copy"
+              className="absolute right-1 top-1/2 -translate-y-1/2"
+            />
+          </Tooltip>
+        </div>
       </Card.Section>
 
       <Card.Row>

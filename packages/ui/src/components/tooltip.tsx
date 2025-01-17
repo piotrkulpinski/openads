@@ -20,7 +20,8 @@ const TooltipContent = ({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cx(
-          "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+          "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground",
+          "data-[state=delayed-open]:data-[side=bottom]:animate-slide-up-and-fade data-[state=delayed-open]:data-[side=left]:animate-slide-right-and-fade data-[state=delayed-open]:data-[side=right]:animate-slide-left-and-fade data-[state=delayed-open]:data-[side=top]:animate-slide-down-and-fade",
           className,
         )}
         {...props}
@@ -48,7 +49,7 @@ const TooltipBase = ({ children, className, delayDuration, tooltip, ...rest }: T
       <TooltipPortal>
         <TooltipContent {...rest}>
           {tooltip}
-          <TooltipArrow className="fill-foreground" />
+          <TooltipArrow className="fill-primary" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>
