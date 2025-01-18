@@ -5,6 +5,15 @@ model Booking {
   startsAt  DateTime
   endsAt    DateTime
 
+  // Payment fields
+  amount                Int // Amount in cents
+  currency              String  @default("usd")
+  status                String  @default("pending") // pending, paid, cancelled, refunded
+  stripePaymentIntentId String? @unique
+  stripeTransferId      String?
+  stripeFee             Int? // Stripe's fee in cents
+  platformFee           Int? // Our platform fee in cents
+
   // Relations
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
@@ -15,4 +24,6 @@ model Booking {
   // Indexes
   @@index([workspaceId])
   @@index([spotId])
+  @@index([stripePaymentIntentId])
+  @@index([status])
 }

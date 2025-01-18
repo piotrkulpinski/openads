@@ -47,7 +47,11 @@ export const GeneralForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
 
   return (
     <Card asChild {...props}>
-      <form onSubmit={form.handleSubmit(data => updateWorkspace({ ...data, id: workspace.id }))}>
+      <form
+        onSubmit={form.handleSubmit(data =>
+          updateWorkspace({ ...data, workspaceId: workspace.id }),
+        )}
+      >
         <Form {...form}>
           <Card.Section>
             <Header

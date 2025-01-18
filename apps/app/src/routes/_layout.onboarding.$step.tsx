@@ -7,6 +7,7 @@ import { OnboardingNextButton } from "~/components/onboarding/next-button"
 import { OnboardingStep } from "~/components/onboarding/step"
 import { QueryCell } from "~/components/query-cell"
 import { SpotForm } from "~/components/spots/spot-form"
+import { StripeConnectButtons } from "~/components/stripe/stripe-connect-buttons"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
@@ -14,14 +15,14 @@ import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/_layout/onboarding/$step")({
   params: {
-    parse: (p) => z.object({ step: z.enum(ONBOARDING_STEPS) }).parse(p),
+    parse: p => z.object({ step: z.enum(ONBOARDING_STEPS) }).parse(p),
   },
 
   validateSearch: z.object({
     workspace: z.string().optional(),
   }),
 
-  onError: (error) => {
+  onError: error => {
     if (error?.routerCode === "PARSE_PARAMS") {
       throw notFound()
     }
@@ -35,10 +36,7 @@ function OnboardingStepPage() {
   const { workspace: slug } = Route.useSearch()
   const { continueTo } = useOnboardingProgress()
 
-  const query = trpc.workspace.getBySlug.useQuery(
-    { slug: slug! },
-    { enabled: !!slug },
-  )
+  const query = trpc.workspace.getBySlug.useQuery({ slug: slug! }, { enabled: !!slug })
 
   switch (step) {
     case "welcome":
@@ -63,9 +61,7 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm
-            onSuccess={({ slug }) => continueTo("spot", slug)}
-          />
+          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("spot", slug)} />
         </OnboardingStep>
       )
 
@@ -78,18 +74,34 @@ function OnboardingStepPage() {
           <QueryCell
             query={query}
             pending={() => <LoaderIcon className="mx-auto animate-spin" />}
-            empty={() => (
-              <p className="text-red-500">
-                There was an error loading the workspace.
-              </p>
-            )}
+            empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
             success={({ data }) => (
-              <SpotForm
-                workspaceId={data?.id}
-                onSuccess={() => continueTo("completed", slug)}
-              >
-                <OnboardingLaterButton step="completed" slug={slug} />
+              <SpotForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", slug)}>
+                <OnboardingLaterButton step="stripe" slug={slug} />
               </SpotForm>
+            )}
+          />
+        </OnboardingStep>
+      )
+
+    case "stripe":
+      return (
+        <OnboardingStep
+          title="Connect your Stripe account"
+          description="Connect your Stripe account to start receiving payments for your ad spots."
+        >
+          <QueryCell
+            query={query}
+            pending={() => <LoaderIcon className="mx-auto animate-spin" />}
+            empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
+            success={({ data }) => (
+              <div className="space-y-4">
+                <StripeConnectButtons workspace={data} />
+
+                <OnboardingLaterButton step="completed" slug={slug}>
+                  I'll connect Stripe later
+                </OnboardingLaterButton>
+              </div>
             )}
           />
         </OnboardingStep>

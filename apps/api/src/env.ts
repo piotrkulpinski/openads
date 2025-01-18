@@ -15,6 +15,10 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     REDIS_REST_URL: z.string(),
     REDIS_REST_TOKEN: z.string(),
+    STRIPE_SECRET_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
+    STRIPE_CONNECT_CLIENT_ID: z.string(),
+    STRIPE_PLATFORM_FEE_PERCENT: z.coerce.number().positive().max(100).default(0),
   },
 
   /**

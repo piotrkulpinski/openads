@@ -6,7 +6,7 @@ import { trpc } from "~/lib/trpc"
 
 export function useOnboardingProgress() {
   const navigate = useNavigate()
-  const preWorkspaceSteps = ["workspace"]
+  const preWorkspaceSteps = ["welcome", "workspace"]
 
   const { mutate, mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
     onError: ({ data }) => {

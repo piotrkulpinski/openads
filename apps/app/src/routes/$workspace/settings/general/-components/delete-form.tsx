@@ -23,6 +23,10 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
       // Invalidate the workspace list
       await trpcUtils.workspace.getAll.invalidate()
     },
+
+    onError: error => {
+      toast.error(error.message)
+    },
   })
 
   return (
@@ -38,7 +42,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
         <DialogConfirm
           title="Delete your workspace?"
           label="Delete Workspace"
-          onConfirm={() => deleteWorkspace({ id })}
+          onConfirm={() => deleteWorkspace({ workspaceId: id })}
           confirmText={slug}
         >
           <Button size="lg" isPending={isPending} variant="destructive">

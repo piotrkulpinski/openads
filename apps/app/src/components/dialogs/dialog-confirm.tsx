@@ -37,6 +37,7 @@ export const DialogConfirm = ({
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
+    defaultValues: { confirm: "" },
   })
 
   const onSubmit = () => {
