@@ -2,7 +2,7 @@ import { Button } from "@openads/ui/button"
 import { useNavigate } from "@tanstack/react-router"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
-import { DialogConfirm } from "~/components/dialogs/dialog-confirm"
+import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { Card } from "~/components/ui/card"
 import { Header } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
@@ -39,7 +39,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
       </Card.Panel>
 
       <Card.Row direction="rowReverse" className="border-red-200 bg-red-50">
-        <DialogConfirm
+        <ConfirmModal
           title="Delete your workspace?"
           label="Delete Workspace"
           onConfirm={() => deleteWorkspace({ workspaceId: id })}
@@ -48,7 +48,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
           <Button size="lg" isPending={isPending} variant="destructive">
             Delete Workspace
           </Button>
-        </DialogConfirm>
+        </ConfirmModal>
       </Card.Row>
     </Card>
   )

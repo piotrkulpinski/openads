@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Header } from "~/components/ui/header"
 
-type DialogConfirmProps = HTMLAttributes<HTMLButtonElement> &
+type ConfirmModalProps = HTMLAttributes<HTMLButtonElement> &
   ComponentProps<typeof Button> & {
     label?: ReactNode
     title?: ReactNode
@@ -19,7 +19,7 @@ type DialogConfirmProps = HTMLAttributes<HTMLButtonElement> &
     confirmText?: string
   }
 
-export const DialogConfirm = ({
+export const ConfirmModal = ({
   children,
   label = "Delete",
   title = "Are you sure?",
@@ -28,7 +28,7 @@ export const DialogConfirm = ({
   variant = "destructive",
   onConfirm,
   confirmText,
-}: DialogConfirmProps) => {
+}: ConfirmModalProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const schema = z.object({
