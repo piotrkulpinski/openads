@@ -1,6 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@openads/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from "@openads/ui/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { useState } from "react"
@@ -52,9 +59,11 @@ export const ConfirmModal = ({
       <Form {...form}>
         <DialogContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-            <Header size="h4" title={title} description={description}>
-              <DialogClose />
-            </Header>
+            <DialogTitle asChild>
+              <Header size="h4" title={title} description={description}>
+                <DialogClose />
+              </Header>
+            </DialogTitle>
 
             {!!confirmText && (
               <FormField

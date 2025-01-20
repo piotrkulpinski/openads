@@ -108,7 +108,7 @@ const HeaderBase = ({
   return (
     <HeaderRoot alignment={alignment} gap={gap} separated={separated} {...props}>
       {title && <HeaderTitle size={size}>{title}</HeaderTitle>}
-      {children && <Stack className="-my-0.5">{children}</Stack>}
+      {children && <Stack>{children}</Stack>}
       {description && <HeaderDescription>{description}</HeaderDescription>}
     </HeaderRoot>
   )

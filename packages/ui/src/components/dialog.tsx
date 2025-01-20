@@ -8,12 +8,13 @@ import { cx } from "../lib/cva"
 const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
+const DialogTitle = DialogPrimitive.Title
 const DialogClose = DialogPrimitive.Close
 
 const DialogOverlay = ({ className, ...props }: ComponentProps<typeof DialogPrimitive.Overlay>) => (
   <DialogPrimitive.Overlay
     className={cx(
-      "fixed inset-0 z-50 bg-primary-foreground/60 backdrop-blur-sm",
+      "fixed inset-0 z-50 bg-background/60 backdrop-blur-sm",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
       className,
@@ -58,13 +59,6 @@ const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
       "flex flex-col-reverse flex-wrap gap-x-2 gap-y-4 sm:flex-row sm:justify-end",
       className,
     )}
-    {...props}
-  />
-)
-
-const DialogTitle = ({ className, ...props }: ComponentProps<typeof DialogPrimitive.Title>) => (
-  <DialogPrimitive.Title
-    className={cx("text-lg font-semibold leading-none tracking-tight lg:text-xl", className)}
     {...props}
   />
 )

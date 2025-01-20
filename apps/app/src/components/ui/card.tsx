@@ -40,8 +40,8 @@ const cardRowVariants = cva({
 
   variants: {
     size: {
-      md: "md:py-4",
-      lg: "md:py-6",
+      md: "min-h-16 md:py-4",
+      lg: "min-h-18 md:py-6",
     },
     gap: {
       sm: "gap-3 md:gap-x-4",
