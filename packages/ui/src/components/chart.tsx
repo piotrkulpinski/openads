@@ -1,6 +1,6 @@
 "use client"
 
-import type { CSSProperties, ComponentProps, ComponentType, HTMLProps, ReactNode } from "react"
+import type { CSSProperties, ComponentProps, ComponentType, HTMLAttributes, ReactNode } from "react"
 import { createContext, useContext, useId, useMemo } from "react"
 import * as RechartsPrimitive from "recharts"
 import { cx } from "../lib/cva"
@@ -40,7 +40,7 @@ const ChartContainer = ({
   children,
   config,
   // ...props
-}: HTMLProps<"div"> & {
+}: HTMLAttributes<"div"> & {
   config: ChartConfig
   children: ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"]
 }) => {

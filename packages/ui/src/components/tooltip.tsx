@@ -2,6 +2,7 @@
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import type { ComponentProps, ReactNode } from "react"
+import { popoverAnimationClasses } from "~/lib/classes"
 import { cx } from "../lib/cva"
 
 const TooltipProvider = TooltipPrimitive.Provider
@@ -20,8 +21,8 @@ const TooltipContent = ({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cx(
-          "z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground",
-          "data-[state=delayed-open]:data-[side=bottom]:animate-slide-up-and-fade data-[state=delayed-open]:data-[side=left]:animate-slide-right-and-fade data-[state=delayed-open]:data-[side=right]:animate-slide-left-and-fade data-[state=delayed-open]:data-[side=top]:animate-slide-down-and-fade",
+          "z-50 rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground will-change-[transform,opacity]",
+          popoverAnimationClasses,
           className,
         )}
         {...props}

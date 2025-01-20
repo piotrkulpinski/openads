@@ -44,13 +44,13 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
-  --animate-slide-down-and-fade: slide-down-and-fade 0.5s
+  --animate-slide-down-and-fade: slide-down-and-fade 0.4s
     cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-left-and-fade: slide-left-and-fade 0.5s
+  --animate-slide-left-and-fade: slide-left-and-fade 0.4s
     cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-up-and-fade: slide-up-and-fade 0.5s
+  --animate-slide-up-and-fade: slide-up-and-fade 0.4s
     cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-right-and-fade: slide-right-and-fade 0.5s
+  --animate-slide-right-and-fade: slide-right-and-fade 0.4s
     cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes accordion-down {
@@ -74,44 +74,44 @@
   @keyframes slide-down-and-fade {
     from {
       opacity: 0;
-      transform: "translateY(-px)";
+      transform: translateY(-4px);
     }
     to {
       opacity: 1;
-      transform: "translateY(0)";
+      transform: translateY(0);
     }
   }
 
   @keyframes slide-left-and-fade {
     from {
       opacity: 0;
-      transform: "translateX(px)";
+      transform: translateX(4px);
     }
     to {
       opacity: 1;
-      transform: "translateX(0)";
+      transform: translateX(0);
     }
   }
 
   @keyframes slide-up-and-fade {
     from {
       opacity: 0;
-      transform: "translateY(px)";
+      transform: translateY(4px);
     }
     to {
       opacity: 1;
-      transform: "translateY(0)";
+      transform: translateY(0);
     }
   }
 
   @keyframes slide-right-and-fade {
     from {
       opacity: 0;
-      transform: "translateX(-px)";
+      transform: translateX(-4px);
     }
     to {
       opacity: 1;
-      transform: "translateX(0)";
+      transform: translateX(0);
     }
   }
 }
