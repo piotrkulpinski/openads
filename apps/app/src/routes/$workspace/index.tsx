@@ -25,7 +25,7 @@ function DashboardPage() {
 
   return (
     <>
-      <WelcomeModal onClose={() => navigate({ search: {} })} />
+      <WelcomeModal onClose={() => navigate({ search: {}, replace: true })} />
       <H3>Dashboard</H3>
     </>
   )

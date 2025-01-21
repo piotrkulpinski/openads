@@ -1,11 +1,10 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { SpotForm } from "~/components/spots/spot-form"
 import { H3 } from "~/components/ui/heading"
-import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspace/spots/$spotId")({
   loader: async ({ context: { trpcUtils, workspace }, params: { spotId } }) => {
-    const spot = await trpcUtils.spot.getById.ensureData({
+    const spot = await trpcUtils.spot.getById.fetch({
       id: spotId,
       workspaceId: workspace.id,
     })
@@ -14,7 +13,7 @@ export const Route = createFileRoute("/$workspace/spots/$spotId")({
       throw notFound()
     }
 
-    return
+    return { spot }
   },
 
   component: SpotsEditPage,
@@ -22,20 +21,12 @@ export const Route = createFileRoute("/$workspace/spots/$spotId")({
 
 function SpotsEditPage() {
   const { workspace } = Route.useRouteContext()
-  const { spotId } = Route.useParams()
-
-  const { data: spot } = trpc.spot.getById.useQuery(
-    { id: spotId, workspaceId: workspace.id },
-    { enabled: !!spotId },
-  )
-
-  if (!spot) {
-    throw notFound()
-  }
+  const { spot } = Route.useLoaderData()
 
   return (
     <>
       <H3>Edit Ad Spot</H3>
+
       <SpotForm
         workspaceId={workspace.id}
         spot={spot}

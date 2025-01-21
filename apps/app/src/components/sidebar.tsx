@@ -2,7 +2,7 @@ import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import { Link } from "@tanstack/react-router"
 import { CalendarDays, LayoutDashboardIcon, Megaphone, MousePointer2, Settings } from "lucide-react"
-import type { HTMLProps } from "react"
+import type { HTMLAttributes } from "react"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { Logo } from "~/components/ui/logo"
@@ -10,7 +10,7 @@ import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 import { useWorkspace } from "~/contexts/workspace-context"
 
-export const Sidebar = ({ className, ...props }: HTMLProps<HTMLDivElement>) => {
+export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
   const { slug: workspaceSlug } = useWorkspace()
 
   return (

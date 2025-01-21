@@ -12,7 +12,7 @@ export const FormButton = ({ isPending, ...props }: ComponentProps<typeof Button
       size="lg"
       isPending={isPending}
       disabled={!isDirty || isPending || (isSubmitted && !isValid)}
-      className="first:w-full"
+      className="first:not-only:w-full"
       {...props}
     />
   )

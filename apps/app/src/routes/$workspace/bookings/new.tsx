@@ -1,19 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { SpotForm } from "~/components/spots/spot-form"
+import { BookingForm } from "~/components/bookings/booking-form"
 import { H3 } from "~/components/ui/heading"
 
-export const Route = createFileRoute("/$workspace/spots/new")({
-  component: SpotsNewPage,
+export const Route = createFileRoute("/$workspace/bookings/new")({
+  component: BookingsNewPage,
 })
 
-function SpotsNewPage() {
+function BookingsNewPage() {
   const { workspace } = Route.useRouteContext()
 
   return (
     <>
-      <H3>New Ad Spot</H3>
+      <H3>New Booking</H3>
 
-      <SpotForm
+      <BookingForm
         workspaceId={workspace.id}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"

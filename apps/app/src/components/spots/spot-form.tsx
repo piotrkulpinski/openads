@@ -10,7 +10,7 @@ import { Tooltip } from "@openads/ui/tooltip"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import { HelpCircleIcon } from "lucide-react"
-import type { HTMLProps } from "react"
+import type { HTMLAttributes } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
@@ -22,7 +22,7 @@ import type { RouterOutputs } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
 import type { createRouter } from "~/router"
 
-type SpotFormProps = HTMLProps<HTMLFormElement> & {
+type SpotFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
 
   /**

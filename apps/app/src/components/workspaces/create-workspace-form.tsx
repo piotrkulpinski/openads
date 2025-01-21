@@ -5,7 +5,7 @@ import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import type { HTMLProps } from "react"
+import type { HTMLAttributes } from "react"
 import { useForm } from "react-hook-form"
 import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
@@ -13,7 +13,7 @@ import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
 
-type CreateWorkspaceFormProps = HTMLProps<HTMLFormElement> & {
+type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
    * A callback to call when the mutation is successful
    */
@@ -67,6 +67,7 @@ export const CreateWorkspaceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
+
               <FormControl>
                 <Input
                   autoFocus
@@ -91,6 +92,7 @@ export const CreateWorkspaceForm = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Slug</FormLabel>
+
               <FormControl>
                 <Input placeholder="acme" {...field} />
               </FormControl>
@@ -106,6 +108,7 @@ export const CreateWorkspaceForm = ({
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Website URL</FormLabel>
+
               <FormControl>
                 <Input type="url" placeholder="https://acme.com" {...field} />
               </FormControl>

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/$workspace")({
         <div className="flex items-stretch size-full">
           <Sidebar />
 
-          <div className="p-4 flex-1 sm:px-6 lg:px-10 lg:py-8">
+          <div className="p-4 flex-1 sm:px-6 lg:px-10 lg:py-6">
             <div className="flex flex-col gap-4 mx-auto w-full max-w-6xl">
               <Outlet />
             </div>

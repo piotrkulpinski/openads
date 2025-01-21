@@ -2,7 +2,6 @@ import { Slot, Slottable } from "@radix-ui/react-slot"
 import { LoaderIcon } from "lucide-react"
 import { Children, type ComponentProps, type ReactNode } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
-// import { Slottable } from "./slottable"
 
 const buttonVariants = cva({
   base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center rounded-md text-sm/tight font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
@@ -97,13 +96,19 @@ const Button = ({
       className={cx(buttonVariants({ variant, size, isPending, isAffixOnly, className }))}
       {...props}
     >
-      <Slot className={buttonAffixVariants()} aria-hidden="true">
+      <Slot
+        className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5em]" })}
+        aria-hidden="true"
+      >
         {prefix}
       </Slot>
 
       <Slottable>{children}</Slottable>
 
-      <Slot className={buttonAffixVariants()} aria-hidden="true">
+      <Slot
+        className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5em]" })}
+        aria-hidden="true"
+      >
         {suffix}
       </Slot>
 

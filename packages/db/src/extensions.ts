@@ -8,14 +8,14 @@ export const customIdExtension = Prisma.defineExtension({
     $allModels: {
       async create({ model, args, query }) {
         const record = args.data as RecordData
-        record.id ??= generateId(model)
+        record.id ||= generateId(model)
         return await query(args)
       },
 
       async createMany({ model, args, query }) {
         const records = (Array.isArray(args.data) ? args.data : [args.data]) as RecordData[]
         for (const record of records) {
-          record.id ??= generateId(model)
+          record.id ||= generateId(model)
         }
         return await query(args)
       },
