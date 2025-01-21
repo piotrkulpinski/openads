@@ -2,7 +2,7 @@
 
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 import type { ComponentProps, ReactNode } from "react"
-import { popoverAnimationClasses } from "~/lib/classes"
+import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
 
 const TooltipProvider = TooltipPrimitive.Provider

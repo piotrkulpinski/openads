@@ -3,7 +3,7 @@
 import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "@radix-ui/react-icons"
 import * as MenubarPrimitive from "@radix-ui/react-menubar"
 import type { ComponentProps } from "react"
-import { popoverAnimationClasses } from "~/lib/classes"
+import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
 
 const MenubarMenu = MenubarPrimitive.Menu

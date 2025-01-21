@@ -3,19 +3,14 @@
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu"
 import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "@radix-ui/react-icons"
 import type { ComponentProps } from "react"
-import { popoverAnimationClasses } from "~/lib/classes"
+import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
 
 const ContextMenu = ContextMenuPrimitive.Root
-
 const ContextMenuTrigger = ContextMenuPrimitive.Trigger
-
 const ContextMenuGroup = ContextMenuPrimitive.Group
-
 const ContextMenuPortal = ContextMenuPrimitive.Portal
-
 const ContextMenuSub = ContextMenuPrimitive.Sub
-
 const ContextMenuRadioGroup = ContextMenuPrimitive.RadioGroup
 
 const ContextMenuSubTrigger = ({

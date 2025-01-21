@@ -2,7 +2,7 @@
 
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import type { ComponentProps } from "react"
-import { popoverAnimationClasses } from "~/lib/classes"
+import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
 
 const Popover = PopoverPrimitive.Root

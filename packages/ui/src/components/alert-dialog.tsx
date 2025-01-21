@@ -2,8 +2,9 @@
 
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 import type { ComponentProps } from "react"
+import { Modal } from "../components/modal"
 import { cx } from "../lib/cva"
-import { buttonVariants } from "./button"
+import { Button, buttonVariants } from "./button"
 
 const AlertDialog = AlertDialogPrimitive.Root
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
@@ -26,20 +27,25 @@ const AlertDialogOverlay = ({
 
 const AlertDialogContent = ({
   className,
+  size = "sm",
+  fixed,
   ...props
-}: ComponentProps<typeof AlertDialogPrimitive.Content>) => (
+}: ComponentProps<typeof AlertDialogPrimitive.Content> & ComponentProps<typeof Modal>) => (
   <AlertDialogPortal>
     <AlertDialogOverlay />
-    <AlertDialogPrimitive.Content
-      className={cx(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
-        "data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:slide-out-to-bottom-4",
-        className,
-      )}
-      {...props}
-    />
+
+    <Modal size={size} fixed={fixed} asChild>
+      <AlertDialogPrimitive.Content
+        className={cx(
+          "grid gap-6 border bg-background p-6 shadow-sm rounded-lg",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
+          "data-[state=open]:slide-in-from-bottom-4 data-[state=closed]:slide-out-to-bottom-4",
+          className,
+        )}
+        {...props}
+      />
+    </Modal>
   </AlertDialogPortal>
 )
 
@@ -78,14 +84,10 @@ const AlertDialogAction = ({
   <AlertDialogPrimitive.Action className={cx(buttonVariants(), className)} {...props} />
 )
 
-const AlertDialogCancel = ({
-  className,
-  ...props
-}: ComponentProps<typeof AlertDialogPrimitive.Cancel>) => (
-  <AlertDialogPrimitive.Cancel
-    className={cx(buttonVariants({ variant: "outline" }), "mt-2 sm:mt-0", className)}
-    {...props}
-  />
+const AlertDialogCancel = ({ className, ...props }: ComponentProps<typeof Button>) => (
+  <AlertDialogPrimitive.Cancel asChild>
+    <Button variant="outline" size="sm" {...props} />
+  </AlertDialogPrimitive.Cancel>
 )
 
 export {

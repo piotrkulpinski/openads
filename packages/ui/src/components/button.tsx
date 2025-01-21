@@ -4,19 +4,20 @@ import { Children, type ComponentProps, type ReactNode } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
 
 const buttonVariants = cva({
-  base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center rounded-md text-sm/tight font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
+  base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center border rounded-md text-sm leading-none font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
 
   variants: {
     variant: {
-      default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      outline: "border border-input bg-background hover:bg-muted hover:text-accent-foreground",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "text-primary underline-offset-4 hover:underline",
+      default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/90",
+      destructive:
+        "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/90",
+      outline: "border-input bg-background hover:bg-muted hover:text-accent-foreground",
+      ghost: "border-transparent hover:bg-accent hover:text-accent-foreground",
+      link: "border-transparent text-primary underline-offset-4 hover:underline",
     },
 
     size: {
-      sm: "px-3 py-2 gap-[0.66ch] rounded-md text-xs/tight",
+      sm: "px-3 py-1.5 gap-[0.66ch] rounded-md text-xs leading-none",
       md: "px-4 py-2 gap-[0.75ch]",
       lg: "px-6 py-2.5 gap-[1ch] rounded-md",
     },
@@ -97,7 +98,7 @@ const Button = ({
       {...props}
     >
       <Slot
-        className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5em]" })}
+        className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5ch]" })}
         aria-hidden="true"
       >
         {prefix}
@@ -106,7 +107,7 @@ const Button = ({
       <Slottable>{children}</Slottable>
 
       <Slot
-        className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5em]" })}
+        className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5ch]" })}
         aria-hidden="true"
       >
         {suffix}

@@ -3,19 +3,14 @@
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "@radix-ui/react-icons"
 import type { ComponentProps } from "react"
-import { popoverAnimationClasses } from "~/lib/classes"
+import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
-
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
-
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
-
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
-
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
-
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 const DropdownMenuSubTrigger = ({
@@ -140,7 +135,7 @@ const DropdownMenuLabel = ({
   inset?: boolean
 }) => (
   <DropdownMenuPrimitive.Label
-    className={cx("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
+    className={cx("px-2 py-1.5 text-sm font-medium", inset && "pl-8", className)}
     {...props}
   />
 )
