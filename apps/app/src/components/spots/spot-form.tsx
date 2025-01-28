@@ -16,7 +16,6 @@ import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
 import { Stack } from "~/components/ui/stack"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
-import { nullsToUndefined } from "~/lib/helpers"
 import { trpc } from "~/lib/trpc"
 import type { RouterOutputs } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
@@ -57,8 +56,7 @@ export const SpotForm = ({
 
   const form = useForm<SpotSchema>({
     resolver: zodResolver(spotSchema),
-    values: spot ? nullsToUndefined(spot) : undefined,
-    defaultValues: getDefaults(spotSchema),
+    values: spot || getDefaults(spotSchema),
   })
 
   const onSuccess = async (data: RouterOutputs["spot"]["create"]) => {

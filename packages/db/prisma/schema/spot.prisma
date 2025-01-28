@@ -1,8 +1,8 @@
 model Spot {
   id          String   @id @default(cuid())
   name        String
-  description String?
-  previewUrl  String?
+  description String   @default("")
+  previewUrl  String   @default("")
   price       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

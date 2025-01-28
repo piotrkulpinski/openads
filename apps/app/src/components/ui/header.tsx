@@ -1,7 +1,6 @@
 import { type VariantProps, cva, cx } from "@openads/ui/cva"
-import { isReactElement } from "@openads/ui/helpers"
 import { Slot } from "@radix-ui/react-slot"
-import type { ComponentProps, HTMLAttributes, ReactNode } from "react"
+import { type ComponentProps, type HTMLAttributes, type ReactNode, isValidElement } from "react"
 import { Heading, type HeadingProps } from "~/components/ui/heading"
 import { Prose } from "~/components/ui/prose"
 import { Stack } from "~/components/ui/stack"
@@ -69,7 +68,7 @@ const HeaderRoot = ({
   asChild = false,
   ...props
 }: HeaderRootProps) => {
-  const useAsChild = asChild && isReactElement(props.children)
+  const useAsChild = asChild && isValidElement(props.children)
   const Component = useAsChild ? Slot : "div"
 
   return (

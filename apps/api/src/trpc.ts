@@ -92,3 +92,20 @@ export const workspaceProcedure = authProcedure
       ctx: { workspace },
     })
   })
+
+// procedure that checks if a user has access to a specific spot
+export const spotProcedure = authProcedure
+  .input(z.object({ spotId: z.string() }))
+  .use(async ({ ctx: { db, user }, input: { spotId }, next }) => {
+    const spot = await db.spot.findFirst({
+      where: { AND: [{ id: spotId }, db.spot.belongsTo(user.id)] },
+    })
+
+    if (!spot) {
+      throw new TRPCError({ code: "FORBIDDEN" })
+    }
+
+    return next({
+      ctx: { spot },
+    })
+  })

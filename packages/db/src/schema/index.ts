@@ -1,4 +1,5 @@
 export * from "./workspace"
 export * from "./spot"
 export * from "./booking"
+export * from "./field"
 export * from "../lib/utils"

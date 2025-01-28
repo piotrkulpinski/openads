@@ -38,7 +38,7 @@ export const GeneralForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
       await trpcUtils.workspace.getAll.invalidate()
       await trpcUtils.workspace.getBySlug.invalidate({ slug })
 
-      //
+      // Invalidate the workspace settings
       router.invalidate()
     },
 

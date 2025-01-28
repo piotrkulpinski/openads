@@ -20,7 +20,6 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
-import { nullsToUndefined } from "~/lib/helpers"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 import { getDefaults } from "~/lib/zod"
@@ -62,8 +61,7 @@ export const BookingForm = ({
 
   const form = useForm<BookingSchema>({
     resolver: zodResolver(bookingSchema),
-    values: booking ? nullsToUndefined(booking) : undefined,
-    defaultValues: getDefaults(bookingSchema),
+    values: booking || getDefaults(bookingSchema),
   })
 
   const onSuccess = async (data: RouterOutputs["booking"]["create"]) => {
@@ -122,13 +120,14 @@ export const BookingForm = ({
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
+                        prefix={<CalendarIcon />}
                         className="w-full justify-start text-left font-normal"
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+
+                    <PopoverContent className="w-auto" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -156,13 +155,13 @@ export const BookingForm = ({
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
+                        prefix={<CalendarIcon />}
                         className="w-full justify-start text-left font-normal"
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
                         {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto" align="start">
                       <Calendar
                         mode="single"
                         selected={field.value}

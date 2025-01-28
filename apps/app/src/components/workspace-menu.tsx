@@ -1,7 +1,7 @@
-import { useHotkeys, useMediaQuery } from "@mantine/hooks"
+import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
-import { Button } from "@openads/ui/button"
+import { Button, buttonVariants } from "@openads/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
+import { useIsMobile } from "@openads/ui/hooks"
 import { Skeleton } from "@openads/ui/skeleton"
 import { useNavigate } from "@tanstack/react-router"
 import { ChevronsUpDown, Plus } from "lucide-react"
@@ -20,7 +21,7 @@ import { trpc, trpcUtils } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 export const WorkspaceMenu = () => {
-  const isMobile = useMediaQuery("(max-width: 768px)")
+  const isMobile = useIsMobile()
   const activeWorkspace = useWorkspace()
   const navigate = useNavigate()
 
@@ -64,22 +65,22 @@ export const WorkspaceMenu = () => {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-2">
-          <Avatar className="size-7">
-            <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
-            <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        className={buttonVariants({ size: "sm", variant: "outline", className: "gap-2" })}
+      >
+        <Avatar className="size-7">
+          <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
+          <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
+        </Avatar>
 
-          <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
-            <span className="truncate font-medium">{activeWorkspace?.name}</span>
-            <span className="truncate text-xs text-muted-foreground/75 font-normal">
-              {activeWorkspace?.plan}
-            </span>
-          </div>
-          <ChevronsUpDown className="ml-auto size-4" />
-        </Button>
+        <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
+          <span className="truncate text-sm/tight font-medium">{activeWorkspace?.name}</span>
+          <span className="truncate text-xs/tight text-muted-foreground/75 font-normal">
+            {activeWorkspace?.plan}
+          </span>
+        </div>
+        <ChevronsUpDown className="ml-auto size-4" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -103,8 +104,8 @@ export const WorkspaceMenu = () => {
             </Avatar>
 
             <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
-              <span className="truncate font-medium">{workspace.name}</span>
-              <span className="truncate text-xs text-muted-foreground/75 font-normal">
+              <span className="truncate text-sm/tight font-medium">{workspace.name}</span>
+              <span className="truncate text-xs/tight text-muted-foreground/75 font-normal">
                 {workspace.plan}
               </span>
             </div>

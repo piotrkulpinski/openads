@@ -21,7 +21,7 @@ function BookingsIndexPage() {
       <Stack className="justify-between">
         <H3>Bookings</H3>
 
-        <Button size="lg" prefix={<PlusIcon />} className="-my-1" asChild>
+        <Button prefix={<PlusIcon />} className="-my-1" asChild>
           <Link to="/$workspace/bookings/new" params={{ workspace: workspace.slug }}>
             Create Booking
           </Link>

@@ -1,5 +1,11 @@
 import { Button } from "@openads/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@openads/ui/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@openads/ui/dialog"
 import { ArrowRightIcon } from "lucide-react"
 import { useCallback, useMemo, useState } from "react"
 import type { Dispatch, HTMLAttributes, SetStateAction } from "react"
@@ -25,7 +31,7 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
   return (
     <Dialog open={showWelcomeModal} onOpenChange={handleOpenChange}>
       <DialogContent>
-        <div className="-m-6 mb-0 flex justify-center bg-primary-foreground border-b border-primary/15 p-12 rounded-t-lg">
+        <div className="-m-6 mb-0 flex justify-center bg-primary-foreground border-b p-12 rounded-t-lg">
           <LogoSymbol className="size-12" />
         </div>
 
@@ -34,10 +40,12 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
             <IntroTitle>Welcome to {siteConfig.name}!</IntroTitle>
           </DialogTitle>
 
-          <IntroDescription className="max-w-md">
-            Thanks for signing up – your account is ready to go! Now you have one central, organized
-            place to manage all your ad spots and bookings.
-          </IntroDescription>
+          <DialogDescription asChild>
+            <IntroDescription className="max-w-md">
+              Thanks for signing up – your account is ready to go! Now you have one central,
+              organized place to manage all your ad spots and bookings.
+            </IntroDescription>
+          </DialogDescription>
 
           <DialogClose asChild>
             <Button size="lg" className="mt-4 w-full" suffix={<ArrowRightIcon />}>

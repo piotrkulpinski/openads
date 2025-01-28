@@ -2,6 +2,7 @@ import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import { router } from "~/trpc"
 import { authRouter } from "~/trpc/auth"
 import { bookingRouter } from "~/trpc/booking"
+import { fieldRouter } from "~/trpc/field"
 import { onboardingRouter } from "~/trpc/onboarding"
 import { spotRouter } from "~/trpc/spot"
 import { userRouter } from "~/trpc/user"
@@ -14,6 +15,7 @@ export const appRouter = router({
   workspace: workspaceRouter,
   spot: spotRouter,
   booking: bookingRouter,
+  field: fieldRouter,
 })
 
 export type AppRouter = typeof appRouter

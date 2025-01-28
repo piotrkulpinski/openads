@@ -1,5 +1,5 @@
+import { formatDateRange } from "@curiousleaf/utils"
 import { Link } from "@tanstack/react-router"
-import { format } from "date-fns"
 import type { RouterOutputs } from "~/lib/trpc"
 
 type Booking = RouterOutputs["booking"]["getAll"][number]
@@ -18,7 +18,7 @@ export function BookingItem({ booking }: BookingItemProps) {
       <div className="space-y-1">
         <p className="font-medium">{booking.spot.name}</p>
         <p className="text-sm text-muted-foreground">
-          {format(new Date(booking.startsAt), "PPP")} - {format(new Date(booking.endsAt), "PPP")}
+          {formatDateRange(booking.startsAt, booking.endsAt)}
         </p>
       </div>
 

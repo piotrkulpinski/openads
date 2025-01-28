@@ -1,10 +1,8 @@
 enum FieldType {
   Text
   Textarea
-  Image
   Url
   Number
-  DateTime
   Switch
 }
 
@@ -12,11 +10,10 @@ model Field {
   id          String    @id @default(cuid())
   type        FieldType @default(Text)
   name        String
-  slug        String
-  default     String?
-  placeholder String?
-  isRequired  Boolean?  @default(false)
-  order       Int?      @default(99)
+  default     String    @default("")
+  placeholder String    @default("")
+  isRequired  Boolean   @default(false)
+  order       Int       @default(99)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -31,7 +28,7 @@ model Field {
 
 model Meta {
   id    String @id @default(cuid())
-  value Json?
+  value Json
 
   // Relations
   booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)

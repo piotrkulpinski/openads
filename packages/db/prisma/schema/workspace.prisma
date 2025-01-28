@@ -8,7 +8,7 @@ model Workspace {
   name       String
   slug       String        @unique
   websiteUrl String
-  faviconUrl String?
+  faviconUrl String        @default("")
   plan       WorkspacePlan @default(Free)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt

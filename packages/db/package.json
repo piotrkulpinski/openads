@@ -5,7 +5,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./ids": "./src/lib/ids.ts",
+    "./utils": "./src/lib/utils.ts"
   },
   "scripts": {
     "db:generate": "prisma generate --no-hints",

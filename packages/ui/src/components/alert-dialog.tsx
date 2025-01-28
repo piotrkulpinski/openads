@@ -9,6 +9,7 @@ import { Button, buttonVariants } from "./button"
 const AlertDialog = AlertDialogPrimitive.Root
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 const AlertDialogPortal = AlertDialogPrimitive.Portal
+const AlertDialogDescription = AlertDialogPrimitive.Description
 
 const AlertDialogOverlay = ({
   className,
@@ -65,16 +66,6 @@ const AlertDialogTitle = ({
   ...props
 }: ComponentProps<typeof AlertDialogPrimitive.Title>) => (
   <AlertDialogPrimitive.Title className={cx("text-lg font-semibold", className)} {...props} />
-)
-
-const AlertDialogDescription = ({
-  className,
-  ...props
-}: ComponentProps<typeof AlertDialogPrimitive.Description>) => (
-  <AlertDialogPrimitive.Description
-    className={cx("text-sm text-muted-foreground", className)}
-    {...props}
-  />
 )
 
 const AlertDialogAction = ({

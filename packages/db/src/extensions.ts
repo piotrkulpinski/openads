@@ -3,6 +3,8 @@ import { generateId } from "./lib/ids"
 
 type RecordData = Record<string, any>
 
+const allowedRoles = [WorkspaceMemberRole.Owner, WorkspaceMemberRole.Manager]
+
 export const customIdExtension = Prisma.defineExtension({
   query: {
     $allModels: {
@@ -23,13 +25,17 @@ export const customIdExtension = Prisma.defineExtension({
   },
 })
 
-export const workspaceFilterExtension = Prisma.defineExtension({
+export const modelFilterExtension = Prisma.defineExtension({
   model: {
     workspace: {
       belongsTo: (userId: string) => {
-        const allowedRoles = [WorkspaceMemberRole.Owner, WorkspaceMemberRole.Manager]
-
         return { members: { some: { userId, role: { in: allowedRoles } } } }
+      },
+    },
+
+    spot: {
+      belongsTo: (userId: string) => {
+        return { workspace: { members: { some: { userId, role: { in: allowedRoles } } } } }
       },
     },
   },

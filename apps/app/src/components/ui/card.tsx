@@ -4,7 +4,7 @@ import { type ComponentProps, type HTMLAttributes, isValidElement } from "react"
 import { sectionVariants } from "~/components/ui/section"
 
 const cardVariants = cva({
-  base: "relative flex flex-col bg-white border rounded-md overflow-clip hover:[&[href]]:z-10 hover:[&[href]]:border-ring",
+  base: "relative flex flex-col bg-background border rounded-md overflow-clip hover:[&[href]]:z-10 hover:[&[href]]:border-ring",
 })
 
 const cardPanelVariants = cva({

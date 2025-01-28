@@ -30,7 +30,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
   })
 
   return (
-    <Card className="border-red-200" {...props}>
+    <Card className="border-red-200 dark:border-red-950" {...props}>
       <Card.Panel asChild>
         <Header
           title="Delete Workspace"
@@ -38,7 +38,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
         />
       </Card.Panel>
 
-      <Card.Row direction="rowReverse" className="border-red-200 bg-red-50">
+      <Card.Row direction="rowReverse" className="border-red-200 bg-red-500/10 dark:border-red-950">
         <ConfirmModal
           title="Delete your workspace?"
           label="Delete Workspace"

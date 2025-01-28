@@ -1,7 +1,8 @@
-import { Slot, Slottable } from "@radix-ui/react-slot"
+import { Slot } from "@radix-ui/react-slot"
 import { LoaderIcon } from "lucide-react"
-import { Children, type ComponentProps, type ReactNode } from "react"
+import { Children, type ComponentProps, type ReactNode, isValidElement } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
+import { Slottable } from "./slottable"
 
 const buttonVariants = cva({
   base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center border rounded-md text-sm leading-none font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
@@ -83,38 +84,43 @@ const Button = ({
   suffix,
   ...props
 }: ButtonProps) => {
-  const Comp = asChild ? Slot : "button"
-
-  const isChildrenEmpty = (children: ReactNode) => {
-    return Children.count(children) === 0
-  }
+  const useAsChild = asChild && isValidElement(children)
+  const Component = useAsChild ? Slot : "button"
 
   // Determine if the button has affix only.
-  const isAffixOnly = isChildrenEmpty(children) && (!prefix || !suffix)
+  const isAffixOnly = Children.count(children) === 0 && (!prefix || !suffix)
 
   return (
-    <Comp
+    <Component
       className={cx(buttonVariants({ variant, size, isPending, isAffixOnly, className }))}
       {...props}
     >
-      <Slot
-        className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5ch]" })}
-        aria-hidden="true"
-      >
-        {prefix}
-      </Slot>
+      <Slottable child={children} asChild={asChild}>
+        {child => (
+          <>
+            <Slot
+              className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5ch]" })}
+              aria-hidden="true"
+            >
+              {prefix}
+            </Slot>
 
-      <Slottable>{children}</Slottable>
+            {Children.count(child) !== 0 && <span className="truncate">{child}</span>}
 
-      <Slot
-        className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5ch]" })}
-        aria-hidden="true"
-      >
-        {suffix}
-      </Slot>
+            <Slot
+              className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5ch]" })}
+              aria-hidden="true"
+            >
+              {suffix}
+            </Slot>
 
-      {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin text-white" />}
-    </Comp>
+            {!!isPending && (
+              <LoaderIcon className="absolute size-[1.25em] animate-spin text-white" />
+            )}
+          </>
+        )}
+      </Slottable>
+    </Component>
   )
 }
 

@@ -1,9 +1,15 @@
 import { Button } from "@openads/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@openads/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@openads/ui/dialog"
 import { useNavigate } from "@tanstack/react-router"
 import { type PropsWithChildren, useState } from "react"
 import { toast } from "sonner"
-import { Header } from "~/components/ui/header"
+import { HeaderDescription, HeaderRoot, HeaderTitle } from "~/components/ui/header"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 
 export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
@@ -15,15 +21,17 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="max-w-[455px]">
-        <DialogTitle asChild>
-          <Header
-            size="h4"
-            title="Create workspace"
-            description="For example, you can use the name of your company or department."
-          >
-            <DialogClose />
-          </Header>
-        </DialogTitle>
+        <HeaderRoot>
+          <DialogTitle asChild>
+            <HeaderTitle size="h4">Create workspace</HeaderTitle>
+          </DialogTitle>
+
+          <DialogDescription asChild>
+            <HeaderDescription>
+              For example, you can use the name of your company or department.
+            </HeaderDescription>
+          </DialogDescription>
+        </HeaderRoot>
 
         <CreateWorkspaceForm
           onSuccess={({ slug }) => {

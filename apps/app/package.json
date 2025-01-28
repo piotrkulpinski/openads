@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@curiousleaf/utils": "^1.1.1",
+    "@dnd-kit/core": "6.0.8",
+    "@dnd-kit/modifiers": "6.0.1",
+    "@dnd-kit/sortable": "7.0.2",
     "@hookform/resolvers": "^3.10.0",
     "@mantine/hooks": "^7.16.0",
     "@openads/api": "workspace:*",

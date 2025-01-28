@@ -10,6 +10,7 @@ const Dialog = DialogPrimitive.Root
 const DialogTrigger = DialogPrimitive.Trigger
 const DialogPortal = DialogPrimitive.Portal
 const DialogTitle = DialogPrimitive.Title
+const DialogDescription = DialogPrimitive.Description
 const DialogClose = DialogPrimitive.Close
 
 const DialogOverlay = ({ className, ...props }: ComponentProps<typeof DialogPrimitive.Overlay>) => (
@@ -66,16 +67,6 @@ const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
       "flex flex-col-reverse flex-wrap gap-x-2 gap-y-4 sm:flex-row sm:justify-end",
       className,
     )}
-    {...props}
-  />
-)
-
-const DialogDescription = ({
-  className,
-  ...props
-}: ComponentProps<typeof DialogPrimitive.Description>) => (
-  <DialogPrimitive.Description
-    className={cx("text-sm text-muted-foreground", className)}
     {...props}
   />
 )

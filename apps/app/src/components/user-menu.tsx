@@ -7,13 +7,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
-import { useNavigate } from "@tanstack/react-router"
+import { useRouter } from "@tanstack/react-router"
 import { LogOutIcon } from "lucide-react"
 import { signOut, useSession } from "~/lib/auth"
 
 export const UserMenu = () => {
   const { data: session, isPending } = useSession()
-  const navigate = useNavigate()
+  const router = useRouter()
 
   if (!session?.user || isPending) {
     return (
@@ -21,6 +21,10 @@ export const UserMenu = () => {
         <AvatarFallback />
       </Avatar>
     )
+  }
+
+  const handleLogout = () => {
+    return signOut({ fetchOptions: { onSuccess: () => router.invalidate() } })
   }
 
   return (
@@ -42,9 +46,7 @@ export const UserMenu = () => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => signOut({ fetchOptions: { onSuccess: () => navigate({ to: "/" }) } })}
-        >
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOutIcon className="size-4" />
           Logout
         </DropdownMenuItem>

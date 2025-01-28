@@ -49,7 +49,7 @@ type QueryCellOptionsWithEmpty<TData, TError> = {
 } & QueryCellOptions<TData, TError>
 
 type QueryCellOptionsNoEmpty<TData, TError> = {
-  success: (query: QueryObserverSuccessResult<TData, TError>) => ReactNode
+  success: (query: QueryObserverSuccessResult<NonNullable<TData>, TError>) => ReactNode
 } & QueryCellOptions<TData, TError>
 
 export const createQueryCell = <TError>(queryCellOpts: CreateQueryCellOptions<TError>) => {
@@ -60,7 +60,7 @@ export const createQueryCell = <TError>(queryCellOpts: CreateQueryCellOptions<TE
   ) {
     const { query } = opts
 
-    if (query.status === "success") {
+    if (query.status === "success" && !query.isPlaceholderData) {
       if (
         "empty" in opts &&
         (query.data == null || (Array.isArray(query.data) && query.data.length === 0))

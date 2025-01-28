@@ -21,7 +21,7 @@ function SpotsIndexPage() {
       <Stack className="justify-between">
         <H3>Ad Spots</H3>
 
-        <Button size="lg" prefix={<PlusIcon />} className="-my-1" asChild>
+        <Button prefix={<PlusIcon />} className="-my-1" asChild>
           <Link to="/$workspace/spots/new" params={{ workspace: workspace.slug }}>
             Create Spot
           </Link>

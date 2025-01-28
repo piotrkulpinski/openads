@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogTitle,
   DialogTrigger,
@@ -14,7 +15,7 @@ import { useState } from "react"
 import type { ComponentProps, HTMLAttributes, ReactNode } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Header } from "~/components/ui/header"
+import { HeaderDescription, HeaderRoot, HeaderTitle } from "~/components/ui/header"
 
 type ConfirmModalProps = HTMLAttributes<HTMLButtonElement> &
   ComponentProps<typeof Button> & {
@@ -34,12 +35,12 @@ export const ConfirmModal = ({
   cancelLabel = "Cancel",
   variant = "destructive",
   onConfirm,
-  confirmText,
+  confirmText = "",
 }: ConfirmModalProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
   const schema = z.object({
-    confirm: confirmText ? z.literal(confirmText) : z.undefined(),
+    confirm: z.literal(confirmText),
   })
 
   const form = useForm<z.infer<typeof schema>>({
@@ -59,11 +60,15 @@ export const ConfirmModal = ({
       <Form {...form}>
         <DialogContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
-            <DialogTitle asChild>
-              <Header size="h4" title={title} description={description}>
-                <DialogClose />
-              </Header>
-            </DialogTitle>
+            <HeaderRoot>
+              <DialogTitle asChild>
+                <HeaderTitle size="h4">{title}</HeaderTitle>
+              </DialogTitle>
+
+              <DialogDescription asChild>
+                <HeaderDescription>{description}</HeaderDescription>
+              </DialogDescription>
+            </HeaderRoot>
 
             {!!confirmText && (
               <FormField
@@ -90,7 +95,7 @@ export const ConfirmModal = ({
                 </Button>
               </DialogClose>
 
-              <Button variant={variant} disabled={!form.formState.isValid}>
+              <Button variant={variant} disabled={!!confirmText && !form.formState.isValid}>
                 {label}
               </Button>
             </DialogFooter>
