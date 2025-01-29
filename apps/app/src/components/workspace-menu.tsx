@@ -1,7 +1,7 @@
 import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
-import { Button, buttonVariants } from "@openads/ui/button"
+import { buttonVariants } from "@openads/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,16 +51,22 @@ export const WorkspaceMenu = () => {
 
   if (isFetching) {
     return (
-      <Button size="sm" variant="outline" className="gap-2" disabled>
+      <div
+        className={buttonVariants({
+          size: "sm",
+          variant: "outline",
+          className: "gap-2 pointer-events-none",
+        })}
+      >
         <Skeleton className="size-7 rounded-full" />
 
         <div className="grid gap-0.5 flex-1 text-left text-sm leading-tight">
           <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3.5 w-16" />
+          <Skeleton className="h-4 w-16" />
         </div>
 
-        <ChevronsUpDown className="ml-auto size-4" />
-      </Button>
+        <ChevronsUpDown className="size-4" />
+      </div>
     )
   }
 
@@ -80,7 +86,7 @@ export const WorkspaceMenu = () => {
             {activeWorkspace?.plan}
           </span>
         </div>
-        <ChevronsUpDown className="ml-auto size-4" />
+        <ChevronsUpDown className="size-4" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent

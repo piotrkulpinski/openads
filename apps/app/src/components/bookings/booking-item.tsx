@@ -1,19 +1,20 @@
 import { formatDateRange } from "@curiousleaf/utils"
+import { cx } from "@openads/ui/cva"
 import { Link } from "@tanstack/react-router"
+import type { ComponentProps } from "react"
 import type { RouterOutputs } from "~/lib/trpc"
 
-type Booking = RouterOutputs["booking"]["getAll"][number]
-
-interface BookingItemProps {
-  booking: Booking
+type BookingItemProps = ComponentProps<typeof Link> & {
+  booking: RouterOutputs["booking"]["getAll"][number]
 }
 
-export function BookingItem({ booking }: BookingItemProps) {
+export function BookingItem({ booking, className, ...props }: BookingItemProps) {
   return (
     <Link
       to={booking.id}
       from="/$workspace/bookings"
-      className="flex items-center justify-between px-4 py-3 hover:bg-muted/50"
+      className={cx("flex items-center justify-between px-4 py-3 hover:bg-muted/50", className)}
+      {...props}
     >
       <div className="space-y-1">
         <p className="font-medium">{booking.spot.name}</p>
