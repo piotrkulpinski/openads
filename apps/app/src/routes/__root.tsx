@@ -13,17 +13,19 @@ export type RouterAppContext = {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  loader: async ({ context, location }) => {
-    if (location.pathname === "/login") {
+  beforeLoad: async ({ context, location: { pathname, searchStr } }) => {
+    if (["/login", "/embed"].includes(pathname)) {
       return
     }
 
     const session = await context.trpcUtils.auth.getSession.fetch()
 
     if (!session?.user) {
+      const callbackURL = new URL(pathname + searchStr, siteConfig.url).toString()
+
       throw redirect({
         to: "/login",
-        search: { callbackURL: `${siteConfig.url}${location.pathname}` },
+        search: { callbackURL },
       })
     }
   },

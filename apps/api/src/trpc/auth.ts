@@ -1,8 +1,8 @@
 import { auth as betterAuth } from "~/lib/auth"
-import { procedure, router } from "~/trpc"
+import { publicProcedure, router } from "~/trpc"
 
 export const authRouter = router({
-  getSession: procedure.query(async ({ ctx: { req } }) => {
+  getSession: publicProcedure.query(async ({ ctx: { req } }) => {
     return await betterAuth.api.getSession({ headers: req.headers })
   }),
 })

@@ -1,5 +1,6 @@
 import { bookingSchema, idSchema } from "@openads/db/schema"
-import { router, spotProcedure, workspaceProcedure } from "~/trpc"
+import { z } from "zod"
+import { publicProcedure, router, spotProcedure, workspaceProcedure } from "~/trpc"
 
 export const bookingRouter = router({
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
@@ -10,9 +11,9 @@ export const bookingRouter = router({
     })
   }),
 
-  getAllBySpotId: spotProcedure.query(async ({ ctx: { db }, input: { spotId } }) => {
+  getAllBySpotId: spotProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
     return await db.booking.findMany({
-      where: { spotId },
+      where,
       orderBy: { startsAt: "asc" },
       include: { spot: true },
     })
@@ -53,4 +54,17 @@ export const bookingRouter = router({
         where,
       })
     }),
+
+  // Public routes
+  public: router({
+    getAllBySpotId: publicProcedure
+      .input(z.object({ spotId: z.string() }))
+      .query(async ({ ctx: { db }, input: { ...where } }) => {
+        return await db.booking.findMany({
+          where,
+          orderBy: { startsAt: "asc" },
+          include: { spot: true },
+        })
+      }),
+  }),
 })

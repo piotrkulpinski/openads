@@ -1,5 +1,6 @@
 import { Button, type ButtonProps } from "@openads/ui/button"
 import { LoaderIcon } from "lucide-react"
+import { siteConfig } from "~/config/site"
 import { signIn } from "~/lib/auth"
 
 type LoginButtonProps = ButtonProps & {
@@ -11,7 +12,7 @@ export const LoginButton = ({
   provider,
   variant = "outline",
   prefix,
-  callbackURL,
+  callbackURL = siteConfig.url,
   ...props
 }: LoginButtonProps) => {
   const isLoading = false

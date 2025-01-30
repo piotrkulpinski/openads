@@ -23,7 +23,7 @@ export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBooking
   const { price, selections, clearSelection, updateSelection } = useBooking()
   const selection = selections.find(s => s.spotId === spot.id)
 
-  const { data: bookings } = trpc.booking.getAllBySpotId.useQuery(
+  const { data: bookings } = trpc.booking.public.getAllBySpotId.useQuery(
     { spotId: spot.id },
     { initialData: [] },
   )
@@ -73,7 +73,11 @@ export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBooking
       return
     }
 
-    updateSelection({ spotId: spot.id, dateRange, duration: calculateDuration(dateRange) })
+    updateSelection({
+      spotId: spot.id,
+      dateRange,
+      duration: calculateDuration(dateRange),
+    })
   }, [])
 
   const discountedPrice = price?.discountPercentage
@@ -106,8 +110,8 @@ export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBooking
         mode="range"
         selected={selection?.dateRange}
         onSelect={handleSelect}
-        startMonth={new Date(2024, 3)}
         defaultMonth={firstAvailableMonth}
+        startMonth={booked[0]?.from ?? firstAvailableMonth} // TODO: Make sure it's correct
         disabled={[date => date < new Date(), ...booked]}
         modifiers={{ booked }}
         modifiersClassNames={{ booked: "*:line-through" }}

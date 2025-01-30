@@ -12,6 +12,7 @@ export const createRouter = () =>
   createTanStackRouter({
     routeTree,
     // defaultPreload: "intent",
+    defaultPendingMinMs: 0,
     defaultStaleTime: Number.POSITIVE_INFINITY,
     context: { trpcUtils },
     defaultNotFoundComponent: () => <NotFound />,

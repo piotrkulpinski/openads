@@ -10,7 +10,7 @@ type LoginSearch = {
 
 export const Route = createFileRoute("/_layout/login")({
   validateSearch: z.object({
-    callbackURL: z.string().optional().default("/"),
+    callbackURL: z.string().optional(),
   }),
 
   loader: async ({ context }) => {
