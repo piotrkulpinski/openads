@@ -61,7 +61,6 @@ function SpotEmbed() {
         )}
       />
 
-      {/* add powered by logo */}
       <Stack
         size="sm"
         className="justify-center mt-4 text-center opacity-80 duration-200 hover:opacity-100 md:mt-6"
