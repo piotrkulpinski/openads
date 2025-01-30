@@ -2,6 +2,7 @@ import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { buttonVariants } from "@openads/ui/button"
+import { cx } from "@openads/ui/cva"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +15,7 @@ import {
 import { useIsMobile } from "@openads/ui/hooks"
 import { Skeleton } from "@openads/ui/skeleton"
 import { useNavigate } from "@tanstack/react-router"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { Check, ChevronsUpDown, Plus } from "lucide-react"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { trpc, trpcUtils } from "~/lib/trpc"
@@ -90,7 +91,7 @@ export const WorkspaceMenu = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 space-y-1 rounded-lg"
         align="start"
         side={isMobile ? "bottom" : "right"}
         sideOffset={4}
@@ -101,8 +102,10 @@ export const WorkspaceMenu = () => {
           <DropdownMenuItem
             key={workspace.id}
             onClick={() => changeWorkspace(workspace)}
-            className="gap-2 p-2"
-            disabled={workspace.slug === activeWorkspace.slug}
+            className={cx(
+              "gap-2 p-2",
+              workspace.slug === activeWorkspace.slug && "bg-accent opacity-75 pointer-events-none",
+            )}
           >
             <Avatar className="size-7">
               <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />
@@ -116,7 +119,11 @@ export const WorkspaceMenu = () => {
               </span>
             </div>
 
-            {index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>}
+            {workspace.slug === activeWorkspace.slug ? (
+              <Check className="ml-auto text-green-500" />
+            ) : (
+              index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+            )}
           </DropdownMenuItem>
         ))}
 

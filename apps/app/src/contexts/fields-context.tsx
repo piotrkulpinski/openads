@@ -24,7 +24,7 @@ type FieldsProviderProps = PropsWithChildren<{
   spot: NonNullable<RouterOutputs["spot"]["getById"]>
 }>
 
-export const FieldsProvider = ({ children, spot }: FieldsProviderProps) => {
+export const FieldsProvider = ({ spot, ...props }: FieldsProviderProps) => {
   const [selectedField, setSelectedField] = useState<Field | null>(null)
 
   const { data: fields, refetch } = trpc.field.getAll.useQuery(
@@ -110,9 +110,8 @@ export const FieldsProvider = ({ children, spot }: FieldsProviderProps) => {
         onUpdateField,
         onReorderFields,
       }}
-    >
-      {children}
-    </FieldsContext.Provider>
+      {...props}
+    />
   )
 }
 

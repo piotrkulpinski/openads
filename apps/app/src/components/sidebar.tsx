@@ -1,8 +1,16 @@
 import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import { Link } from "@tanstack/react-router"
-import { CalendarDays, LayoutDashboardIcon, Megaphone, MousePointer2, Settings } from "lucide-react"
-import type { HTMLAttributes } from "react"
+import {
+  CalendarDays,
+  Code2,
+  LayoutDashboardIcon,
+  Megaphone,
+  MousePointer2,
+  Settings,
+} from "lucide-react"
+import { type HTMLAttributes, useState } from "react"
+import { EmbedModal } from "~/components/modals/embed-modal"
 import { Nav } from "~/components/nav"
 import { NavMain } from "~/components/nav-main"
 import { Logo } from "~/components/ui/logo"
@@ -12,6 +20,7 @@ import { useWorkspace } from "~/contexts/workspace-context"
 
 export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
   const { slug: workspaceSlug } = useWorkspace()
+  const [embedOpen, setEmbedOpen] = useState(false)
 
   return (
     <div
@@ -37,7 +46,7 @@ export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>)
 
       <Nav>
         <NavMain
-          links={[
+          items={[
             {
               title: "Dashboard",
               to: `/${workspaceSlug}`,
@@ -67,6 +76,23 @@ export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>)
           ]}
         />
       </Nav>
+
+      <Separator />
+
+      <Nav>
+        <NavMain
+          items={[
+            {
+              title: "Embed",
+              to: "#",
+              prefix: <Code2 />,
+              onClick: () => setEmbedOpen(true),
+            },
+          ]}
+        />
+      </Nav>
+
+      <EmbedModal open={embedOpen} onOpenChange={setEmbedOpen} />
     </div>
   )
 }

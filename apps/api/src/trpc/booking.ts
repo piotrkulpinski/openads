@@ -1,10 +1,18 @@
 import { bookingSchema, idSchema } from "@openads/db/schema"
-import { router, workspaceProcedure } from "~/trpc"
+import { router, spotProcedure, workspaceProcedure } from "~/trpc"
 
 export const bookingRouter = router({
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
     return await db.booking.findMany({
       where,
+      orderBy: { startsAt: "asc" },
+      include: { spot: true },
+    })
+  }),
+
+  getAllBySpotId: spotProcedure.query(async ({ ctx: { db }, input: { spotId } }) => {
+    return await db.booking.findMany({
+      where: { spotId },
       orderBy: { startsAt: "asc" },
       include: { spot: true },
     })

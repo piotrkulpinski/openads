@@ -5,21 +5,21 @@ import { TooltipContent, TooltipRoot, TooltipTrigger } from "@openads/ui/tooltip
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps, ReactNode } from "react"
 
-type NavMainLink = Omit<ComponentProps<typeof Link>, "prefix"> & {
+type NavMainItem = Omit<ComponentProps<typeof Link>, "prefix"> & {
   prefix?: ReactNode
   label?: string
 }
 
 type NavMainProps = {
-  links: NavMainLink[]
+  items: NavMainItem[]
 }
 
-export const NavMain = ({ links }: NavMainProps) => {
+export const NavMain = ({ items }: NavMainProps) => {
   const isMobile = useIsMobile()
 
   return (
     <>
-      {links.map(({ title, label, prefix, ...props }, index) =>
+      {items.map(({ title, label, prefix, ...props }, index) =>
         isMobile ? (
           <TooltipRoot key={index}>
             <TooltipTrigger asChild>

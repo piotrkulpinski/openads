@@ -15,7 +15,7 @@ export const createRouter = () =>
     defaultStaleTime: Number.POSITIVE_INFINITY,
     context: { trpcUtils },
     defaultNotFoundComponent: () => <NotFound />,
-    defaultPendingComponent: () => <LoaderIcon className="animate-spin" />,
+    defaultPendingComponent: () => <LoaderIcon className="animate-spin mx-auto mt-[5vh]" />,
     Wrap: ({ children }: PropsWithChildren) => {
       return (
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
