@@ -15,8 +15,6 @@ export const server = {
         }),
     }),
     handler: async ({ email }) => {
-      console.log(email)
-
       try {
         await fetch("https://connect.mailerlite.com/api/subscribers", {
           method: "POST",
@@ -29,7 +27,7 @@ export const server = {
 
         return { message: "Thank you! We'll notify you when it's live." }
       } catch (error) {
-        console.log(error)
+        console.error(error)
       }
     },
   }),
