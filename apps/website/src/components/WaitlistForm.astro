@@ -1,0 +1,81 @@
+<form id="email-form" novalidate>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <input
+      id="email"
+      name="email"
+      type="email"
+      placeholder="Enter your email"
+      class="w-full flex-1 px-4 py-3 rounded-lg border border-input bg-background/5 backdrop-blur-xl ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    />
+
+    <button
+      type="submit"
+      class="relative inline-flex items-center justify-center px-8 py-3 font-medium -tracking-micro transition-all bg-foreground text-background rounded-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:shadow-md hover:shadow-foreground/20 hover:-translate-y-px"
+      style="background-size: 200% auto;"
+    >
+      Join the Waitlist
+    </button>
+  </div>
+</form>
+
+<script>
+  import { actions } from "astro:actions";
+  import { isInputError } from "astro:actions";
+
+  function clearPreviousMessage(id: string) {
+    const messageElement = document.getElementById(id);
+    if (messageElement) {
+      messageElement.remove();
+    }
+  }
+
+  function addMessageElement(
+    message: string,
+    type: "error" | "success",
+    element: HTMLElement
+  ) {
+    const p = document.createElement("p");
+
+    p.id = "message";
+    p.className = `message ${type === "success" ? "text-green-500" : "text-red-500"} mt-2 px-2 text-sm`;
+    p.innerText = message;
+    form.appendChild(p);
+    p.innerText = message;
+    element.appendChild(p);
+  }
+
+  function clearInput(id: string) {
+    const emailInput = document.getElementById(id) as HTMLInputElement;
+    if (emailInput) emailInput.value = "";
+  }
+
+  function renderMessage(error: any, data: any, form: HTMLFormElement) {
+    if (error && isInputError(error)) {
+      const message = error.fields.email && error.fields.email[0];
+      addMessageElement(message || "", "error", form);
+    } else {
+      if (data?.strapiErrors) {
+        const message = data?.strapiErrors.message;
+        addMessageElement(message, "error", form);
+      } else {
+        clearInput("email");
+        addMessageElement(data?.message, "success", form);
+      }
+    }
+  }
+
+  const form = document.getElementById("email-form") as HTMLFormElement;
+
+  async function handleFormSubmit(e: Event) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    const { data, error } = await actions.subscribe(formData);
+
+    clearPreviousMessage("message");
+    renderMessage(error, data, form);
+  }
+
+  form.addEventListener("submit", handleFormSubmit);
+</script>

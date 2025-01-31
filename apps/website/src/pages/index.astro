@@ -3,6 +3,7 @@ import DevSuiteLogo from "~/assets/devsuite.svg";
 import OpenAlternativeLogo from "~/assets/openalternative.svg";
 import Orb from "~/components/Orb.astro";
 import Prose from "~/components/Prose.astro";
+import WaitlistForm from "~/components/WaitlistForm.astro";
 import Layout from "~/layouts/Layout.astro";
 ---
 
@@ -36,21 +37,7 @@ import Layout from "~/layouts/Layout.astro";
     </Prose>
 
     <section class="w-full max-w-md pt-6 md:pt-8">
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <input
-          type="email"
-          placeholder="Enter your email"
-          class="w-full flex-1 px-4 py-3 rounded-lg border border-input bg-background/5 backdrop-blur-xl ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        />
-
-        <button
-          type="submit"
-          class="relative inline-flex items-center justify-center px-8 py-3 font-medium -tracking-micro transition-all bg-foreground text-background rounded-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:shadow-md hover:shadow-foreground/20 hover:-translate-y-px"
-          style="background-size: 200% auto;"
-        >
-          <span class="relative z-10">Join the Waitlist</span>
-        </button>
-      </div>
+      <WaitlistForm />
 
       <Prose class="mt-4 text-xs">
         We respect your privacy. No spam, ever.
