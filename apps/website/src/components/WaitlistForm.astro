@@ -20,6 +20,9 @@ import LoaderIcon from "~/assets/loader.svg";
       <span>Join the Waitlist</span>
     </button>
   </div>
+
+  <p id="message" class="hidden mt-2 px-2 text-sm text-green-500 text-red-500">
+  </p>
 </form>
 
 <script>
@@ -31,15 +34,12 @@ import LoaderIcon from "~/assets/loader.svg";
   const submitButton = form.querySelector("button") as HTMLButtonElement;
   const spinner = submitButton.querySelector("svg") as SVGElement;
   const buttonText = submitButton.querySelector("span") as HTMLSpanElement;
+  const messageEl = document.getElementById("message") as HTMLParagraphElement;
 
   const handleMessage = (message: string, type: MessageType) => {
-    document.getElementById("message")?.remove();
-
-    const messageEl = document.createElement("p");
-    messageEl.id = "message";
-    messageEl.className = `${type === "success" ? "text-green-500" : "text-red-500"} mt-2 px-2 text-sm`;
+    messageEl.className = `mt-2 px-2 text-sm ${type === "success" ? "text-green-500" : "text-red-500"}`;
     messageEl.innerText = message;
-    form.appendChild(messageEl);
+    messageEl.classList.remove("hidden");
   };
 
   const handleFormSubmit = async (e: Event) => {
@@ -48,6 +48,7 @@ import LoaderIcon from "~/assets/loader.svg";
     submitButton.disabled = true;
     spinner.classList.remove("hidden");
     buttonText.innerText = "Joining...";
+    messageEl.classList.add("hidden");
 
     try {
       const { data, error } = await actions.subscribe(new FormData(form));
