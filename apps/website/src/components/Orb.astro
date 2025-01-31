@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...props } = Astro.props;
+---
+
+<div
+  class:list={[
+    className,
+    "h-[800px] w-[1200px] aspect-[1.5/1] overflow-hidden opacity-100 will-change-transform",
+  ]}
+  {...props}
+>
+  <div
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] aspect-square rounded-[500px] overflow-visible blur-3xl"
+  >
+    <div
+      class="absolute inset-0 rounded-full overflow-hidden will-change-transform bg-conic from-[#10b981] via-[#2dd4bf] via-[#22d3ee] via-[#84cc16] to-[#10b981]"
+    >
+    </div>
+  </div>
+  <div
+    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] aspect-square rounded-[500px] overflow-visible blur-2xl mix-blend-overlay"
+  >
+    <div
+      class="absolute inset-0 rounded-full overflow-hidden will-change-transform bg-conic from-[#ccfbf1] via-[#15803d] to-[#4d7c0f]"
+    >
+    </div>
+  </div>
+</div>

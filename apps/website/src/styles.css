@@ -1,0 +1,76 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(107 24% 15%);
+  --color-border: hsl(0 0% 89.8%);
+  --color-input: hsl(0 0% 89.8%);
+  --color-ring: hsl(0 0% 75.9%);
+
+  --font-sans: "General Sans", sans-serif;
+
+  --tracking-micro: -0.0125em;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    @apply border-border;
+  }
+}
+
+@layer base {
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background: hsl(107 24% 3.9%);
+      --color-foreground: hsl(107 24% 98%);
+      --color-border: hsl(0 0% 14.9%);
+      --color-input: hsl(0 0% 14.9%);
+      --color-ring: hsl(0 0% 25.1%);
+    }
+  }
+
+  @media (prefers-reduced-motion) {
+    * {
+      view-transition-name: none !important;
+      animation: none !important;
+    }
+  }
+
+  * {
+    @apply underline-offset-[0.1em];
+    @apply decoration-[0.05em];
+    @apply border-border;
+  }
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Variable.woff2") format("woff2");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+a,
+button,
+label[for],
+[href] [class*="group-hover"] {
+  @apply transition;
+  @apply ease-out;
+  @apply duration-100;
+  @apply cursor-pointer;
+}

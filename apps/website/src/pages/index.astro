@@ -1,11 +1,83 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import DevSuiteLogo from "~/assets/devsuite.svg";
+import OpenAlternativeLogo from "~/assets/openalternative.svg";
+import Orb from "~/components/Orb.astro";
+import Prose from "~/components/Prose.astro";
+import Layout from "~/layouts/Layout.astro";
 ---
 
 <Layout>
-	<Welcome />
+  <div
+    class="relative flex flex-col items-center justify-center gap-6 pt-12 pb-48 px-8 overflow-clip text-center sm:pt-20 sm:pb-64"
+  >
+    <span
+      class="-mb-4 px-3 py-1 border bg-foreground/5 font-medium text-xs -tracking-tight text-foreground/60 rounded-full"
+    >
+      Waitlist is now open!
+    </span>
+
+    <h1
+      class="relative max-w-[23ch] font-semibold text-4xl/[1.1em] tracking-micro sm:text-5xl/[1.1em] md:text-6xl/[1.1em]"
+    >
+      <div
+        class="absolute -inset-1 bg-gradient-to-b from-transparent to-background/20 pointer-events-none dark:to-background/40"
+      >
+      </div>
+      Ready to start earning from your high-traffic website?
+    </h1>
+
+    <Prose class="max-w-xl text-lg">
+      We are currently working on a new ad platform that will revolutionize how
+      you manage your ads and grow your business.
+      <!-- <p>
+        Achieve ground-breaking growth and increased ad sales with our ad spot
+        management platform.
+      </p> -->
+    </Prose>
+
+    <section class="w-full max-w-md pt-6 md:pt-8">
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <input
+          type="email"
+          placeholder="Enter your email"
+          class="w-full flex-1 px-4 py-3 rounded-lg border border-input bg-background/5 backdrop-blur-xl ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        />
+
+        <button
+          type="submit"
+          class="relative inline-flex items-center justify-center px-8 py-3 font-medium -tracking-micro transition-all bg-foreground text-background rounded-lg ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:shadow-md hover:shadow-foreground/20 hover:-translate-y-px"
+          style="background-size: 200% auto;"
+        >
+          <span class="relative z-10">Join the Waitlist</span>
+        </button>
+      </div>
+
+      <Prose class="mt-4 text-xs">
+        We respect your privacy. No spam, ever.
+      </Prose>
+    </section>
+
+    <Orb class="absolute bottom-[-450px] left-1/2 -translate-x-1/2 -z-1" />
+  </div>
+
+  <div
+    class="pt-4 px-8 mb-24 w-full flex flex-col items-center text-center gap-4 bg-background shadow-[0px_0px_32px_48px_var(--color-background)]"
+  >
+    <Prose class="max-w-2xl">Powering the world's best content websites</Prose>
+
+    <div
+      class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
+    >
+      <OpenAlternativeLogo class="h-7 w-auto sm:h-8" />
+      <DevSuiteLogo class="h-7 w-auto sm:h-8" />
+    </div>
+  </div>
+
+  <Prose class="mt-auto px-8 max-w-2xl text-sm text-center">
+    Made by <a
+      href="https://kulpinski.pl"
+      target="_blank"
+      rel="noopener noreferrer">@piotrkulpinski</a
+    >
+  </Prose>
 </Layout>

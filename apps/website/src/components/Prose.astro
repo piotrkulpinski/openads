@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div">;
+
+const { class: className, ...props } = Astro.props;
+---
+
+<div
+  class:list={[
+    className,
+    "w-full text-foreground/80 dark:text-foreground/60 prose prose-a:font-normal prose-a:text-current prose-a:no-underline prose-a:hover:text-foreground first:prose-p:mt-0 last:prose-p:mb-0 first:prose-ul:mt-0 last:prose-ul:mb-0 prose-li:m-0 prose-img:border prose-img:rounded-md prose-lead:text-lg/relaxed prose-pre:!text-[0.8125em] prose-pre:!bg-foreground/5 prose-inline-code:before:hidden prose-inline-code:after:hidden prose-inline-code:bg-foreground/10 prose-inline-code:rounded prose-inline-code:px-[0.33em] prose-inline-code:py-[0.166em] prose-inline-code:font-normal prose-headings:font-semibold prose-headings:font-display prose-headings:text-foreground prose-headings:tracking-tight prose-h2:text-[1.8em] text-secondary",
+  ]}
+  {...props}
+>
+  <slot />
+</div>
