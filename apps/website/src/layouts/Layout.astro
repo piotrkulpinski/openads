@@ -17,7 +17,16 @@ import "~/styles.css";
     <meta name="author" content="Piotr Kulpinski" />
     <meta name="generator" content={Astro.generator} />
 
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link
+      href="/favicon.png"
+      rel="icon"
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      href="/favicon-dark.png"
+      rel="icon"
+      media="(prefers-color-scheme: dark)"
+    />
 
     <!-- Plausible Analytics -->
     <script

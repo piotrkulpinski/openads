@@ -7,10 +7,7 @@ const { class: className, ...props } = Astro.props;
 ---
 
 <div
-  class:list={[
-    className,
-    "h-[800px] w-[1200px] aspect-[1.5/1] overflow-hidden opacity-100 will-change-transform",
-  ]}
+  class:list={[className, "w-4xl aspect-[1.5/1] will-change-transform"]}
   {...props}
 >
   <div

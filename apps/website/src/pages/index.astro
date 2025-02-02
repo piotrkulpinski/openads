@@ -1,6 +1,7 @@
 ---
 import DevSuiteLogo from "~/assets/devsuite.svg";
 import OpenAlternativeLogo from "~/assets/openalternative.svg";
+import Badge from "~/components/Badge.astro";
 import Orb from "~/components/Orb.astro";
 import Prose from "~/components/Prose.astro";
 import WaitlistForm from "~/components/WaitlistForm.astro";
@@ -11,11 +12,7 @@ import Layout from "~/layouts/Layout.astro";
   <div
     class="relative flex flex-col items-center justify-center gap-6 pt-12 pb-48 px-8 overflow-clip text-center sm:pt-20 sm:pb-64"
   >
-    <span
-      class="-mb-4 px-3 py-1 border bg-foreground/5 font-medium text-xs -tracking-tight text-foreground/60 rounded-full"
-    >
-      Waitlist is now open!
-    </span>
+    <Badge class="-mb-4">Waitlist is now open!</Badge>
 
     <h1
       class="relative max-w-[23ch] font-semibold text-4xl/[1.1em] tracking-micro sm:text-5xl/[1.1em] md:text-6xl/[1.1em]"
@@ -44,27 +41,27 @@ import Layout from "~/layouts/Layout.astro";
       </Prose>
     </section>
 
-    <Orb class="absolute bottom-[-450px] left-1/2 -translate-x-1/2 -z-1" />
+    <Orb class="absolute bottom-[-50%] left-1/2 -translate-x-1/2 -z-1" />
   </div>
 
   <div
-    class="pt-4 px-8 mb-24 w-full flex flex-col items-center text-center gap-4 bg-background shadow-[0px_0px_32px_48px_var(--color-background)]"
+    class="px-8 flex-1 w-full flex flex-col items-center text-center gap-4 shadow-[0px_0px_32px_64px_var(--color-background)]"
   >
     <Prose class="max-w-2xl">Powering the world's best content websites</Prose>
 
     <div
-      class="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
+      class="mt-4 mb-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-4"
     >
       <OpenAlternativeLogo class="h-7 w-auto sm:h-8" />
       <DevSuiteLogo class="h-7 w-auto sm:h-8" />
     </div>
-  </div>
 
-  <Prose class="mt-auto px-8 max-w-2xl text-sm text-center">
-    Made by <a
-      href="https://kulpinski.pl"
-      target="_blank"
-      rel="noopener noreferrer">@piotrkulpinski</a
-    >
-  </Prose>
+    <Prose class="mt-auto px-8 max-w-2xl text-sm text-center">
+      Made by <a
+        href="https://kulpinski.pl"
+        target="_blank"
+        rel="noopener noreferrer">@piotrkulpinski</a
+      >
+    </Prose>
+  </div>
 </Layout>

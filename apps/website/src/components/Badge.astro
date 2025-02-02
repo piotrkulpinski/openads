@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"span">;
+
+const { class: className, ...props } = Astro.props;
+---
+
+<span
+  class:list={[
+    "px-3 py-1 border bg-foreground/[2.5%] font-medium text-xs -tracking-tight text-foreground/60 rounded-full inset-shadow-xs inset-shadow-foreground/10",
+    className,
+  ]}
+  {...props}
+>
+  <slot />
+</span>
