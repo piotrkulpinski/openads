@@ -16,6 +16,8 @@ export default defineConfig({
   env: {
     schema: {
       MAILERLITE_API_TOKEN: envField.string({ context: "server", access: "secret" }),
+      PLAUSIBLE_API_URL: envField.string({ context: "client", access: "public" }),
+      PLAUSIBLE_SCRIPT_URL: envField.string({ context: "client", access: "public" }),
     },
   },
 })
