@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "globalEnv": [
+    "MAILERLITE_API_TOKEN",
+    "PLAUSIBLE_API_URL",
+    "PLAUSIBLE_SCRIPT_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
