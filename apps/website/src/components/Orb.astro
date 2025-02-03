@@ -6,10 +6,7 @@ type Props = HTMLAttributes<"div">;
 const { class: className, ...props } = Astro.props;
 ---
 
-<div
-  class:list={[className, "w-4xl aspect-[1.5/1] will-change-transform"]}
-  {...props}
->
+<div class:list={["w-4xl aspect-[1.5/1]", className]} {...props}>
   <div
     class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] aspect-square rounded-[500px] overflow-visible blur-3xl"
   >
