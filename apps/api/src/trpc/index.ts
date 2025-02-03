@@ -5,11 +5,13 @@ import { bookingRouter } from "~/trpc/booking"
 import { fieldRouter } from "~/trpc/field"
 import { onboardingRouter } from "~/trpc/onboarding"
 import { spotRouter } from "~/trpc/spot"
+import { stripeRouter } from "~/trpc/stripe"
 import { userRouter } from "~/trpc/user"
 import { workspaceRouter } from "~/trpc/workspace"
 
 export const appRouter = router({
   auth: authRouter,
+  stripe: stripeRouter,
   user: userRouter,
   onboarding: onboardingRouter,
   workspace: workspaceRouter,

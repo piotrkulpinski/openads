@@ -18,23 +18,29 @@ export const StripeConnectButtons = ({
 
   // TODO Add a workspace provider from onboarding to make is simpler
 
-  const connectAccount = trpc.workspace.createStripeConnect.useMutation({
+  const connectAccount = trpc.stripe.connect.create.useMutation({
     onSuccess: data => {
       utils.workspace.getBySlug.invalidate({ slug: workspace.slug })
       onSuccess?.()
       window.location.href = data.url
     },
 
-    onError: () => toast.error("Failed to connect with Stripe"),
+    onError: error => {
+      console.error(error)
+      toast.error("Failed to connect with Stripe")
+    },
   })
 
-  const disconnectAccount = trpc.workspace.disconnectStripeConnect.useMutation({
+  const disconnectAccount = trpc.stripe.connect.delete.useMutation({
     onSuccess: () => {
       utils.workspace.getBySlug.invalidate({ slug: workspace.slug })
       onSuccess?.()
     },
 
-    onError: () => toast.error("Failed to disconnect with Stripe"),
+    onError: error => {
+      console.error(error)
+      toast.error("Failed to disconnect with Stripe")
+    },
   })
 
   return (
