@@ -1,7 +1,9 @@
 import { Button } from "@openads/ui/button"
+import { cx } from "@openads/ui/cva"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { StripeIcon } from "~/components/icons/stripe"
+import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type StripeConnectButtonsProps = HTMLAttributes<HTMLElement> & {
@@ -56,23 +58,36 @@ export const StripeConnectButtons = ({
         </Button>
       ) : (
         <>
-          <p className="text-sm text-gray-600">
-            Your Stripe account is connected and ready to receive payments.
-            {workspace.stripeConnectStatus === "pending" && (
-              <span className="block text-yellow-600 mt-2">
-                Please complete your Stripe onboarding to start receiving payments.
-              </span>
+          <hr />
+
+          <p
+            className={cx(
+              "text-sm",
+              workspace.stripeConnectStatus === "pending"
+                ? "text-yellow-500"
+                : "text-muted-foreground",
             )}
+          >
+            {workspace.stripeConnectStatus === "pending"
+              ? "Please complete your Stripe onboarding to start receiving payments."
+              : "Your Stripe account is connected and ready to receive payments."}
           </p>
 
-          <Button
-            variant="destructive"
-            onClick={() => disconnectAccount.mutate({ workspaceId: workspace.id })}
-            isPending={disconnectAccount.isPending}
-            prefix={<StripeIcon className="size-4" />}
+          <ConfirmModal
+            title="Disconnect from Stripe?"
+            label="Disconnect"
+            description="Are you sure you want to disconnect from Stripe? This will close your Stripe account. You won't be able to create new charges, log in to your dashboard, or access your Stripe financial data."
+            onConfirm={() => disconnectAccount.mutate({ workspaceId: workspace.id })}
+            confirmText={workspace.slug}
           >
-            Disconnect Stripe
-          </Button>
+            <Button
+              variant="destructive"
+              isPending={disconnectAccount.isPending}
+              prefix={<StripeIcon className="size-4" />}
+            >
+              Disconnect Stripe
+            </Button>
+          </ConfirmModal>
         </>
       )}
     </div>

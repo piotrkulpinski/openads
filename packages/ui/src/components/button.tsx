@@ -28,7 +28,7 @@ const buttonVariants = cva({
     },
 
     isPending: {
-      true: "text-transparent select-none",
+      true: "[&>*:not(.animate-spin)]:text-transparent select-none",
     },
   },
 
@@ -114,9 +114,7 @@ const Button = ({
               {suffix}
             </Slot>
 
-            {!!isPending && (
-              <LoaderIcon className="absolute size-[1.25em] animate-spin text-white" />
-            )}
+            {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin" />}
           </>
         )}
       </Slottable>
