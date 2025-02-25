@@ -1,5 +1,5 @@
 ---
-import { PLAUSIBLE_API_URL, PLAUSIBLE_SCRIPT_URL } from "astro:env/client";
+import { PLAUSIBLE_DOMAIN, PLAUSIBLE_URL } from "astro:env/client";
 import Logo from "~/assets/logo.svg";
 import "~/styles.css";
 ---
@@ -33,9 +33,8 @@ import "~/styles.css";
     <script
       is:inline
       defer
-      data-domain="openads.co"
-      data-api={PLAUSIBLE_API_URL}
-      src={PLAUSIBLE_SCRIPT_URL}></script>
+      data-domain={PLAUSIBLE_DOMAIN}
+      src={`${PLAUSIBLE_URL}/js/script.js`}></script>
   </head>
 
   <body
