@@ -1,7 +1,7 @@
 "use client"
 
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "@radix-ui/react-icons"
+import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
@@ -118,9 +118,9 @@ const DropdownMenuRadioItem = ({
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2 grid place-items-center size-3.5">
       <DropdownMenuPrimitive.ItemIndicator>
-        <DotFilledIcon className="h-4 w-4 fill-current" />
+        <span className="size-2.5 rounded-full bg-primary" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}

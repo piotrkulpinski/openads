@@ -1,5 +1,5 @@
-import { Slot } from "@radix-ui/react-slot"
 import { LoaderIcon } from "lucide-react"
+import { Slot } from "radix-ui"
 import { Children, type ComponentProps, type ReactNode, isValidElement } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
 import { Slottable } from "./slottable"
@@ -85,7 +85,7 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const useAsChild = asChild && isValidElement(children)
-  const Component = useAsChild ? Slot : "button"
+  const Component = useAsChild ? Slot.Root : "button"
 
   // Determine if the button has affix only.
   const isAffixOnly = Children.count(children) === 0 && (!prefix || !suffix)
@@ -98,21 +98,21 @@ const Button = ({
       <Slottable child={children} asChild={asChild}>
         {child => (
           <>
-            <Slot
+            <Slot.Root
               className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5ch]" })}
               aria-hidden="true"
             >
               {prefix}
-            </Slot>
+            </Slot.Root>
 
             {Children.count(child) !== 0 && <span className="truncate">{child}</span>}
 
-            <Slot
+            <Slot.Root
               className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5ch]" })}
               aria-hidden="true"
             >
               {suffix}
-            </Slot>
+            </Slot.Root>
 
             {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin" />}
           </>

@@ -1,5 +1,5 @@
 import { type VariantProps, cva, cx } from "@openads/ui/cva"
-import { Slot } from "@radix-ui/react-slot"
+import { Slot } from "radix-ui"
 import type { ComponentProps } from "react"
 import { isValidElement } from "react"
 
@@ -36,7 +36,7 @@ type StackProps = ComponentProps<"div"> &
 
 const Stack = ({ className, asChild, size, direction, ...props }: StackProps) => {
   const useAsChild = asChild && isValidElement(props.children)
-  const Comp = useAsChild ? Slot : "div"
+  const Comp = useAsChild ? Slot.Root : "div"
 
   return <Comp className={cx(stackVariants({ size, direction, className }))} {...props} />
 }

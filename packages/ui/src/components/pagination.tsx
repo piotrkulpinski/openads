@@ -1,4 +1,4 @@
-import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 import { cx } from "../lib/cva"
 import { Button, type ButtonProps } from "./button"
@@ -56,7 +56,7 @@ const PaginationNext = ({ className, ...props }: ComponentProps<typeof Paginatio
 
 const PaginationEllipsis = ({ className, ...props }: ComponentProps<"span">) => (
   <span aria-hidden className={cx("flex size-9 items-center justify-center", className)} {...props}>
-    <DotsHorizontalIcon className="size-4" />
+    <EllipsisIcon className="size-4" />
     <span className="sr-only">More pages</span>
   </span>
 )

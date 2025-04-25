@@ -1,6 +1,6 @@
 "use client"
 
-import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area"
+import { ScrollArea as ScrollAreaPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { cx } from "../lib/cva"
 

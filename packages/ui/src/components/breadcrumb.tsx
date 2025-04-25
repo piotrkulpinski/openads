@@ -1,5 +1,5 @@
-import { ChevronRightIcon, DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Slot } from "@radix-ui/react-slot"
+import { ChevronRightIcon, EllipsisIcon } from "lucide-react"
+import { Slot } from "radix-ui"
 import type { ComponentProps } from "react"
 import { cx } from "../lib/cva"
 
@@ -26,14 +26,13 @@ const BreadcrumbLink = ({
   className,
   ...props
 }: ComponentProps<"a"> & { asChild?: boolean }) => {
-  const Comp = asChild ? Slot : "a"
+  const Comp = asChild ? Slot.Root : "a"
 
   return <Comp className={cx("transition-colors hover:text-foreground", className)} {...props} />
 }
 
 const BreadcrumbPage = ({ className, ...props }: ComponentProps<"span">) => (
   <span
-    role="link"
     aria-disabled="true"
     aria-current="page"
     className={cx("font-normal text-foreground", className)}
@@ -59,7 +58,7 @@ const BreadcrumbEllipsis = ({ className, ...props }: ComponentProps<"span">) => 
     className={cx("flex h-9 w-9 items-center justify-center", className)}
     {...props}
   >
-    <DotsHorizontalIcon className="h-4 w-4" />
+    <EllipsisIcon className="h-4 w-4" />
     <span className="sr-only">More</span>
   </span>
 )

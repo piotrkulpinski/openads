@@ -1,5 +1,5 @@
 import { type VariantProps, cva, cx } from "@openads/ui/cva"
-import { Slot } from "@radix-ui/react-slot"
+import { Slot } from "radix-ui"
 import { type ComponentProps, type HTMLAttributes, isValidElement } from "react"
 import { sectionVariants } from "~/components/ui/section"
 
@@ -73,7 +73,7 @@ export type CardProps = HTMLAttributes<HTMLDivElement> &
 
 const CardRoot = ({ asChild = false, className, ...props }: CardProps) => {
   const useAsChild = asChild && isValidElement(props.children)
-  const Component = useAsChild ? Slot : "div"
+  const Component = useAsChild ? Slot.Root : "div"
 
   return <Component className={cx(cardVariants({ className }))} {...props} />
 }
@@ -97,7 +97,7 @@ const CardPanel = ({
   ...props
 }: CardPanelProps) => {
   const useAsChild = asChild && isValidElement(props.children)
-  const Component = useAsChild ? Slot : "div"
+  const Component = useAsChild ? Slot.Root : "div"
 
   return (
     <Component

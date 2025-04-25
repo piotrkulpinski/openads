@@ -1,6 +1,6 @@
 "use client"
 
-import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import { Tooltip as TooltipPrimitive } from "radix-ui"
 import type { ComponentProps, ReactNode } from "react"
 import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"

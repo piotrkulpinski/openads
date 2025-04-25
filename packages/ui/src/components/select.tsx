@@ -1,7 +1,7 @@
 "use client"
 
-import { CaretSortIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
-import * as SelectPrimitive from "@radix-ui/react-select"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, ChevronsUpDownIcon } from "lucide-react"
+import { Select as SelectPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
@@ -26,7 +26,7 @@ const SelectTrigger = ({
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <CaretSortIcon className="h-4 w-4 opacity-50" />
+      <ChevronsUpDownIcon className="ml-1 size-4 opacity-50" />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 )

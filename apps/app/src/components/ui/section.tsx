@@ -1,5 +1,5 @@
 import { type VariantProps, cva, cx } from "@openads/ui/cva"
-import { Slot } from "@radix-ui/react-slot"
+import { Slot } from "radix-ui"
 import { type HTMLAttributes, isValidElement } from "react"
 
 const sectionVariants = cva({
@@ -17,7 +17,7 @@ type SectionProps = HTMLAttributes<HTMLElement> &
 
 const Section = ({ className, asChild = false, ...props }: SectionProps) => {
   const useAsChild = asChild && isValidElement(props.children)
-  const Component = useAsChild ? Slot : "section"
+  const Component = useAsChild ? Slot.Root : "section"
 
   return <Component className={cx(sectionVariants({ className }))} {...props} />
 }

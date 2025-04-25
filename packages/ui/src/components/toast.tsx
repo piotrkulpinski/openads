@@ -1,7 +1,7 @@
 "use client"
 
-import { Cross2Icon } from "@radix-ui/react-icons"
-import * as ToastPrimitives from "@radix-ui/react-toast"
+import { XIcon } from "lucide-react"
+import { Toast as ToastPrimitives } from "radix-ui"
 import type { ComponentProps } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
 
@@ -64,7 +64,7 @@ const ToastClose = ({ className, ...props }: ComponentProps<typeof ToastPrimitiv
       toast-close=""
       {...props}
     >
-      <Cross2Icon className="h-4 w-4" />
+      <XIcon className="h-4 w-4" />
     </ToastPrimitives.Close>
   )
 }

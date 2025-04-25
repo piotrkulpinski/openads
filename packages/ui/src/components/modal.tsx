@@ -1,6 +1,6 @@
 "use client"
 
-import { Slot } from "@radix-ui/react-slot"
+import { Slot } from "radix-ui"
 import { type HTMLAttributes, isValidElement } from "react"
 import { type VariantProps, cva, cx } from "../lib/cva"
 
@@ -42,7 +42,7 @@ export type ModalProps = HTMLAttributes<HTMLDivElement> &
 
 const Modal = ({ className, asChild = false, size = "md", fixed = true, ...props }: ModalProps) => {
   const useAsChild = asChild && isValidElement(props.children)
-  const Component = useAsChild ? Slot : "div"
+  const Component = useAsChild ? Slot.Root : "div"
 
   return <Component className={cx(modalVariants({ size, fixed, className }))} {...props} />
 }

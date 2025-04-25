@@ -1,7 +1,7 @@
 "use client"
 
-import { CheckIcon, ChevronRightIcon, DotFilledIcon } from "@radix-ui/react-icons"
-import * as MenubarPrimitive from "@radix-ui/react-menubar"
+import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { Menubar as MenubarPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
@@ -148,9 +148,9 @@ const MenubarRadioItem = ({
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2 grid place-items-center size-3.5">
       <MenubarPrimitive.ItemIndicator>
-        <DotFilledIcon className="h-4 w-4 fill-current" />
+        <span className="size-2.5 rounded-full bg-primary" />
       </MenubarPrimitive.ItemIndicator>
     </span>
     {children}

@@ -1,7 +1,6 @@
 "use client"
 
-import { CheckIcon } from "@radix-ui/react-icons"
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { cx } from "../lib/cva"
 
@@ -15,13 +14,13 @@ const RadioGroupItem = ({
 }: ComponentProps<typeof RadioGroupPrimitive.Item>) => (
   <RadioGroupPrimitive.Item
     className={cx(
-      "aspect-square h-4 w-4 rounded-full border border-primary text-primary shadow-sm focus:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+      "size-4 rounded-full border-foreground/50! text-foreground shadow disabled:cursor-not-allowed disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
       className,
     )}
     {...props}
   >
-    <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-      <CheckIcon className="h-3.5 w-3.5 fill-primary" />
+    <RadioGroupPrimitive.Indicator className="grid place-items-center">
+      <span className="size-2.5 rounded-full bg-primary" />
     </RadioGroupPrimitive.Indicator>
   </RadioGroupPrimitive.Item>
 )
