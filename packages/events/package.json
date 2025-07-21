@@ -16,11 +16,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openpanel/nextjs": "^1.0.6",
-    "@vercel/functions": "^1.5.0"
+    "@openpanel/nextjs": "^1.0.8",
+    "@vercel/functions": "^2.2.3"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "typescript": "^5.7.3"
+    "typescript": "^5.8.3"
   }
 }

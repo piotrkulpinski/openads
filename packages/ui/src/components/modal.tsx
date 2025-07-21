@@ -2,7 +2,7 @@
 
 import { Slot } from "radix-ui"
 import { type HTMLAttributes, isValidElement } from "react"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 
 const modalVariants = cva({
   base: "fixed left-1/2 -translate-x-1/2 z-50 w-[calc(100vw-2rem)] overflow-y-auto",

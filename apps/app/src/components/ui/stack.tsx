@@ -1,4 +1,4 @@
-import { type VariantProps, cva, cx } from "@openads/ui/cva"
+import { cva, cx, type VariantProps } from "@openads/ui/cva"
 import { Slot } from "radix-ui"
 import type { ComponentProps } from "react"
 import { isValidElement } from "react"

@@ -3,8 +3,8 @@
 import { PanelLeft } from "lucide-react"
 import { Slot } from "radix-ui"
 import {
-  type CSSProperties,
   type ComponentProps,
+  type CSSProperties,
   createContext,
   useCallback,
   useContext,
@@ -13,7 +13,7 @@ import {
   useState,
 } from "react"
 import { useIsMobile } from "../hooks/use-mobile"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 import { Button } from "./button"
 import { Input } from "./input"
 import { Separator } from "./separator"

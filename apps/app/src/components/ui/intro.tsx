@@ -1,4 +1,4 @@
-import { type VariantProps, cva, cx } from "@openads/ui/cva"
+import { cva, cx, type VariantProps } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
 import { Heading, type HeadingProps } from "~/components/ui/heading"
 

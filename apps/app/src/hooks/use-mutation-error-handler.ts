@@ -12,15 +12,18 @@ export const useMutationErrorHandler = () => {
   return <T extends FieldValues>({ error, form }: HandleError<T>) => {
     const { data, message } = error
 
-    if (!data?.fieldErrors || !Object.keys(data?.fieldErrors).length) {
+    // Type the data properly to avoid TypeScript errors
+    const fieldErrors = data?.fieldErrors as Record<string, string[]> | undefined
+
+    if (!fieldErrors || !Object.keys(fieldErrors).length) {
       toast.error(message) // Show the error message
       form.reset() // Reset the form
 
       return
     }
 
-    for (const [name, message] of Object.entries(data?.fieldErrors)) {
-      form.setError(name as FieldPath<T>, { message: message?.[0] }, { shouldFocus: true })
+    for (const [name, messages] of Object.entries(fieldErrors)) {
+      form.setError(name as FieldPath<T>, { message: messages?.[0] }, { shouldFocus: true })
     }
   }
 }

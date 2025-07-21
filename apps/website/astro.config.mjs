@@ -7,10 +7,6 @@ import { defineConfig, envField } from "astro/config"
 export default defineConfig({
   adapter: vercel(),
 
-  experimental: {
-    responsiveImages: true,
-  },
-
   vite: {
     plugins: [tailwindcss()],
   },

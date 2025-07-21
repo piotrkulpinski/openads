@@ -1,17 +1,16 @@
-import { slugify } from "@curiousleaf/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { type WorkspaceSchema, workspaceSchema } from "@openads/db/schema"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
+import { slugify } from "@primoui/utils"
 import type { HTMLAttributes } from "react"
 import { useForm } from "react-hook-form"
 import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
-import { getDefaults } from "~/lib/zod"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
@@ -31,7 +30,11 @@ export const CreateWorkspaceForm = ({
 
   const form = useForm<WorkspaceSchema>({
     resolver: zodResolver(workspaceSchema),
-    defaultValues: getDefaults(workspaceSchema),
+    defaultValues: {
+      name: "",
+      slug: "",
+      websiteUrl: "",
+    },
   })
 
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({

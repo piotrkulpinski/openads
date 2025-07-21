@@ -1,5 +1,5 @@
 import type * as React from "react"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 
 const badgeVariants = cva({
   base: "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-0.5 text-xs font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",

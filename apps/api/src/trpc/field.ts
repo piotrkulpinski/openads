@@ -17,7 +17,7 @@ export const fieldRouter = router({
   }),
 
   update: spotProcedure
-    .input(fieldSchema.partial().merge(idSchema))
+    .input(fieldSchema.partial().extend(idSchema.shape))
     .mutation(async ({ ctx: { db }, input: { id, spotId, ...data } }) => {
       return await db.field.update({
         where: { id, spotId },

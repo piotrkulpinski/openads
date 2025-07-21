@@ -41,6 +41,14 @@ function SpotEmbed() {
 
   const spotsQuery = trpc.spot.public.getAll.useQuery({ workspaceId }, { enabled: !!workspaceId })
 
+  if (!workspaceId) {
+    return (
+      <div className="h-screen grid place-items-center">
+        <p className="text-muted-foreground text-center">No workspace ID provided.</p>
+      </div>
+    )
+  }
+
   return (
     <>
       <QueryCell

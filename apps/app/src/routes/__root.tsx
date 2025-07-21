@@ -1,7 +1,7 @@
 import { Provider as Analytics } from "@openads/events/client"
 import { TooltipProvider } from "@openads/ui/tooltip"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import { Outlet, createRootRouteWithContext, redirect } from "@tanstack/react-router"
+import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
