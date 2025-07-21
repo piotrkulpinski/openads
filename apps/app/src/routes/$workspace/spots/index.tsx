@@ -1,6 +1,6 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
-import { Link, createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, Link } from "@tanstack/react-router"
 import { PlusIcon } from "lucide-react"
 import { QueryCell } from "~/components/query-cell"
 import { SpotItem } from "~/components/spots/spot-item"

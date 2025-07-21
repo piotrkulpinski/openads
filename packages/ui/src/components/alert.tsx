@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 
 const alertVariants = cva({
   base: "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",

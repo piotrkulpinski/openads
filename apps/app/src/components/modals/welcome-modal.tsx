@@ -7,8 +7,8 @@ import {
   DialogTitle,
 } from "@openads/ui/dialog"
 import { ArrowRightIcon } from "lucide-react"
-import { useCallback, useMemo, useState } from "react"
 import type { Dispatch, HTMLAttributes, SetStateAction } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 import { LogoSymbol } from "~/components/ui/logo-symbol"
 import { siteConfig } from "~/config/site"

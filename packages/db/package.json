@@ -14,18 +14,26 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "postinstall": "bun run db:generate"
+  },
+  "prisma": {
+    "schema": "./prisma"
   },
   "dependencies": {
-    "@prisma/client": "^6.2.1",
-    "nanoid": "^5.0.9",
-    "zod": "^3.24.1"
+    "@prisma/client": "^6.11.1",
+    "nanoid": "^5.1.5",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "@types/node": "^22.10.5",
-    "prisma": "^6.2.1",
-    "typescript": "5.7.2"
+    "@types/node": "^24.0.13",
+    "prisma": "^6.11.1",
+    "typescript": "^5.8.3"
   },
-  "trustedDependencies": ["@prisma/client", "@prisma/engines", "prisma"]
+  "trustedDependencies": [
+    "@prisma/client",
+    "@prisma/engines",
+    "prisma"
+  ]
 }

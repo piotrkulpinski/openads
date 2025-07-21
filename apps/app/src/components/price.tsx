@@ -1,7 +1,7 @@
-import { formatNumber } from "@curiousleaf/utils"
 import NumberFlow, { continuous, type Format } from "@number-flow/react"
 import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
+import { formatNumber } from "@primoui/utils"
 import type { ComponentProps } from "react"
 import type Stripe from "stripe"
 

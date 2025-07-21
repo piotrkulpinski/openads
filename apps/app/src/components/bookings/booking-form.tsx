@@ -10,8 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@openads/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@openads/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
-import { type createRouter, useNavigate } from "@tanstack/react-router"
 import type { NavigateOptions } from "@tanstack/react-router"
+import { type createRouter, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -22,7 +22,6 @@ import { FormButton } from "~/components/form-button"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
-import { getDefaults } from "~/lib/zod"
 
 type BookingFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
@@ -61,7 +60,15 @@ export const BookingForm = ({
 
   const form = useForm<BookingSchema>({
     resolver: zodResolver(bookingSchema),
-    values: booking || getDefaults(bookingSchema),
+    values: booking,
+    defaultValues: {
+      startsAt: new Date(),
+      endsAt: new Date(),
+      amount: 0,
+      currency: "usd",
+      status: "pending",
+      spotId: "",
+    },
   })
 
   const onSuccess = async (data: RouterOutputs["booking"]["create"]) => {

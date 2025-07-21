@@ -44,14 +44,10 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
-  --animate-slide-down-and-fade: slide-down-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-left-and-fade: slide-left-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-up-and-fade: slide-up-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-right-and-fade: slide-right-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-down-and-fade: slide-down-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-left-and-fade: slide-left-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up-and-fade: slide-up-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-right-and-fade: slide-right-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes accordion-down {
     from {

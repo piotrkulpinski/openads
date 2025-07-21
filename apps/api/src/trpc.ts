@@ -1,10 +1,10 @@
 import { db } from "@openads/db"
 import { Prisma } from "@openads/db/client"
-import { TRPCError, initTRPC } from "@trpc/server"
+import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
+import type { ZodFlattenedError } from "zod"
 import { ZodError, z } from "zod"
-import type { typeToFlattenedError } from "zod"
 import { auth as betterAuth } from "~/lib/auth"
 import { redis } from "~/services/redis"
 
@@ -23,7 +23,7 @@ const t = initTRPC.context<typeof createContext>().create({
   transformer: superjson,
 
   errorFormatter: ({ shape, error: { cause } }) => {
-    let dataError: typeToFlattenedError<any, string> = {
+    let dataError: ZodFlattenedError<any, string> = {
       formErrors: [],
       fieldErrors: {},
     }

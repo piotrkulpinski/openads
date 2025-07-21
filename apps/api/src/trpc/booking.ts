@@ -39,7 +39,7 @@ export const bookingRouter = router({
     }),
 
   update: workspaceProcedure
-    .input(bookingSchema.partial().merge(idSchema))
+    .input(bookingSchema.partial().extend(idSchema.shape))
     .mutation(async ({ ctx: { db }, input: { id, workspaceId, ...data } }) => {
       return await db.booking.update({
         where: { id, workspaceId },

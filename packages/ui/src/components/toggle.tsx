@@ -2,7 +2,7 @@
 
 import { Toggle as TogglePrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 
 const toggleVariants = cva({
   base: "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-muted hover:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground",

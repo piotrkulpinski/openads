@@ -12,7 +12,6 @@ import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useFields } from "~/contexts/fields-context"
 import type { RouterOutputs } from "~/lib/trpc"
-import { getDefaults } from "~/lib/zod"
 
 type FieldsFormProps = HTMLAttributes<HTMLElement> & {
   field: RouterOutputs["field"]["getAll"][number]
@@ -25,7 +24,15 @@ export const FieldsForm = ({ className, field, ...props }: FieldsFormProps) => {
 
   const form = useForm<FieldSchema>({
     resolver: zodResolver(fieldSchema),
-    values: field || getDefaults(fieldSchema),
+    values: field,
+    defaultValues: {
+      type: FieldType.Text,
+      name: "",
+      default: "",
+      placeholder: "",
+      isRequired: false,
+      order: 0,
+    },
   })
 
   const excludeDefaultFor: FieldType[] = [FieldType.Switch]

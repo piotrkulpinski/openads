@@ -29,7 +29,7 @@ export const spotRouter = router({
     }),
 
   update: workspaceProcedure
-    .input(spotSchema.partial().merge(idSchema))
+    .input(spotSchema.partial().extend(idSchema.shape))
     .mutation(async ({ ctx: { db }, input: { id, workspaceId, ...data } }) => {
       return await db.spot.update({
         where: { id, workspaceId },

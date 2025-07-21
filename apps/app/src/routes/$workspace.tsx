@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, notFound } from "@tanstack/react-router"
+import { createFileRoute, notFound, Outlet } from "@tanstack/react-router"
 import { Sidebar } from "~/components/sidebar"
 import { WorkspaceContext } from "~/contexts/workspace-context"
 

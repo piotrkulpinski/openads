@@ -3,7 +3,7 @@
 import { XIcon } from "lucide-react"
 import { Toast as ToastPrimitives } from "radix-ui"
 import type { ComponentProps } from "react"
-import { type VariantProps, cva, cx } from "../lib/cva"
+import { cva, cx, type VariantProps } from "../lib/cva"
 
 const ToastProvider = ToastPrimitives.Provider
 
