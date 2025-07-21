@@ -9,16 +9,16 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "@primoui/utils": "^1.2.0",
+    "@primoui/utils": "^1.2.1",
     "@hono/trpc-server": "^0.4.0",
-    "@hono/zod-validator": "^0.7.0",
+    "@hono/zod-validator": "^0.7.2",
     "@openads/db": "workspace:*",
     "@openads/utils": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
     "@trpc/server": "^11.4.3",
     "@upstash/redis": "^1.35.1",
     "better-auth": "latest",
-    "hono": "^4.8.4",
+    "hono": "^4.8.5",
     "stripe": "^18.3.0",
     "superjson": "^2.2.2",
     "zod": "^4.0.5"
