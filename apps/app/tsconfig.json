@@ -1,6 +1,6 @@
 {
   "extends": "@openads/tsconfig/react-library.json",
-  "references": [{ "path": "../api/tsconfig.json" }],
+  "references": [{ "path": "../api" }],
   "compilerOptions": {
     "incremental": true,
     "outDir": "./dist",

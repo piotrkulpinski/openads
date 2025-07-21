@@ -21,14 +21,14 @@
     "schema": "./prisma"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.1",
+    "@prisma/client": "^6.12.0",
     "nanoid": "^5.1.5",
     "zod": "^4.0.5"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "@types/node": "^24.0.13",
-    "prisma": "^6.11.1",
+    "@types/node": "^24.0.15",
+    "prisma": "^6.12.0",
     "typescript": "^5.8.3"
   },
   "trustedDependencies": [
