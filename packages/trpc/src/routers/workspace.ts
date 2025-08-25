@@ -1,6 +1,6 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
 import { workspaceSchema } from "@openads/db/schema"
-import { authProcedure, router, workspaceProcedure } from "~/trpc"
+import { authProcedure, router, workspaceProcedure } from "../index"
 
 export const workspaceRouter = router({
   getAll: authProcedure.query(async ({ ctx: { db, user } }) => {

@@ -1,13 +1,13 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
-import { router } from "~/trpc"
-import { authRouter } from "~/trpc/auth"
-import { bookingRouter } from "~/trpc/booking"
-import { fieldRouter } from "~/trpc/field"
-import { onboardingRouter } from "~/trpc/onboarding"
-import { spotRouter } from "~/trpc/spot"
-import { stripeRouter } from "~/trpc/stripe"
-import { userRouter } from "~/trpc/user"
-import { workspaceRouter } from "~/trpc/workspace"
+import { router } from "./index"
+import { authRouter } from "./routers/auth"
+import { bookingRouter } from "./routers/booking"
+import { fieldRouter } from "./routers/field"
+import { onboardingRouter } from "./routers/onboarding"
+import { spotRouter } from "./routers/spot"
+import { stripeRouter } from "./routers/stripe"
+import { userRouter } from "./routers/user"
+import { workspaceRouter } from "./routers/workspace"
 
 export const appRouter = router({
   auth: authRouter,

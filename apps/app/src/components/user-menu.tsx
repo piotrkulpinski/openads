@@ -9,10 +9,10 @@ import {
 } from "@openads/ui/dropdown-menu"
 import { useRouter } from "@tanstack/react-router"
 import { LogOutIcon } from "lucide-react"
-import { signOut, useSession } from "~/lib/auth"
+import { authClient } from "~/lib/auth"
 
 export const UserMenu = () => {
-  const { data: session, isPending } = useSession()
+  const { data: session, isPending } = authClient.useSession()
   const router = useRouter()
 
   if (!session?.user || isPending) {
@@ -24,7 +24,7 @@ export const UserMenu = () => {
   }
 
   const handleLogout = () => {
-    return signOut({ fetchOptions: { onSuccess: () => router.invalidate() } })
+    return authClient.signOut({ fetchOptions: { onSuccess: () => router.invalidate() } })
   }
 
   return (

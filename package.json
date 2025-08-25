@@ -17,7 +17,7 @@
     "@trpc/server": "^11.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.1",
+    "@biomejs/biome": "^2.1.2",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   },

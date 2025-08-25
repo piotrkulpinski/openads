@@ -1,32 +1,23 @@
-import Stripe from "stripe"
+import { createStripeClient, createPaymentIntent as createPaymentIntentCore } from "@openads/stripe"
 import { env } from "~/env"
 
-export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-06-30.basil",
-  typescript: true,
+export const stripe = createStripeClient({
+  STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
+  STRIPE_PLATFORM_FEE_PERCENT: env.STRIPE_PLATFORM_FEE_PERCENT,
 })
 
-type CreatePaymentIntentProps = {
+const stripeConfig = {
+  STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
+  STRIPE_PLATFORM_FEE_PERCENT: env.STRIPE_PLATFORM_FEE_PERCENT,
+}
+
+export type CreatePaymentIntentProps = {
   amount: number
   workspaceId: string
   bookingId: string
   stripeConnectId: string
 }
 
-export async function createPaymentIntent({
-  amount,
-  workspaceId,
-  bookingId,
-  stripeConnectId,
-}: CreatePaymentIntentProps) {
-  const applicationFeeAmount = Math.round((amount * env.STRIPE_PLATFORM_FEE_PERCENT) / 100)
-
-  return stripe.paymentIntents.create({
-    amount,
-    currency: "usd",
-    payment_method_types: ["card"],
-    application_fee_amount: applicationFeeAmount,
-    transfer_data: { destination: stripeConnectId },
-    metadata: { workspaceId, bookingId },
-  })
+export async function createPaymentIntent(props: CreatePaymentIntentProps) {
+  return createPaymentIntentCore(stripe, stripeConfig, props)
 }

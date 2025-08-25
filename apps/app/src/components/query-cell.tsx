@@ -1,4 +1,4 @@
-import type { AppRouter } from "@openads/api/trpc"
+import type { AppRouter } from "@openads/trpc/router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 
 import { createQueryCell } from "~/lib/query-cell"

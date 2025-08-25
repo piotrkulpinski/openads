@@ -1,4 +1,4 @@
-import type { RouterOutputs } from "@openads/api/trpc"
+import type { RouterOutputs } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { Calendar } from "@openads/ui/calendar"
 import { cx } from "@openads/ui/cva"

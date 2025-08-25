@@ -1,12 +1,10 @@
 import { Prisma } from "@openads/db/client"
 import { TRPCError } from "@trpc/server"
-import { env } from "~/env"
-import { stripe } from "~/lib/stripe"
-import { router, workspaceProcedure } from "~/trpc"
+import { router, workspaceProcedure } from "../index"
 
 export const stripeRouter = router({
   connect: router({
-    create: workspaceProcedure.mutation(async ({ ctx: { db, user, workspace } }) => {
+    create: workspaceProcedure.mutation(async ({ ctx: { db, user, workspace, stripe, env } }) => {
       // Create a Stripe Connect account
       const account = await stripe.accounts.create({
         type: "standard",
@@ -34,7 +32,7 @@ export const stripeRouter = router({
       return { url: accountLink.url }
     }),
 
-    delete: workspaceProcedure.mutation(async ({ ctx: { db, workspace } }) => {
+    delete: workspaceProcedure.mutation(async ({ ctx: { db, workspace, stripe } }) => {
       if (!workspace.stripeConnectId) {
         throw new TRPCError({ code: "NOT_FOUND" })
       }

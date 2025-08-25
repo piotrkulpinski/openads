@@ -1,6 +1,6 @@
 import { bookingSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { publicProcedure, router, spotProcedure, workspaceProcedure } from "~/trpc"
+import { publicProcedure, router, spotProcedure, workspaceProcedure } from "../index"
 
 export const bookingRouter = router({
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {

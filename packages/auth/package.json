@@ -1,0 +1,19 @@
+{
+  "name": "@openads/auth",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./client": "./src/client.ts"
+  },
+  "dependencies": {
+    "@openads/db": "workspace:*",
+    "better-auth": "latest"
+  },
+  "devDependencies": {
+    "@openads/tsconfig": "workspace:*",
+    "@types/node": "^24.0.15",
+    "typescript": "^5.8.3"
+  }
+}

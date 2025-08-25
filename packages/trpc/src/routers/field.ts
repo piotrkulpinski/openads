@@ -1,6 +1,6 @@
 import { fieldSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { router, spotProcedure } from "~/trpc"
+import { router, spotProcedure } from "../index"
 
 export const fieldRouter = router({
   getAll: spotProcedure.query(async ({ ctx: { db }, input: { spotId } }) => {

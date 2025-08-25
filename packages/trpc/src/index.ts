@@ -1,36 +1,53 @@
-import { db } from "@openads/db"
+import type { db } from "@openads/db"
 import { Prisma } from "@openads/db/client"
+import type { StripeClient } from "@openads/stripe"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import type { ZodFlattenedError } from "zod"
 import { ZodError, z } from "zod"
-import { auth as betterAuth } from "~/lib/auth"
-import { redis } from "~/services/redis"
 
 /**
- * This is the actual context you'll use in your router. It will be used to
- * process every request that goes through your tRPC endpoint
- * @link https://trpc.io/docs/context
+ * Context type that the API will provide
  */
-export const createContext = async (ctx: FetchCreateContextFnOptions) => {
-  const auth = await betterAuth.api.getSession({ headers: ctx.req.headers })
-
-  return { ...ctx, auth, db, redis }
+export interface Context extends FetchCreateContextFnOptions, Record<string, unknown> {
+  auth: {
+    user: {
+      id: string
+      email: string
+      name?: string | null
+      image?: string | null
+      emailVerified: boolean
+      createdAt: Date
+      updatedAt: Date
+    }
+  } | null
+  db: typeof db
+  redis: any // We'll type this properly when we know the Redis client type
+  stripe: StripeClient
+  env: {
+    APP_URL: string
+    // Add other env vars as needed
+  }
 }
 
-const t = initTRPC.context<typeof createContext>().create({
+/**
+ * Create context function type that API must implement
+ */
+export type CreateContextFn = (ctx: FetchCreateContextFnOptions) => Promise<Context>
+
+const t = initTRPC.context<Context>().create({
   transformer: superjson,
 
   errorFormatter: ({ shape, error: { cause } }) => {
-    let dataError: ZodFlattenedError<any, string> = {
-      formErrors: [],
-      fieldErrors: {},
+    let dataError = {
+      formErrors: [] as string[],
+      fieldErrors: {} as Record<string, string[]>,
     }
 
     // Zod error
     if (cause instanceof ZodError) {
-      dataError = Object.assign(dataError, cause.flatten())
+      const flattened = cause.flatten()
+      dataError = Object.assign(dataError, flattened)
     }
 
     // Prisma error

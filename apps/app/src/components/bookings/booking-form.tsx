@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { AppRouter } from "@openads/api/trpc"
 import type { BookingSchema } from "@openads/db/schema"
 import { bookingSchema } from "@openads/db/schema"
+import type { AppRouter } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { Calendar } from "@openads/ui/calendar"
 import { cx } from "@openads/ui/cva"
