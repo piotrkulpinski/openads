@@ -1,0 +1,16 @@
+{
+  "name": "@openads/stripe",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "stripe": "^18.3.0"
+  },
+  "devDependencies": {
+    "@openads/tsconfig": "workspace:*",
+    "@types/node": "^24.0.15",
+    "typescript": "^5.8.3"
+  }
+}

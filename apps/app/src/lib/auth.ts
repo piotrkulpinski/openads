@@ -1,7 +1,7 @@
-import { createAuthClient } from "better-auth/react"
+import { type AuthClient, createAuthClientInstance } from "@openads/auth/client"
 import { env } from "~/env"
 
-export const { signIn, signOut, useSession } = createAuthClient({
+export const authClient: AuthClient = createAuthClientInstance({
   baseURL: `${env.VITE_API_URL}/api/auth`,
   credentials: "include",
 })

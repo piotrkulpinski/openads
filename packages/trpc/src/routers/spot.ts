@@ -1,6 +1,6 @@
 import { idSchema, spotSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { publicProcedure, router, workspaceProcedure } from "~/trpc"
+import { publicProcedure, router, workspaceProcedure } from "../index"
 
 export const spotRouter = router({
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {

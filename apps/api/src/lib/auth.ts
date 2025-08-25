@@ -1,40 +1,8 @@
-import { db } from "@openads/db"
-import { betterAuth } from "better-auth"
-import { prismaAdapter } from "better-auth/adapters/prisma"
+import { createAuthServer } from "@openads/auth/server"
 import { env } from "~/env"
 
-export const auth = betterAuth({
-  database: prismaAdapter(db, {
-    provider: "postgresql",
-  }),
-
-  socialProviders: {
-    google: {
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    },
-  },
-
-  account: {
-    accountLinking: {
-      enabled: true,
-    },
-  },
-
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
-    },
-  },
-
-  advanced: {
-    crossSubDomainCookies: {
-      enabled: true,
-    },
-
-    generateId: false,
-  },
-
-  trustedOrigins: [env.APP_URL],
+export const auth = createAuthServer({
+  GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET,
+  APP_URL: env.APP_URL,
 })

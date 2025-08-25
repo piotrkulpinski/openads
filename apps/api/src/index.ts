@@ -1,13 +1,13 @@
 import { trpcServer } from "@hono/trpc-server"
+import { appRouter } from "@openads/trpc/router"
 import { Hono } from "hono"
 import { showRoutes } from "hono/dev"
 import { logger } from "hono/logger"
+import { createContext } from "~/context"
 import { env } from "~/env"
 import { auth } from "~/lib/auth"
 import { corsMiddleware } from "~/middleware/cors"
 import { onError } from "~/middleware/on-error"
-import { createContext } from "~/trpc"
-import { appRouter } from "~/trpc/index"
 
 const app = new Hono()
 

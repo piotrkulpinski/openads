@@ -1,0 +1,29 @@
+{
+  "name": "@openads/trpc",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./router": "./src/router.ts",
+    "./routers/auth": "./src/routers/auth.ts",
+    "./routers/booking": "./src/routers/booking.ts",
+    "./routers/field": "./src/routers/field.ts",
+    "./routers/onboarding": "./src/routers/onboarding.ts",
+    "./routers/spot": "./src/routers/spot.ts",
+    "./routers/stripe": "./src/routers/stripe.ts",
+    "./routers/user": "./src/routers/user.ts",
+    "./routers/workspace": "./src/routers/workspace.ts"
+  },
+  "dependencies": {
+    "@openads/db": "workspace:*",
+    "@openads/stripe": "workspace:*",
+    "@trpc/server": "^11.4.3",
+    "superjson": "^2.2.2",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "@openads/tsconfig": "workspace:*",
+    "@types/node": "^24.0.15",
+    "typescript": "^5.8.3"
+  }
+}

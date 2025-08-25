@@ -1,6 +1,6 @@
 import { ONBOARDING_STEPS, type OnboardingStep } from "@openads/utils"
 import { z } from "zod"
-import { authProcedure, router } from "~/trpc"
+import { authProcedure, router } from "../index"
 
 export const onboardingRouter = router({
   setProgress: authProcedure

@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { authProcedure, router } from "~/trpc"
+import { authProcedure, router } from "../index"
 
 export const userRouter = router({
   me: authProcedure.query(async ({ ctx: { db, user } }) => {

@@ -1,4 +1,4 @@
-import type { AppRouter } from "@openads/api/trpc"
+import type { AppRouter } from "@openads/trpc/router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"

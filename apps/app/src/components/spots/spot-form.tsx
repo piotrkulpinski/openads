@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { AppRouter } from "@openads/api/trpc"
 import { type SpotSchema, spotSchema } from "@openads/db/schema"
+import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
