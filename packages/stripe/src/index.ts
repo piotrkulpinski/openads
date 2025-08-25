@@ -24,7 +24,7 @@ export interface CreatePaymentIntentProps {
 export async function createPaymentIntent(
   stripe: StripeClient,
   config: StripeConfig,
-  props: CreatePaymentIntentProps
+  props: CreatePaymentIntentProps,
 ) {
   const { amount, workspaceId, bookingId, stripeConnectId } = props
   const applicationFeeAmount = Math.round((amount * config.STRIPE_PLATFORM_FEE_PERCENT) / 100)
