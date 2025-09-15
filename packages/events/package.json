@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "@openpanel/nextjs": "^1.0.8",
-    "@vercel/functions": "^2.2.4"
+    "@vercel/functions": "^2.2.13"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }
