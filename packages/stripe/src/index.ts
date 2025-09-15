@@ -7,7 +7,7 @@ export interface StripeConfig {
 
 export function createStripeClient(config: StripeConfig) {
   return new Stripe(config.STRIPE_SECRET_KEY, {
-    apiVersion: "2025-06-30.basil",
+    apiVersion: "2025-08-27.basil",
     typescript: true,
   })
 }

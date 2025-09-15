@@ -6,11 +6,11 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "stripe": "^18.3.0"
+    "stripe": "^18.5.0"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",
-    "@types/node": "^24.0.15",
-    "typescript": "^5.8.3"
+    "@types/node": "^24.5.0",
+    "typescript": "^5.9.2"
   }
 }

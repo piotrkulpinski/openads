@@ -1,7 +1,23 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": ["**/.env.*local"],
-  "globalEnv": ["MAILERLITE_API_TOKEN", "PLAUSIBLE_DOMAIN", "PLAUSIBLE_URL"],
+  "globalEnv": [
+    "APP_URL",
+    "DATABASE_URL",
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_URL",
+    "GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET",
+    "REDIS_REST_URL",
+    "REDIS_REST_TOKEN",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_CONNECT_CLIENT_ID",
+    "STRIPE_PLATFORM_FEE_PERCENT",
+    "MAILERLITE_API_TOKEN",
+    "PLAUSIBLE_DOMAIN",
+    "PLAUSIBLE_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

@@ -13,13 +13,10 @@
     "db:reset": "bun --cwd packages/db db:reset",
     "postinstall": "bun run db:generate"
   },
-  "dependencies": {
-    "@trpc/server": "^11.4.3"
-  },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.2",
-    "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
+    "@biomejs/biome": "^2.2.4",
+    "turbo": "^2.5.6",
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=18"
