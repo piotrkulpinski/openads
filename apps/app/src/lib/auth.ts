@@ -1,7 +1,7 @@
-import { type AuthClient, createAuthClientInstance } from "@openads/auth/client"
+import { createAuthClient } from "@openads/auth/client"
 import { env } from "~/env"
 
-export const authClient: AuthClient = createAuthClientInstance({
+export const authClient = createAuthClient({
   baseURL: `${env.VITE_API_URL}/api/auth`,
   credentials: "include",
 })
