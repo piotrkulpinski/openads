@@ -4,10 +4,6 @@ import { LoginButton } from "~/components/auth/login-button"
 import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 import { siteConfig } from "~/config/site"
 
-type LoginSearch = {
-  callbackURL?: string
-}
-
 export const Route = createFileRoute("/_layout/login")({
   validateSearch: z.object({
     callbackURL: z.string().optional(),
@@ -21,21 +17,23 @@ export const Route = createFileRoute("/_layout/login")({
     }
   },
 
-  component: () => {
-    const { callbackURL } = Route.useSearch()
-
-    return (
-      <Intro alignment="center">
-        <IntroTitle>Login to {siteConfig.name}.</IntroTitle>
-        <IntroDescription>{siteConfig.tagline}</IntroDescription>
-
-        <LoginButton
-          provider="google"
-          callbackURL={callbackURL}
-          prefix={<img src="/google.svg" alt="" width={20} height={20} />}
-          className="mt-6"
-        />
-      </Intro>
-    )
-  },
+  component: App,
 })
+
+function App() {
+  const { callbackURL } = Route.useSearch()
+
+  return (
+    <Intro alignment="center">
+      <IntroTitle>Login to {siteConfig.name}.</IntroTitle>
+      <IntroDescription>{siteConfig.tagline}</IntroDescription>
+
+      <LoginButton
+        provider="google"
+        callbackURL={callbackURL}
+        prefix={<img src="/google.svg" alt="" width={20} height={20} />}
+        className="mt-6"
+      />
+    </Intro>
+  )
+}

@@ -35,11 +35,13 @@ export function createAuthServer(config: AuthConfig) {
     },
 
     advanced: {
+      database: {
+        generateId: false,
+      },
+
       crossSubDomainCookies: {
         enabled: true,
       },
-
-      generateId: false,
     },
 
     trustedOrigins: [config.APP_URL],
@@ -47,3 +49,4 @@ export function createAuthServer(config: AuthConfig) {
 }
 
 export type AuthServer = ReturnType<typeof createAuthServer>
+export type Session = AuthServer["$Infer"]["Session"]

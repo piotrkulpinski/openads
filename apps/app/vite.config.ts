@@ -7,7 +7,14 @@ import tsconfigPaths from "vite-tsconfig-paths"
 // https://vite.dev/config/
 export default defineConfig({
   server: { port: Number.parseInt(process.env.PORT ?? "5183") },
-  plugins: [tsconfigPaths(), tailwindcss(), tanstackRouter({ quoteStyle: "double" }), react()],
+
+  plugins: [
+    tsconfigPaths(),
+    tailwindcss(),
+    tanstackRouter({ target: "react", quoteStyle: "double", autoCodeSplitting: true }),
+    react(),
+  ],
+
   build: {
     rollupOptions: {
       output: {

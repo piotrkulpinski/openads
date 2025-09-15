@@ -15,6 +15,7 @@
     "./routers/workspace": "./src/routers/workspace.ts"
   },
   "dependencies": {
+    "@openads/auth": "workspace:*",
     "@openads/db": "workspace:*",
     "@openads/stripe": "workspace:*",
     "@trpc/server": "^11.4.3",

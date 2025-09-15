@@ -1,16 +1,48 @@
-import { RouterProvider } from "@tanstack/react-router"
+import { QueryClientProvider } from "@tanstack/react-query"
+import { createRouter, RouterProvider } from "@tanstack/react-router"
+import { LoaderIcon } from "lucide-react"
+import type { PropsWithChildren } from "react"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import { createRouter } from "./router"
-
+import { NotFound } from "~/components/not-found"
+import { queryClient, trpc, trpcClient, trpcUtils } from "~/lib/trpc"
+import { routeTree } from "~/routeTree.gen"
 import "./styles.css"
 
-// Set up a Router instance
-const router = createRouter()
-const root = document.getElementById("root")
+// Create a new router instance
+const router = createRouter({
+  routeTree,
+  // defaultPreload: "intent",
+  defaultPendingMinMs: 0,
+  defaultStaleTime: Number.POSITIVE_INFINITY,
+  context: { trpcUtils },
+  defaultNotFoundComponent: () => <NotFound />,
+  defaultPendingComponent: () => <LoaderIcon className="animate-spin mx-auto mt-[5vh]" />,
+  Wrap: ({ children }: PropsWithChildren) => {
+    return (
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      </trpc.Provider>
+    )
+  },
+})
 
-if (root) {
-  createRoot(root).render(
+// Register the router instance for type safety
+declare module "@tanstack/react-router" {
+  interface Register {
+    router: typeof router
+  }
+}
+
+// reloads the app if there is an error fetching an outdated chunk due to a new build deployed
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload()
+})
+
+// Render the app
+const rootElement = document.getElementById("app")
+if (rootElement && !rootElement.innerHTML) {
+  createRoot(rootElement).render(
     <StrictMode>
       <RouterProvider router={router} />
     </StrictMode>,

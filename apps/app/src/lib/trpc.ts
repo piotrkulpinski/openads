@@ -1,6 +1,6 @@
 import type { AppRouter, RouterInputs, RouterOutputs } from "@openads/trpc/router"
 import { QueryClient } from "@tanstack/react-query"
-import { httpBatchLink } from "@trpc/client"
+import { createTRPCClient, httpBatchStreamLink } from "@trpc/client"
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query"
 import superjson from "superjson"
 import { env } from "~/env"
@@ -18,10 +18,10 @@ export const queryClient = new QueryClient({
   },
 })
 
-export const trpcClient = trpc.createClient({
+export const trpcClient = createTRPCClient<AppRouter>({
   links: [
-    httpBatchLink({
-      url: `${env.VITE_API_URL}/trpc`,
+    httpBatchStreamLink({
+      url: `${typeof window === "undefined" ? env.VITE_API_URL : ""}/api/trpc`,
       fetch: (url, options) => fetch(url, { ...options, credentials: "include" }),
       transformer: superjson,
     }),

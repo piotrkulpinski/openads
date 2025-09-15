@@ -1,3 +1,4 @@
+import type { Session } from "@openads/auth/server"
 import type { db } from "@openads/db"
 import { Prisma } from "@openads/db/client"
 import type { StripeClient } from "@openads/stripe"
@@ -10,17 +11,7 @@ import { ZodError, z } from "zod"
  * Context type that the API will provide
  */
 export interface Context extends FetchCreateContextFnOptions, Record<string, unknown> {
-  auth: {
-    user: {
-      id: string
-      email: string
-      name?: string | null
-      image?: string | null
-      emailVerified: boolean
-      createdAt: Date
-      updatedAt: Date
-    }
-  } | null
+  auth: Session | null
   db: typeof db
   redis: any // We'll type this properly when we know the Redis client type
   stripe: StripeClient
