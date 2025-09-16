@@ -1,6 +1,7 @@
 import { db } from "@openads/db"
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
+import { admin, lastLoginMethod } from "better-auth/plugins"
 
 export interface AuthConfig {
   GOOGLE_CLIENT_ID: string
@@ -45,6 +46,7 @@ export function createAuthServer(config: AuthConfig) {
     },
 
     trustedOrigins: [config.APP_URL],
+    plugins: [admin(), lastLoginMethod()],
   })
 }
 

@@ -16,6 +16,7 @@ export const LoginButton = ({
   callbackURL = siteConfig.url,
   ...props
 }: LoginButtonProps) => {
+  // const wasLastUsed = authClient.isLastUsedLoginMethod(provider)
   const isLoading = false
 
   return (
@@ -27,6 +28,7 @@ export const LoginButton = ({
       {...props}
     >
       Sign in with {ucFirst(provider)}
+      {/*{wasLastUsed && <Badge>Last Used</Badge>}*/}
     </Button>
   )
 }
