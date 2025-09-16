@@ -1,8 +1,9 @@
 import { Provider as Analytics } from "@openads/events/client"
 import { TooltipProvider } from "@openads/ui/tooltip"
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { TanstackDevtools } from "@tanstack/react-devtools"
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/router-devtools"
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
 import { env } from "~/env"
@@ -37,8 +38,13 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
       <Toaster />
 
-      <TanStackRouterDevtools position="bottom-left" />
-      <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+      <TanstackDevtools
+        config={{ position: "bottom-left" }}
+        plugins={[
+          { name: "Tanstack Query", render: <ReactQueryDevtoolsPanel /> },
+          { name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> },
+        ]}
+      />
     </TooltipProvider>
   ),
 })

@@ -2,9 +2,7 @@ import { db } from "@openads/db"
 import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { env } from "~/env"
-import { stripe } from "../../lib/stripe"
-
-const webhookSecret = env.STRIPE_WEBHOOK_SECRET!
+import { stripe } from "../../services/stripe"
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -17,9 +15,9 @@ export async function POST(req: Request) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
+    event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
-    return new NextResponse("Invalid signature", { status: 400 })
+    return new NextResponse(`Invalid signature: ${err}`, { status: 400 })
   }
 
   try {
