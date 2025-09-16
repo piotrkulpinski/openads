@@ -28,6 +28,19 @@ const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
+const persistSidebarOpenState = (openState: boolean) => {
+  if (typeof window === "undefined" || !("cookieStore" in window) || !window.cookieStore) {
+    return
+  }
+
+  void window.cookieStore.set({
+    name: SIDEBAR_COOKIE_NAME,
+    value: String(openState),
+    path: "/",
+    maxAge: SIDEBAR_COOKIE_MAX_AGE,
+  })
+}
+
 type SidebarContext = {
   state: "expanded" | "collapsed"
   open: boolean
@@ -76,7 +89,7 @@ const SidebarProvider = ({
         _setOpen(openState)
       }
 
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+      persistSidebarOpenState(openState)
     },
     [setOpenProp, open],
   )

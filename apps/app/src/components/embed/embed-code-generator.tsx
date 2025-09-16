@@ -80,7 +80,7 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
         <div className="space-y-2">
           <Label htmlFor="width">Width</Label>
           <Input
-            id="width"
+            name="width"
             value={width}
             onChange={e => setWidth(e.target.value)}
             placeholder="e.g. 100%, 500px"
@@ -90,7 +90,7 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
         <div className="space-y-2">
           <Label htmlFor="height">Height</Label>
           <Input
-            id="height"
+            name="height"
             value={height}
             onChange={e => setHeight(e.target.value)}
             placeholder="e.g. 500px, auto"
@@ -100,7 +100,7 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
         <div className="space-y-2">
           <Label htmlFor="theme">Theme</Label>
           <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger id="theme">
+            <SelectTrigger name="theme">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -113,7 +113,7 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
         <div className="space-y-2">
           <Label htmlFor="layout">Layout</Label>
           <Select value={layout} onValueChange={setLayout}>
-            <SelectTrigger id="layout">
+            <SelectTrigger name="layout">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

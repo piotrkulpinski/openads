@@ -46,7 +46,7 @@ export const WorkspaceMenu = () => {
   useHotkeys(
     [...Array(9).keys()].map(index => [
       `mod+${index + 1}`,
-      e => changeWorkspace(workspaces[Number.parseInt(e.key) - 1]),
+      e => changeWorkspace(workspaces[Number.parseInt(e.key, 10) - 1]),
     ]),
   )
 

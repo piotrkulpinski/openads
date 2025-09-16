@@ -8,23 +8,30 @@ import { Stack } from "~/components/ui/stack"
 import { BookingProvider } from "~/contexts/booking-context"
 import { trpc } from "~/lib/trpc"
 
+const defaultValues = {
+  workspaceId: "",
+  spotIds: "",
+  theme: "auto",
+  layout: "default",
+} as const
+
 export const Route = createFileRoute("/embed")({
   validateSearch: z.object({
-    workspaceId: z.string().default(""),
-    spotIds: z.string().default(""),
-    theme: z.enum(["auto", "light", "dark"]).catch("auto"),
-    layout: z.enum(["default", "grid"]).catch("default"),
+    workspaceId: z.string().default(defaultValues.workspaceId),
+    spotIds: z.string().default(defaultValues.spotIds),
+    theme: z.enum(["auto", "light", "dark"]).catch(defaultValues.theme),
+    layout: z.enum(["default", "grid"]).catch(defaultValues.layout),
   }),
 
   search: {
-    middlewares: [stripSearchParams({ spotIds: "", theme: "auto", layout: "default" })],
+    middlewares: [stripSearchParams(defaultValues)],
   },
 
   component: SpotEmbed,
 })
 
 function SpotEmbed() {
-  const { workspaceId, spotIds, theme, layout } = Route.useSearch()
+  const { workspaceId } = Route.useSearch()
 
   // useEffect(() => {
   //   // Send resize message to parent

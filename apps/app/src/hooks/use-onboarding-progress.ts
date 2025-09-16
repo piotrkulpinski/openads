@@ -8,7 +8,7 @@ export function useOnboardingProgress() {
   const navigate = useNavigate()
   const preWorkspaceSteps = ["welcome", "workspace"]
 
-  const { mutate, mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
+  const { mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
     onError: ({ data }) => {
       toast.error("Failed to update onboarding progress. Please try again.")
       console.error("Failed to update onboarding progress", data)
