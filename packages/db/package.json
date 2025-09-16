@@ -4,10 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts",
-    "./schema": "./src/schema/index.ts",
-    "./ids": "./src/lib/ids.ts",
-    "./utils": "./src/lib/utils.ts"
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "db:generate": "prisma generate --no-hints",
@@ -22,6 +19,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",
+    "@t3-oss/env-core": "^0.13.8",
     "nanoid": "^5.1.5",
     "zod": "^4.1.8"
   },

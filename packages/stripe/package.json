@@ -3,10 +3,13 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
   },
   "dependencies": {
-    "stripe": "^18.5.0"
+    "@t3-oss/env-core": "^0.13.8",
+    "stripe": "^18.5.0",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",

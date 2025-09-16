@@ -1,22 +1,17 @@
+import { env as auth } from "@openads/auth/env"
+import { env as db } from "@openads/db/env"
+import { env as redis } from "@openads/redis/env"
+import { env as stripe } from "@openads/stripe/env"
 import { createEnv } from "@t3-oss/env-core"
 import { z } from "zod"
 
 export const env = createEnv({
+  extends: [auth, db, redis, stripe],
+
   server: {
     NODE_ENV: z.enum(["development", "production"]).default("development"),
     PORT: z.coerce.number().default(3001),
     APP_URL: z.url(),
-    DATABASE_URL: z.url(),
-    BETTER_AUTH_SECRET: z.string().length(32),
-    BETTER_AUTH_URL: z.url(),
-    GOOGLE_CLIENT_ID: z.string(),
-    GOOGLE_CLIENT_SECRET: z.string(),
-    REDIS_REST_URL: z.string(),
-    REDIS_REST_TOKEN: z.string(),
-    STRIPE_SECRET_KEY: z.string(),
-    STRIPE_WEBHOOK_SECRET: z.string(),
-    STRIPE_CONNECT_CLIENT_ID: z.string(),
-    STRIPE_PLATFORM_FEE_PERCENT: z.coerce.number().positive().max(100).default(0),
   },
 
   /**

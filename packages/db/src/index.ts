@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { customIdExtension, modelFilterExtension } from "./extensions"
+import { customIdExtension, modelFilterExtension } from "./lib/extensions"
 
 const prismaClientSingleton = () => {
   return new PrismaClient().$extends(customIdExtension).$extends(modelFilterExtension)

@@ -1,6 +1,7 @@
 import type { Session } from "@openads/auth/server"
 import type { db } from "@openads/db"
 import { Prisma } from "@openads/db/client"
+import type { RedisClient } from "@openads/redis"
 import type { StripeClient } from "@openads/stripe"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
@@ -13,7 +14,7 @@ import { ZodError, z } from "zod"
 export interface Context extends FetchCreateContextFnOptions, Record<string, unknown> {
   auth: Session | null
   db: typeof db
-  redis: any // We'll type this properly when we know the Redis client type
+  redis: RedisClient
   stripe: StripeClient
   env: {
     APP_URL: string
