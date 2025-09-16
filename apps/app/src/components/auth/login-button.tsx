@@ -1,4 +1,5 @@
 import { Button, type ButtonProps } from "@openads/ui/button"
+import { ucFirst } from "@primoui/utils"
 import { LoaderIcon } from "lucide-react"
 import { siteConfig } from "~/config/site"
 import { authClient } from "~/lib/auth"
@@ -25,7 +26,7 @@ export const LoginButton = ({
       disabled={isLoading}
       {...props}
     >
-      Sign in with {provider}
+      Sign in with {ucFirst(provider)}
     </Button>
   )
 }

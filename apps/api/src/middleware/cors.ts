@@ -3,8 +3,9 @@ import { env } from "~/env"
 
 export const corsMiddleware = cors({
   origin: env.APP_URL,
-  credentials: true,
   allowHeaders: ["Content-Type", "Authorization", "trpc-accept"],
-  exposeHeaders: ["Set-Cookie"],
+  allowMethods: ["POST", "GET", "OPTIONS"],
+  exposeHeaders: ["Set-Cookie", "Content-Length"],
+  credentials: true,
   maxAge: 86400,
 })
