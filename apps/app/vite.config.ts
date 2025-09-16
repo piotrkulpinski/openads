@@ -6,7 +6,7 @@ import tsconfigPaths from "vite-tsconfig-paths"
 
 // https://vite.dev/config/
 export default defineConfig({
-  server: { port: Number.parseInt(process.env.PORT ?? "5183") },
+  server: { port: Number.parseInt(process.env.PORT ?? "5183", 10) },
 
   plugins: [
     tsconfigPaths(),
