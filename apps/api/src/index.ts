@@ -5,9 +5,9 @@ import { showRoutes } from "hono/dev"
 import { logger } from "hono/logger"
 import { createContext } from "~/context"
 import { env } from "~/env"
-import { auth } from "~/lib/auth"
 import { corsMiddleware } from "~/middleware/cors"
 import { onError } from "~/middleware/on-error"
+import { auth } from "~/services/auth"
 
 const app = new Hono()
 

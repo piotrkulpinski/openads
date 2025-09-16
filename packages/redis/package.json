@@ -1,14 +1,14 @@
 {
-  "name": "@openads/auth",
+  "name": "@openads/redis",
   "version": "0.0.0",
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@openads/db": "workspace:*",
     "@t3-oss/env-core": "^0.13.8",
-    "better-auth": "latest",
+    "@upstash/redis": "^1.35.3",
     "zod": "^4.1.8"
   },
   "devDependencies": {

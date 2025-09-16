@@ -1,47 +1,30 @@
-import { z } from "zod"
+import { isKeyInObject } from "@primoui/utils"
+import { customAlphabet } from "nanoid"
 
-export const reservedSlugs = [
-  "app",
-  "admin",
-  "auth",
-  "console",
-  "staging",
-  "checkout",
-  "feedback",
-  "root",
-  "blog",
-  "cms",
-  "demo",
-  "docs",
-  "test",
-  "settings",
-  "analytics",
-  "status",
-  "mail",
-  "email",
-  "host",
-  "www",
-]
+/**
+ * Generates a unique ID with an optional prefix and length.
+ * @param prefix - The prefix to prepend to the ID.
+ * @param length - The length of the ID.
+ * @returns A unique ID.
+ */
+export const generateId = (prefix?: string, length = 21) => {
+  const alphabet = "0123456789abcdefghijkmnopqrstuvwxyz"
+  const nanoid = customAlphabet(alphabet, length)
+  const prefixes = {
+    User: "usr",
+    Account: "acc",
+    Session: "ses",
+    Verification: "ver",
+    Workspace: "ws",
+    Spot: "spt",
+    Booking: "bkg",
+    Field: "fld",
+    Subscription: "sub",
+  }
 
-export const domainNameRegex = /^((\*\.)|((?!-)[a-z0-9-]{0,63}[a-z0-9]\.))+[a-z]{2,63}$/i
-export const slugRegex = /^(?:[a-z0-9](-?[a-z0-9])*)?$/i
-export const colorRegex = /^#(?:(?:[\da-f]{3}){1,2}|(?:[\da-f]{4}){1,2})$/gi
+  if (prefix && isKeyInObject(prefix, prefixes)) {
+    return `${prefixes[prefix]}_${nanoid()}`
+  }
 
-export const idSchema = z.object({ id: z.string().min(1) })
-export const idsSchema = z.object({ ids: z.string().array() })
-
-export const domainNameSchema = z.string().trim().min(3).max(253).regex(domainNameRegex, {
-  message: "This must be a valid domain name",
-})
-
-export const slugSchema = z.string().trim().regex(slugRegex, {
-  message: "Slug must contain only lowercase letters and dashes [-]",
-})
-
-export const colorSchema = z.string().trim().regex(colorRegex, {
-  message: "Value must be a valid color",
-})
-
-export const isAllowedSlug = (slug: string) => {
-  return !reservedSlugs.includes(slug)
+  return nanoid()
 }

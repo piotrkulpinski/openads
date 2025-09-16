@@ -17,7 +17,9 @@
   },
   "dependencies": {
     "@openpanel/nextjs": "^1.0.8",
-    "@vercel/functions": "^2.2.13"
+    "@t3-oss/env-core": "^0.13.8",
+    "@vercel/functions": "^2.2.13",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@openads/tsconfig": "workspace:*",

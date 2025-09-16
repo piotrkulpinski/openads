@@ -2,9 +2,9 @@ import { db } from "@openads/db"
 import type { Context } from "@openads/trpc"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import { env } from "~/env"
-import { auth as betterAuth } from "~/lib/auth"
-import { stripe } from "~/lib/stripe"
+import { auth as betterAuth } from "~/services/auth"
 import { redis } from "~/services/redis"
+import { stripe } from "~/services/stripe"
 
 /**
  * This is the actual context you'll use in your router. It will be used to
@@ -14,14 +14,5 @@ import { redis } from "~/services/redis"
 export const createContext = async (ctx: FetchCreateContextFnOptions): Promise<Context> => {
   const auth = await betterAuth.api.getSession({ headers: ctx.req.headers })
 
-  return {
-    ...ctx,
-    auth,
-    db,
-    redis,
-    stripe,
-    env: {
-      APP_URL: env.APP_URL,
-    },
-  }
+  return { ...ctx, auth, db, redis, stripe, env }
 }
