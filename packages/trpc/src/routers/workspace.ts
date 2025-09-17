@@ -43,7 +43,6 @@ export const workspaceRouter = router({
     }),
 
   delete: workspaceProcedure.mutation(async ({ ctx: { db }, input: { workspaceId } }) => {
-    console.log("delete", workspaceId)
     const workspace = await db.workspace.delete({
       where: { id: workspaceId },
     })

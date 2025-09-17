@@ -72,6 +72,7 @@ export const createQueryCell = <TError>(queryCellOpts: CreateQueryCellOptions<TE
     }
 
     if (query.status === "error") {
+      console.error(query.error)
       return opts.error?.(query) ?? queryCellOpts.error(query)
     }
 

@@ -4,14 +4,14 @@ import { useFormContext } from "react-hook-form"
 
 export const FormButton = ({ isPending, ...props }: ComponentProps<typeof Button>) => {
   const { formState } = useFormContext()
-  const { isSubmitted, isValid, isDirty } = formState
+  // const { isSubmitted, isValid, isDirty } = formState
 
   return (
     <Button
       type="submit"
       size="lg"
       isPending={isPending}
-      disabled={!isDirty || isPending || (isSubmitted && !isValid)}
+      // disabled={!isDirty || isPending || (isSubmitted && !isValid)}
       className="first:not-only:w-full"
       {...props}
     />

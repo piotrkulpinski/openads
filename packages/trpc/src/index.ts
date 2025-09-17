@@ -1,12 +1,11 @@
 import type { Session } from "@openads/auth/server"
 import type { db } from "@openads/db"
-import { Prisma } from "@openads/db/client"
 import type { RedisClient } from "@openads/redis"
 import type { StripeClient } from "@openads/stripe"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import { ZodError, z } from "zod"
+import { z } from "zod"
 
 /**
  * Context type that the API will provide
@@ -30,42 +29,42 @@ export type CreateContextFn = (ctx: FetchCreateContextFnOptions) => Promise<Cont
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
 
-  errorFormatter: ({ shape, error: { cause } }) => {
-    let dataError = {
-      formErrors: [] as string[],
-      fieldErrors: {} as Record<string, string[]>,
-    }
+  // errorFormatter: ({ shape, error: { cause } }) => {
+  //   let dataError = {
+  //     formErrors: [] as string[],
+  //     fieldErrors: {} as Record<string, string[]>,
+  //   }
 
-    // Zod error
-    if (cause instanceof ZodError) {
-      const flattened = cause.flatten()
-      dataError = Object.assign(dataError, flattened)
-    }
+  //   // Zod error
+  //   if (cause instanceof ZodError) {
+  //     const flattened = cause.flatten()
+  //     dataError = Object.assign(dataError, flattened)
+  //   }
 
-    // Prisma error
-    if (cause instanceof Prisma.PrismaClientKnownRequestError) {
-      // Unique constraint
-      if (cause.code === "P2002") {
-        if (cause.meta?.target) {
-          const name = (cause.meta?.target as string[]).at(-1)
+  //   // Prisma error
+  //   if (cause instanceof Prisma.PrismaClientKnownRequestError) {
+  //     // Unique constraint
+  //     if (cause.code === "P2002") {
+  //       if (cause.meta?.target) {
+  //         const name = (cause.meta?.target as string[]).at(-1)
 
-          if (name) {
-            dataError.fieldErrors[name] = [
-              `This ${name} has been taken. Please choose another one.`,
-            ]
-          }
-        }
-      }
-    }
+  //         if (name) {
+  //           dataError.fieldErrors[name] = [
+  //             `This ${name} has been taken. Please choose another one.`,
+  //           ]
+  //         }
+  //       }
+  //     }
+  //   }
 
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        ...dataError,
-      },
-    }
-  },
+  //   return {
+  //     ...shape,
+  //     data: {
+  //       ...shape.data,
+  //       ...dataError,
+  //     },
+  //   }
+  // },
 })
 
 export const router = t.router

@@ -60,15 +60,15 @@ export const BookingForm = ({
 
   const form = useForm<BookingSchema>({
     resolver: zodResolver(bookingSchema),
-    values: booking,
-    defaultValues: {
-      startsAt: new Date(),
-      endsAt: new Date(),
-      amount: 0,
-      currency: "usd",
-      status: "pending",
-      spotId: "",
-    },
+    defaultValues: Object.assign(
+      {
+        amount: 0,
+        currency: "usd",
+        status: "pending",
+        // spotId: "",
+      },
+      booking,
+    ),
   })
 
   const onSuccess = async (data: RouterOutputs["booking"]["create"]) => {
@@ -135,12 +135,7 @@ export const BookingForm = ({
                     </PopoverTrigger>
 
                     <PopoverContent className="w-auto" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
                     </PopoverContent>
                   </Popover>
                 </FormControl>
@@ -169,12 +164,7 @@ export const BookingForm = ({
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
                     </PopoverContent>
                   </Popover>
                 </FormControl>

@@ -127,12 +127,12 @@ const FormMessage = ({ className, children, ...props }: ComponentProps<"p">) => 
 }
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
   FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  useFormField,
 }
