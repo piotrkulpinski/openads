@@ -19,9 +19,9 @@
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
-  "packageManager": "bun@1.2.19",
+  "packageManager": "npm@11.6.0",
   "workspaces": [
     "apps/*",
     "packages/*"

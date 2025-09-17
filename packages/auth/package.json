@@ -6,13 +6,13 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@openads/db": "workspace:*",
+    "@openads/db": "*",
     "@t3-oss/env-core": "^0.13.8",
     "better-auth": "latest",
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@openads/tsconfig": "workspace:*",
+    "@openads/tsconfig": "*",
     "@types/node": "^24.5.0",
     "typescript": "^5.9.2"
   }

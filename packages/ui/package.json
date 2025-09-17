@@ -23,7 +23,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@openads/tsconfig": "workspace:*",
+    "@openads/tsconfig": "*",
     "@types/node": "^24.5.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

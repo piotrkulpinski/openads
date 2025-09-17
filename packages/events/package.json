@@ -22,7 +22,7 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@openads/tsconfig": "workspace:*",
+    "@openads/tsconfig": "*",
     "typescript": "^5.9.2"
   }
 }
