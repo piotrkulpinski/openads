@@ -25,7 +25,7 @@ export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
         <div className="relative max-w-xl">
           <Input readOnly value={workspace.id} />
 
-          <Tooltip tooltip={clipboard.copied ? "Copied to clipboard" : "Copy to clipboard"}>
+          <Tooltip tooltip="Copy to clipboard">
             <Button
               size="sm"
               variant="ghost"
@@ -36,6 +36,7 @@ export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
                   <CopyIcon className="size-4" />
                 )
               }
+              disabled={clipboard.copied}
               onClick={() => clipboard.copy(workspace.id)}
               aria-label="Copy"
               className="absolute right-1 top-1/2 -translate-y-1/2"

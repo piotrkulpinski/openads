@@ -21,7 +21,7 @@ const TooltipContent = ({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cx(
-          "z-50 rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground will-change-[transform,opacity]",
+          "z-50 rounded-md bg-foreground px-3 py-1.5 text-xs text-background will-change-[transform,opacity]",
           popoverAnimationClasses,
           className,
         )}
@@ -50,7 +50,7 @@ const TooltipBase = ({ children, className, delayDuration, tooltip, ...rest }: T
       <TooltipPortal>
         <TooltipContent {...rest}>
           {tooltip}
-          <TooltipArrow className="fill-primary" />
+          <TooltipArrow className="fill-foreground" />
         </TooltipContent>
       </TooltipPortal>
     </TooltipRoot>
@@ -66,4 +66,4 @@ const Tooltip = Object.assign(TooltipBase, {
   Arrow: TooltipArrow,
 })
 
-export { Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, TooltipProvider }
+export { Tooltip, TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger }

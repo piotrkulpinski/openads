@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useRouter } from "@tanstack/react-router"
-import { LogOutIcon } from "lucide-react"
+import { BookOpenIcon, BugIcon, LifeBuoyIcon, LogOutIcon } from "lucide-react"
 import { authClient } from "~/lib/auth"
 
 export const UserMenu = () => {
@@ -43,6 +43,35 @@ export const UserMenu = () => {
             <p className="truncate text-sm text-muted-foreground">{session.user.email}</p>
           </div>
         </DropdownMenuLabel>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel>Resources</DropdownMenuLabel>
+
+        <DropdownMenuItem asChild>
+          <a href="#" target="_blank" rel="noopener">
+            <BookOpenIcon className="size-4" />
+            Docs
+          </a>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <a
+            href="https://github.com/piotrkulpinski/openads/issues/new"
+            target="_blank"
+            rel="noopener"
+          >
+            <BugIcon className="size-4" />
+            Report
+          </a>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <a href="#" target="_blank" rel="noopener">
+            <LifeBuoyIcon className="size-4" />
+            Support
+          </a>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 

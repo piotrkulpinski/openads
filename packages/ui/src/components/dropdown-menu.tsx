@@ -145,7 +145,7 @@ const DropdownMenuSeparator = ({
   ...props
 }: ComponentProps<typeof DropdownMenuPrimitive.Separator>) => (
   <DropdownMenuPrimitive.Separator
-    className={cx("-mx-1 my-1 h-px bg-muted", className)}
+    className={cx("-mx-1 my-1 h-px bg-border", className)}
     {...props}
   />
 )
@@ -159,18 +159,18 @@ const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<"kbd">) =>
 
 export {
   DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuGroup,
-  DropdownMenuPortal,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuRadioGroup,
+  DropdownMenuTrigger,
 }

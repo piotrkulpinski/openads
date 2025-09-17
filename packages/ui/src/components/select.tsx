@@ -120,18 +120,18 @@ const SelectSeparator = ({
   className,
   ...props
 }: ComponentProps<typeof SelectPrimitive.Separator>) => (
-  <SelectPrimitive.Separator className={cx("-mx-1 my-1 h-px bg-muted", className)} {...props} />
+  <SelectPrimitive.Separator className={cx("-mx-1 my-1 h-px bg-border", className)} {...props} />
 )
 
 export {
   Select,
-  SelectGroup,
-  SelectValue,
-  SelectTrigger,
   SelectContent,
-  SelectLabel,
+  SelectGroup,
   SelectItem,
-  SelectSeparator,
-  SelectScrollUpButton,
+  SelectLabel,
   SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
 }

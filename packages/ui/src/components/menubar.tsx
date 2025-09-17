@@ -174,7 +174,7 @@ const MenubarSeparator = ({
   className,
   ...props
 }: ComponentProps<typeof MenubarPrimitive.Separator>) => (
-  <MenubarPrimitive.Separator className={cx("-mx-1 my-1 h-px bg-muted", className)} {...props} />
+  <MenubarPrimitive.Separator className={cx("-mx-1 my-1 h-px bg-border", className)} {...props} />
 )
 
 const MenubarShortcut = ({ className, ...props }: ComponentProps<"span">) => (
@@ -186,19 +186,19 @@ const MenubarShortcut = ({ className, ...props }: ComponentProps<"span">) => (
 
 export {
   Menubar,
-  MenubarMenu,
-  MenubarTrigger,
-  MenubarContent,
-  MenubarItem,
-  MenubarSeparator,
-  MenubarLabel,
   MenubarCheckboxItem,
+  MenubarContent,
+  MenubarGroup,
+  MenubarItem,
+  MenubarLabel,
+  MenubarMenu,
+  MenubarPortal,
   MenubarRadioGroup,
   MenubarRadioItem,
-  MenubarPortal,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarSub,
   MenubarSubContent,
   MenubarSubTrigger,
-  MenubarGroup,
-  MenubarSub,
-  MenubarShortcut,
+  MenubarTrigger,
 }

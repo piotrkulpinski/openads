@@ -3,14 +3,14 @@
 import { PanelLeft } from "lucide-react"
 import { Slot } from "radix-ui"
 import {
-  type ComponentProps,
-  type CSSProperties,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type ComponentProps,
+  type CSSProperties,
 } from "react"
 import { useIsMobile } from "../hooks/use-mobile"
 import { cva, cx, type VariantProps } from "../lib/cva"
@@ -37,7 +37,7 @@ const persistSidebarOpenState = (openState: boolean) => {
     name: SIDEBAR_COOKIE_NAME,
     value: String(openState),
     path: "/",
-    maxAge: SIDEBAR_COOKIE_MAX_AGE,
+    expires: Date.now() + SIDEBAR_COOKIE_MAX_AGE * 1000,
   })
 }
 

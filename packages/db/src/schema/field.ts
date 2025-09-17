@@ -1,8 +1,8 @@
-import { FieldType } from "@openads/db/client"
 import { z } from "zod"
+import { FieldType } from "../client"
 
 export const fieldSchema = z.object({
-  type: z.nativeEnum(FieldType),
+  type: z.enum(FieldType),
   name: z.string(),
   default: z.string().optional(),
   placeholder: z.string().optional(),

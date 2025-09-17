@@ -39,10 +39,11 @@ export const FieldsForm = ({ className, field, ...props }: FieldsFormProps) => {
   const excludePlaceholderFor: FieldType[] = [FieldType.Switch]
 
   useEffect(() => {
-    const { unsubscribe } = form.watch(debouncedUpdate)
-
-    return () => unsubscribe()
-  }, [form])
+    return form.subscribe({
+      formState: { values: true },
+      callback: ({ values }) => debouncedUpdate(values),
+    })
+  }, [form, debouncedUpdate])
 
   return (
     <Form {...form}>
