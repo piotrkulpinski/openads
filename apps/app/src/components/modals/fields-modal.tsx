@@ -1,12 +1,10 @@
 import {
   AlertDialog,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@openads/ui/alert-dialog"
-import { XIcon } from "lucide-react"
 import { type PropsWithChildren, useState } from "react"
 import { FieldsHead } from "~/components/fields/fields-head"
 import { FieldsList } from "~/components/fields/fields-list"
@@ -25,10 +23,7 @@ export const FieldsModal = ({ children }: PropsWithChildren) => {
           Manage the custom fields of your ad spot
         </AlertDialogDescription>
 
-        <FieldsHead>
-          <AlertDialogCancel prefix={<XIcon />} />
-        </FieldsHead>
-
+        <FieldsHead />
         <FieldsList />
       </AlertDialogContent>
     </AlertDialog>

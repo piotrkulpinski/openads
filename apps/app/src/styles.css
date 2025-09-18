@@ -15,8 +15,8 @@
   --color-card-foreground: oklch(0.141 0.005 285.823);
   --color-popover: oklch(1 0 0);
   --color-popover-foreground: oklch(0.141 0.005 285.823);
-  --color-primary: oklch(0.5465 0.246 262.87);
-  --color-primary-foreground: oklch(0.98 0.016 73.684);
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-foreground: oklch(0.985 0 0);
   --color-secondary: oklch(0.967 0.001 286.375);
   --color-secondary-foreground: oklch(0.21 0.006 285.885);
   --color-muted: oklch(0.967 0.001 286.375);
@@ -24,8 +24,8 @@
   --color-accent: oklch(0.967 0.001 286.375);
   --color-accent-foreground: oklch(0.21 0.006 285.885);
   --color-destructive: oklch(0.577 0.245 27.325);
-  --color-border: oklch(0.92 0.004 286.32);
-  --color-input: oklch(0.92 0.004 286.32);
+  --color-border: oklch(0.92 0 0);
+  --color-input: oklch(0.92 0 0);
   --color-ring: oklch(0.5465 0.246 262.87);
   --color-chart-1: oklch(0.646 0.222 41.116);
   --color-chart-2: oklch(0.6 0.118 184.704);
@@ -41,8 +41,8 @@
   --color-sidebar-border: oklch(0.92 0.004 286.32);
   --color-sidebar-ring: oklch(0.5465 0.246 262.87);
 
-  --font-sans: var(--system-font);
-  --font-display: var(--system-font);
+  --font-sans: Inter, var(--system-font);
+  --font-display: Inter, var(--system-font);
   --font-mono: monospace;
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -129,8 +129,8 @@
       --color-card-foreground: oklch(0.985 0 0);
       --color-popover: oklch(0.21 0.006 285.885);
       --color-popover-foreground: oklch(0.985 0 0);
-      --color-primary: oklch(0.488 0.243 264.376);
-      --color-primary-foreground: oklch(0.98 0.016 73.684);
+      --color-primary: oklch(0.922 0 0);
+      --color-primary-foreground: oklch(0.205 0 0);
       --color-secondary: oklch(0.25 0.006 286.033);
       --color-secondary-foreground: oklch(0.985 0 0);
       --color-muted: oklch(0.25 0.006 286.033);
@@ -138,8 +138,8 @@
       --color-accent: oklch(0.25 0.006 286.033);
       --color-accent-foreground: oklch(0.985 0 0);
       --color-destructive: oklch(0.704 0.191 22.216);
-      --color-border: oklch(0.333 0.004 286.32);
-      --color-input: oklch(0.366 0.004 286.32);
+      --color-border: oklch(1 0 0 / 10%);
+      --color-input: oklch(1 0 0 / 15%);
       --color-ring: oklch(0.488 0.243 264.376);
       --color-chart-1: oklch(0.488 0.243 264.376);
       --color-chart-2: oklch(0.696 0.17 162.48);
@@ -221,6 +221,21 @@
   /* Microsoft Edge */
   input[type="search"]::-ms-clear {
     display: none;
+  }
+
+  /* Dashed background */
+  .bg-dashed {
+    background-image: linear-gradient(
+      45deg,
+      var(--color-border) 12.5%,
+      transparent 12.5%,
+      transparent 50%,
+      var(--color-border) 50%,
+      var(--color-border) 62.5%,
+      transparent 62.5%,
+      transparent 100%
+    );
+    background-size: 0.25rem 0.25rem;
   }
 }
 

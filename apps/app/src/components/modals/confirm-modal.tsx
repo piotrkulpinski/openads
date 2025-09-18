@@ -22,6 +22,7 @@ type ConfirmModalProps = HTMLAttributes<HTMLButtonElement> &
     title?: ReactNode
     description?: string
     cancelLabel?: ReactNode
+    isPending?: boolean
     onConfirm: () => void
     confirmText?: string
   }
@@ -33,6 +34,7 @@ export const ConfirmModal = ({
   description = "This action cannot be undone. This will permanently remove your data from our servers.",
   cancelLabel = "Cancel",
   variant = "destructive",
+  isPending = false,
   onConfirm,
   confirmText = "",
 }: ConfirmModalProps) => {
@@ -42,18 +44,13 @@ export const ConfirmModal = ({
     defaultValues: { confirm: "" },
   })
 
-  const onSubmit = () => {
-    setIsOpen(false)
-    onConfirm()
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <Form {...form}>
         <DialogContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <form onSubmit={form.handleSubmit(onConfirm)} className="flex flex-col gap-6">
             <HeaderRoot>
               <DialogTitle asChild>
                 <HeaderTitle size="h4">{title}</HeaderTitle>
@@ -89,7 +86,11 @@ export const ConfirmModal = ({
                 </Button>
               </DialogClose>
 
-              <Button variant={variant} disabled={!!confirmText && !form.formState.isValid}>
+              <Button
+                variant={variant}
+                isPending={isPending}
+                disabled={isPending || (!!confirmText && !form.formState.isValid)}
+              >
                 {label}
               </Button>
             </DialogFooter>

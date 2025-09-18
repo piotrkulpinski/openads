@@ -18,7 +18,7 @@ export const FieldsHead = ({ children }: HTMLAttributes<HTMLElement>) => {
   const { spot, isPending, selectedField, onAddField, onRemoveField } = useFields()
 
   return (
-    <div className="flex min-w-0 items-center gap-2 px-4 py-3 md:px-5">
+    <div className="flex min-w-0 items-center gap-2 pl-4 pr-12 py-3 md:pl-5">
       <H6 className="flex-1 truncate">{spot.name} Fields</H6>
 
       {isPending && <Loader2Icon className="size-4 text-muted-foreground animate-spin" />}

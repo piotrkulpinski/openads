@@ -1,10 +1,12 @@
 "use client"
 
+import { XIcon } from "lucide-react"
 import { AlertDialog as AlertDialogPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { Modal } from "../components/modal"
 import { cx } from "../lib/cva"
-import { Button, buttonVariants } from "./button"
+import { Button } from "./button"
+import { Overlay } from "./overlay"
 
 const AlertDialog = AlertDialogPrimitive.Root
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger
@@ -15,18 +17,13 @@ const AlertDialogOverlay = ({
   className,
   ...props
 }: ComponentProps<typeof AlertDialogPrimitive.Overlay>) => (
-  <AlertDialogPrimitive.Overlay
-    className={cx(
-      "fixed inset-0 z-50 bg-background/60 backdrop-blur-sm",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out",
-      "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
-      className,
-    )}
-    {...props}
-  />
+  <AlertDialogPrimitive.Overlay asChild>
+    <Overlay />
+  </AlertDialogPrimitive.Overlay>
 )
 
 const AlertDialogContent = ({
+  children,
   className,
   size = "sm",
   fixed,
@@ -37,6 +34,7 @@ const AlertDialogContent = ({
 
     <Modal size={size} fixed={fixed} asChild>
       <AlertDialogPrimitive.Content
+        onOpenAutoFocus={e => e.preventDefault()}
         className={cx(
           "grid gap-6 border bg-background p-6 shadow-sm rounded-lg",
           "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -45,7 +43,14 @@ const AlertDialogContent = ({
           className,
         )}
         {...props}
-      />
+      >
+        {children}
+
+        <AlertDialogPrimitive.Cancel className="absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+          <XIcon className="size-5" />
+          <span className="sr-only">Close</span>
+        </AlertDialogPrimitive.Cancel>
+      </AlertDialogPrimitive.Content>
     </Modal>
   </AlertDialogPortal>
 )
@@ -68,29 +73,28 @@ const AlertDialogTitle = ({
   <AlertDialogPrimitive.Title className={cx("text-lg font-semibold", className)} {...props} />
 )
 
-const AlertDialogAction = ({
-  className,
-  ...props
-}: ComponentProps<typeof AlertDialogPrimitive.Action>) => (
-  <AlertDialogPrimitive.Action className={cx(buttonVariants(), className)} {...props} />
+const AlertDialogAction = ({ ...props }: ComponentProps<typeof Button>) => (
+  <AlertDialogPrimitive.Action asChild>
+    <Button {...props} />
+  </AlertDialogPrimitive.Action>
 )
 
-const AlertDialogCancel = ({ className, ...props }: ComponentProps<typeof Button>) => (
+const AlertDialogCancel = ({ ...props }: ComponentProps<typeof Button>) => (
   <AlertDialogPrimitive.Cancel asChild>
-    <Button variant="outline" size="sm" {...props} />
+    <Button variant="outline" {...props} />
   </AlertDialogPrimitive.Cancel>
 )
 
 export {
   AlertDialog,
-  AlertDialogPortal,
-  AlertDialogOverlay,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogFooter,
-  AlertDialogTitle,
-  AlertDialogDescription,
   AlertDialogAction,
   AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 }
