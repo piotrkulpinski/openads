@@ -11,7 +11,7 @@ export const Route = createFileRoute("/$workspace/settings/general/")({
 
 function SettingsGeneralPage() {
   return (
-    <Section>
+    <Section className="mx-auto w-full lg:max-w-3xl">
       <GeneralForm />
       <IdForm />
       <StripeConnectForm />

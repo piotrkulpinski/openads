@@ -1,7 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useDebouncedCallback } from "@mantine/hooks"
 import { FieldType } from "@openads/db/client"
-import type { FieldSchema } from "@openads/db/schema"
 import { fieldSchema } from "@openads/db/schema"
 import { cx } from "@openads/ui/cva"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
@@ -9,8 +7,9 @@ import { Input } from "@openads/ui/input"
 import { Switch } from "@openads/ui/switch"
 import type { HTMLAttributes } from "react"
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { init } from "zod-empty"
 import { useFields } from "~/contexts/fields-context"
+import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
 
 type FieldsFormProps = HTMLAttributes<HTMLElement> & {
@@ -22,16 +21,10 @@ export const FieldsForm = ({ className, field, ...props }: FieldsFormProps) => {
   const { onUpdateField } = useFields()
   const debouncedUpdate = useDebouncedCallback(onUpdateField, 250)
 
-  const form = useForm<FieldSchema>({
-    resolver: zodResolver(fieldSchema),
-    values: field,
+  const form = useZodForm(fieldSchema, {
     defaultValues: {
-      type: FieldType.Text,
-      name: "",
-      default: "",
-      placeholder: "",
-      isRequired: false,
-      order: 0,
+      ...init(fieldSchema),
+      ...field,
     },
   })
 

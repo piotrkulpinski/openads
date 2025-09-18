@@ -191,7 +191,7 @@
   label[for],
   [href] [class*="group-hover"],
   button [class*="group-hover"] {
-    @apply duration-0;
+    @apply duration-50;
     @apply cursor-pointer;
   }
 

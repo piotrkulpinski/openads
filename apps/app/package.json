@@ -12,7 +12,7 @@
     "@dnd-kit/core": "6.0.8",
     "@dnd-kit/modifiers": "6.0.1",
     "@dnd-kit/sortable": "7.0.2",
-    "@hookform/resolvers": "^3.10.0",
+    "@hookform/resolvers": "^5.2.1",
     "@mantine/hooks": "^8.3.1",
     "@number-flow/react": "^0.5.10",
     "@openads/auth": "*",
@@ -22,7 +22,6 @@
     "@openads/utils": "*",
     "@primoui/utils": "^1.3.3",
     "@t3-oss/env-core": "^0.13.8",
-    "@tanstack/devtools-vite": "^0.2.13",
     "@tanstack/react-devtools": "^0.2.2",
     "@tanstack/react-query": "^5.87.4",
     "@tanstack/react-query-devtools": "^5.87.4",
@@ -39,7 +38,8 @@
     "react-hook-form": "^7.62.0",
     "sonner": "^2.0.7",
     "superjson": "^2.2.2",
-    "zod": "^4.1.8"
+    "zod": "^4.1.8",
+    "zod-empty": "^2.0.2"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
@@ -51,7 +51,7 @@
     "tailwindcss": "^4.1.13",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.2",
-    "vite": "^6.3.6",
+    "vite": "^7.1.5",
     "vite-tsconfig-paths": "^5.1.4"
   }
 }

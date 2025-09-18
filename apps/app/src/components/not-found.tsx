@@ -4,7 +4,7 @@ import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 
 export const NotFound = () => {
   return (
-    <Intro>
+    <Intro className="mx-auto w-full lg:max-w-3xl">
       <IntroTitle>404 Not Found</IntroTitle>
 
       <IntroDescription className="max-w-md">

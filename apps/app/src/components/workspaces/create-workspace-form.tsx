@@ -1,15 +1,18 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { type WorkspaceSchema, workspaceSchema } from "@openads/db/schema"
+import { workspaceSchema } from "@openads/db/schema"
+import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { slugify } from "@primoui/utils"
+import type { TRPCClientErrorLike } from "@trpc/client"
 import type { HTMLAttributes } from "react"
-import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
+import { useZodForm } from "~/hooks/use-zod-form"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
@@ -28,24 +31,33 @@ export const CreateWorkspaceForm = ({
   const utils = trpc.useUtils()
   const handleError = useMutationErrorHandler()
 
-  const form = useForm<WorkspaceSchema>({
-    resolver: zodResolver(workspaceSchema),
+  const form = useZodForm(workspaceSchema, {
     defaultValues: {
-      name: "",
-      slug: "",
-      websiteUrl: "",
+      ...init(workspaceSchema),
     },
   })
 
+  const onSuccessHandler = async (data: RouterOutputs["workspace"]["create"]) => {
+    // Show a success toast
+    toast.success("Workspace created successfully")
+
+    // Invalidate the workspaces cache
+    await utils.workspace.getAll.invalidate()
+
+    // Reset the `isDirty` state of the form while keeping the values for optimistic UI
+    form.reset({}, { keepValues: true })
+
+    // Call the callback if provided
+    onSuccess?.(data)
+  }
+
+  const onError = (error: TRPCClientErrorLike<AppRouter>) => {
+    handleError({ error, form })
+  }
+
   const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
-    onSuccess: async data => {
-      onSuccess?.(data)
-
-      // Invalidate the workspaces cache
-      await utils.workspace.getAll.invalidate()
-    },
-
-    onError: error => handleError({ error, form }),
+    onSuccess: onSuccessHandler,
+    onError,
   })
 
   // Set the slug based on the name

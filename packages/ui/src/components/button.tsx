@@ -5,7 +5,7 @@ import { cva, cx, type VariantProps } from "../lib/cva"
 import { Slottable } from "./slottable"
 
 const buttonVariants = cva({
-  base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center border rounded-md text-sm leading-none font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
+  base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center border rounded-md text-sm leading-none font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 active:translate-y-px",
 
   variants: {
     variant: {

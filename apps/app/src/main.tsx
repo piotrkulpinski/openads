@@ -10,7 +10,7 @@ import { routeTree } from "~/routeTree.gen"
 import "./styles.css"
 
 // Create a new router instance
-const router = createRouter({
+export const router = createRouter({
   routeTree,
   // defaultPreload: "intent",
   defaultPendingMinMs: 0,

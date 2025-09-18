@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@openads/ui/button"
 import {
   Dialog,
@@ -13,9 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@openads/ui/input"
 import type { ComponentProps, HTMLAttributes, ReactNode } from "react"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { HeaderDescription, HeaderRoot, HeaderTitle } from "~/components/ui/header"
+import { useZodForm } from "~/hooks/use-zod-form"
 
 type ConfirmModalProps = HTMLAttributes<HTMLButtonElement> &
   ComponentProps<typeof Button> & {
@@ -39,12 +38,7 @@ export const ConfirmModal = ({
 }: ConfirmModalProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const schema = z.object({
-    confirm: z.literal(confirmText),
-  })
-
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useZodForm(z.object({ confirm: z.literal(confirmText) }), {
     defaultValues: { confirm: "" },
   })
 

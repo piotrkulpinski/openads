@@ -1,6 +1,5 @@
 import { removeProtocol } from "@primoui/utils"
 import tailwindcss from "@tailwindcss/vite"
-import { devtools } from "@tanstack/devtools-vite"
 import tanstackRouter from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, loadEnv } from "vite"
@@ -16,7 +15,6 @@ export default defineConfig(({ mode }) => {
     },
 
     plugins: [
-      devtools(),
       tsconfigPaths(),
       tailwindcss(),
       tanstackRouter({ target: "react", quoteStyle: "double", autoCodeSplitting: true }),

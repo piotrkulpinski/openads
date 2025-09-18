@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import { type SpotSchema, spotSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
@@ -11,14 +10,15 @@ import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import { HelpCircleIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
-import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
 import { Stack } from "~/components/ui/stack"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
+import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
-import type { createRouter } from "~/router"
+import type { router } from "~/main"
 
 type SpotFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
@@ -31,7 +31,7 @@ type SpotFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
    * Allows to redirect to a url after the mutation is successful
    */
-  nextUrl?: NavigateOptions<ReturnType<typeof createRouter>>
+  nextUrl?: NavigateOptions<typeof router>
 
   /**
    * A callback to call when the mutation is successful
@@ -53,14 +53,10 @@ export const SpotForm = ({
   const handleError = useMutationErrorHandler()
   const isEditing = !!spot?.id
 
-  const form = useForm<SpotSchema>({
-    resolver: zodResolver(spotSchema),
-    values: spot,
+  const form = useZodForm(spotSchema, {
     defaultValues: {
-      name: "",
-      description: "",
-      previewUrl: "",
-      price: 0,
+      ...init(spotSchema),
+      ...spot,
     },
   })
 
@@ -171,11 +167,17 @@ export const SpotForm = ({
         <FormField
           control={form.control}
           name="price"
-          render={({ field }) => (
+          render={({ field: { onChange, ...field } }) => (
             <FormItem className="col-span-full">
               <FormLabel>Price</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="100" min={0} {...field} />
+                <Input
+                  type="number"
+                  placeholder="100"
+                  min={0}
+                  onChange={e => onChange?.(parseInt(e.target.value, 10))}
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />

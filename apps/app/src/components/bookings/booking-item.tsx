@@ -1,3 +1,4 @@
+import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
 import { formatDateRange } from "@primoui/utils"
 import { Link } from "@tanstack/react-router"
@@ -9,6 +10,13 @@ type BookingItemProps = ComponentProps<typeof Link> & {
 }
 
 export function BookingItem({ booking, className, ...props }: BookingItemProps) {
+  const statusColor = {
+    pending: "bg-blue-500/7.5",
+    paid: "bg-green-500/7.5",
+    cancelled: "bg-red-500/7.5",
+    refunded: "bg-orange-500/7.5",
+  }[booking.status]
+
   return (
     <Link
       to={booking.id}
@@ -25,7 +33,10 @@ export function BookingItem({ booking, className, ...props }: BookingItemProps) 
 
       <div className="text-right">
         <p className="font-medium">${booking.amount / 100}</p>
-        <p className="text-sm text-muted-foreground capitalize">{booking.status}</p>
+
+        <Badge size="sm" variant="secondary" className={cx("capitalize", statusColor)}>
+          {booking.status}
+        </Badge>
       </div>
     </Link>
   )
