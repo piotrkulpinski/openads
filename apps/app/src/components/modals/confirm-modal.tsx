@@ -90,6 +90,7 @@ export const ConfirmModal = ({
                 variant={variant}
                 isPending={isPending}
                 disabled={isPending || (!!confirmText && !form.formState.isValid)}
+                className="min-w-24"
               >
                 {label}
               </Button>

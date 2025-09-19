@@ -35,7 +35,7 @@ const headerVariants = cva({
 })
 
 const headerDescriptionVariants = cva({
-  base: "w-full",
+  base: "w-full text-pretty",
 })
 
 type HeaderRootProps = HTMLAttributes<HTMLDivElement> &

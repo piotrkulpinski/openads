@@ -9,7 +9,7 @@ export const FormButton = ({ isPending, ...props }: ComponentProps<typeof Button
   return (
     <Button
       type="submit"
-      size="lg"
+      // size="lg"
       isPending={isPending}
       // disabled={isPending || (isSubmitted && !isValid)}
       className="first:not-only:w-full"

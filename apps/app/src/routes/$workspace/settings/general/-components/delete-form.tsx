@@ -33,6 +33,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
     <Card className="border-red-200 dark:border-red-950" {...props}>
       <Card.Panel asChild>
         <Header
+          size="h4"
           title="Delete Workspace"
           description="The will permanently delete the current workspace, including its ad spots and bookings. This action cannot be undone - please proceed with caution."
         />
@@ -45,7 +46,7 @@ export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
           onConfirm={() => deleteWorkspace({ workspaceId: id })}
           confirmText={slug}
         >
-          <Button size="lg" isPending={isPending} variant="destructive">
+          <Button isPending={isPending} variant="destructive">
             Delete Workspace
           </Button>
         </ConfirmModal>

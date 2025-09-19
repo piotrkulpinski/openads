@@ -28,7 +28,8 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
 
           <DialogDescription asChild>
             <HeaderDescription>
-              For example, you can use the name of your company or department.
+              Please provide a website URL and a name for this workspace. Usually, this is your
+              product name.
             </HeaderDescription>
           </DialogDescription>
         </HeaderRoot>

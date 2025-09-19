@@ -11,6 +11,7 @@ export const StripeConnectForm = ({ ...props }: HTMLAttributes<HTMLElement>) => 
     <Card {...props}>
       <Card.Section>
         <Header
+          size="h4"
           title="Stripe Connect"
           description="Connect your Stripe account to receive payments for your ad spots."
         />

@@ -53,6 +53,7 @@ export const GeneralForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
         <Form {...form}>
           <Card.Section>
             <Header
+              size="h4"
               title="Update Workspace"
               description="View and update your workspace details."
             />

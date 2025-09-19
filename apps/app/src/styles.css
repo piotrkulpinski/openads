@@ -216,6 +216,11 @@
       transparent 62.5%,
       transparent 100%
     );
+    background-color: color-mix(
+      in oklch,
+      var(--color-foreground),
+      transparent 90%
+    );
     background-size: 0.25rem 0.25rem;
   }
 }

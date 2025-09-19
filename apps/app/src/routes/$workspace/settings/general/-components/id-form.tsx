@@ -18,6 +18,7 @@ export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
     <Card {...props}>
       <Card.Section>
         <Header
+          size="h4"
           title="Workspace ID"
           description={`Unique ID of your workspace on ${siteConfig.name}.`}
         />

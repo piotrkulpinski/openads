@@ -106,12 +106,12 @@ export const BookingForm = ({
     <Form {...form}>
       <form
         onSubmit={handleSubmit}
-        className={cx("grid gap-4 items-start lg:grid-cols-3", className)}
+        className={cx("grid gap-6 items-start lg:grid-cols-3", className)}
         noValidate
         {...props}
       >
-        <div className={cx("grid gap-4 col-span-2", className)}>
-          <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 col-span-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="startsAt"
