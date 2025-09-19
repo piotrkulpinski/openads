@@ -13,7 +13,7 @@ model Field {
   default     String    @default("")
   placeholder String    @default("")
   isRequired  Boolean   @default(false)
-  order       Int       @default(99)
+  order       Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

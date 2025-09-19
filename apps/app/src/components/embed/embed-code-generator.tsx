@@ -130,7 +130,7 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
 
           <Button
             size="sm"
-            variant="outline"
+            variant="secondary"
             prefix={
               clipboard.copied ? (
                 <CheckIcon className="text-green-500" />

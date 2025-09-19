@@ -96,7 +96,7 @@ export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBooking
         <Stack size="sm">
           {spot.previewUrl && (
             <Tooltip tooltip="Preview this ad">
-              <Button variant="outline" size="sm" prefix={<EyeIcon />} isAffixOnly asChild>
+              <Button variant="secondary" size="sm" prefix={<EyeIcon />} isAffixOnly asChild>
                 <a href={spot.previewUrl} target="_blank" rel="noopener noreferrer nofollow" />
               </Button>
             </Tooltip>

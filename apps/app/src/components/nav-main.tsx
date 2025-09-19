@@ -1,6 +1,5 @@
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
-import { useIsMobile } from "@openads/ui/hooks"
 import { TooltipContent, TooltipRoot, TooltipTrigger } from "@openads/ui/tooltip"
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps, ReactNode } from "react"
@@ -15,7 +14,7 @@ type NavMainProps = {
 }
 
 export const NavMain = ({ items }: NavMainProps) => {
-  const isMobile = useIsMobile()
+  const isMobile = false
 
   return (
     <>
@@ -36,6 +35,7 @@ export const NavMain = ({ items }: NavMainProps) => {
         ) : (
           <Button
             key={index}
+            size="lg"
             variant="ghost"
             prefix={prefix}
             suffix={

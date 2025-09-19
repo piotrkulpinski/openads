@@ -1,55 +1,50 @@
 import { LoaderIcon } from "lucide-react"
 import { Slot } from "radix-ui"
-import { Children, type ComponentProps, isValidElement, type ReactNode } from "react"
+import type { ComponentProps, ReactNode } from "react"
+import { Children, isValidElement } from "react"
 import { cva, cx, type VariantProps } from "../lib/cva"
+import { boxVariants } from "./box"
 import { Slottable } from "./slottable"
 
 const buttonVariants = cva({
-  base: "group/button relative shrink-0 min-w-0 inline-flex items-center justify-center border rounded-md text-[0.8125rem]/tight font-medium focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50",
+  base: [
+    "group/button inline-flex items-center justify-center border-transparent! font-medium text-[0.8125rem]/tight text-start rounded-md overflow-clip hover:z-10 hover:border-transparent",
+    "disabled:opacity-60 disabled:pointer-events-none",
+  ],
 
   variants: {
     variant: {
-      default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/90",
-      destructive: "border-transparent bg-destructive text-white hover:bg-destructive/90",
-      outline: "border-input bg-background hover:bg-muted hover:text-accent-foreground",
-      ghost: "border-transparent hover:bg-accent hover:text-accent-foreground",
-      link: "border-transparent text-primary underline-offset-4 hover:underline",
+      fancy: "bg-primary text-primary-foreground hover:opacity-90",
+      primary: "text-background bg-foreground hover:opacity-90",
+      secondary:
+        "border-border! bg-background text-secondary-foreground hover:bg-card hover:border-ring!",
+      soft: "bg-muted text-secondary-foreground hover:bg-border/50 hover:text-foreground hover:outline-none",
+      ghost: "text-secondary-foreground hover:bg-muted hover:text-foreground hover:outline-none",
+      destructive: "bg-destructive text-white hover:bg-destructive/90",
     },
-
     size: {
-      sm: "px-2 py-1 gap-[0.66ch] text-xs",
+      sm: "px-2 py-1.5 gap-[0.66ch]",
       md: "px-3 py-2 gap-[0.75ch]",
       lg: "px-4 py-2.5 gap-[1ch] rounded-lg sm:text-sm/tight",
     },
-
-    isAffixOnly: {
-      true: "",
-    },
-
     isPending: {
       true: "[&>*:not(.animate-spin)]:text-transparent select-none",
     },
   },
 
-  compoundVariants: [
-    // Is affix only
-    { size: "sm", isAffixOnly: true, class: "px-2" },
-    { size: "md", isAffixOnly: true, class: "px-2" },
-    { size: "lg", isAffixOnly: true, class: "px-2.5" },
-  ],
-
   defaultVariants: {
-    variant: "default",
+    variant: "primary",
     size: "md",
   },
 })
 
 const buttonAffixVariants = cva({
-  base: "shrink-0 size-[1.1em] opacity-75",
+  base: "shrink-0 first:-ml-[0.21425em] last:-mr-[0.21425em] [svg]:my-[0.077em] [svg]:size-[1.1em] [svg]:opacity-75",
 })
 
-type ButtonProps = Omit<ComponentProps<"button">, "size" | "prefix"> &
-  VariantProps<typeof buttonVariants> & {
+export type ButtonProps = Omit<ComponentProps<"button">, "size" | "prefix"> &
+  VariantProps<typeof buttonVariants> &
+  VariantProps<typeof boxVariants> & {
     /**
      * If set to `true`, the button will be rendered as a child within the component.
      * This child component must be a valid React component.
@@ -75,50 +70,48 @@ type ButtonProps = Omit<ComponentProps<"button">, "size" | "prefix"> &
 const Button = ({
   children,
   className,
-  variant,
-  size,
+  disabled,
   asChild,
   isPending,
   prefix,
   suffix,
+  variant,
+  size,
+  hover = true,
+  focus = true,
   ...props
 }: ButtonProps) => {
   const useAsChild = asChild && isValidElement(children)
-  const Component = useAsChild ? Slot.Root : "button"
-
-  // Determine if the button has affix only.
-  const isAffixOnly = Children.count(children) === 0 && (!prefix || !suffix)
+  const Comp = useAsChild ? Slot.Root : "button"
 
   return (
-    <Component
-      className={cx(buttonVariants({ variant, size, isPending, isAffixOnly, className }))}
+    <Comp
+      disabled={disabled ?? isPending}
+      className={cx(
+        boxVariants({ hover, focus }),
+        buttonVariants({ variant, size, isPending, className }),
+      )}
       {...props}
     >
       <Slottable child={children} asChild={asChild}>
         {child => (
           <>
-            <Slot.Root
-              className={buttonAffixVariants({ className: !isAffixOnly && "ml-[-0.5ch]" })}
-              aria-hidden="true"
-            >
-              {prefix}
-            </Slot.Root>
+            <Slot.Root className={buttonAffixVariants()}>{prefix}</Slot.Root>
 
-            {Children.count(child) !== 0 && <span className="truncate">{child}</span>}
+            {Children.count(child) > 0 && (
+              <Slot.Root className="flex-1 truncate only:text-center has-[div]:contents">
+                {isValidElement(child) ? child : <span>{child}</span>}
+              </Slot.Root>
+            )}
 
-            <Slot.Root
-              className={buttonAffixVariants({ className: !isAffixOnly && "mr-[-0.5ch]" })}
-              aria-hidden="true"
-            >
-              {suffix}
-            </Slot.Root>
+            <Slot.Root className={buttonAffixVariants()}>{suffix}</Slot.Root>
 
             {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin" />}
           </>
         )}
       </Slottable>
-    </Component>
+    </Comp>
   )
 }
 
-export { Button, buttonVariants, type ButtonProps }
+export { Button, buttonVariants }

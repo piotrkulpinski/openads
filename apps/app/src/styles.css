@@ -239,8 +239,13 @@
   }
 }
 
-svg.lucide:not([class*="size-"]):not([class*="h-"]) {
-  @apply size-[1em];
+svg.lucide:not([class*="stroke"]) {
+  @apply stroke-[1.75]!;
+}
+
+svg.lucide:not([class*="size-"]):not([class*="h-"]),
+svg[aria-label*="Icon"]:not([class*="size-"]):not([class*="h-"]) {
+  @apply size-[1em]!;
 }
 
 [href] svg[class*="arrow-up-right"]:last-child,

@@ -106,7 +106,7 @@ export const BookingForm = ({
     <Form {...form}>
       <form
         onSubmit={handleSubmit}
-        className={cx("grid grid-cols-3 gap-4 items-start", className)}
+        className={cx("grid gap-4 items-start lg:grid-cols-3", className)}
         noValidate
         {...props}
       >
@@ -123,7 +123,7 @@ export const BookingForm = ({
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           prefix={<CalendarIcon />}
                           className="w-full justify-start text-left font-normal"
                         >
@@ -153,7 +153,7 @@ export const BookingForm = ({
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           prefix={<CalendarIcon />}
                           className="w-full justify-start text-left font-normal"
                         >

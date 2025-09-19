@@ -69,7 +69,7 @@ const DialogFooter = ({ className, ...props }: ComponentProps<"div">) => (
 
 const DialogClose = ({ ...props }: ComponentProps<typeof Button>) => (
   <DialogPrimitive.Close asChild>
-    <Button variant="outline" {...props} />
+    <Button variant="secondary" {...props} />
   </DialogPrimitive.Close>
 )
 

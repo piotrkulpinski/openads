@@ -81,7 +81,7 @@ export const ConfirmModal = ({
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" size="lg">
+                <Button variant="secondary" size="lg">
                   {cancelLabel}
                 </Button>
               </DialogClose>

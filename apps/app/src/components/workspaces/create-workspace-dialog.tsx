@@ -39,7 +39,7 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
             navigate({ to: "/$workspace", params: { workspace: slug } })
           }}
         >
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
         </CreateWorkspaceForm>

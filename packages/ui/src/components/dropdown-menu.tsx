@@ -1,10 +1,11 @@
 "use client"
 
-import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { popoverAnimationClasses } from "../lib/classes"
 import { cx } from "../lib/cva"
+import { Kbd } from "./kbd"
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
@@ -12,41 +13,6 @@ const DropdownMenuGroup = DropdownMenuPrimitive.Group
 const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 const DropdownMenuSub = DropdownMenuPrimitive.Sub
 const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
-
-const DropdownMenuSubTrigger = ({
-  className,
-  inset,
-  children,
-  ...props
-}: ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
-  inset?: boolean
-}) => (
-  <DropdownMenuPrimitive.SubTrigger
-    className={cx(
-      "flex cursor-pointer gap-2 select-none items-center rounded-xs px-2 py-1.5 text-sm outline-hidden focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-      inset && "pl-8",
-      className,
-    )}
-    {...props}
-  >
-    {children}
-    <ChevronRightIcon className="ml-auto" />
-  </DropdownMenuPrimitive.SubTrigger>
-)
-
-const DropdownMenuSubContent = ({
-  className,
-  ...props
-}: ComponentProps<typeof DropdownMenuPrimitive.SubContent>) => (
-  <DropdownMenuPrimitive.SubContent
-    className={cx(
-      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-sm",
-      popoverAnimationClasses,
-      className,
-    )}
-    {...props}
-  />
-)
 
 const DropdownMenuContent = ({
   className,
@@ -57,7 +23,7 @@ const DropdownMenuContent = ({
     <DropdownMenuPrimitive.Content
       sideOffset={sideOffset}
       className={cx(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-sm",
+        "z-50 min-w-40 flex flex-col rounded-md border bg-popover p-1 text-popover-foreground shadow-sm backdrop-blur-xs",
         popoverAnimationClasses,
         className,
       )}
@@ -75,7 +41,7 @@ const DropdownMenuItem = ({
 }) => (
   <DropdownMenuPrimitive.Item
     className={cx(
-      "relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
+      "relative flex m-0 cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0",
       inset && "pl-8",
       className,
     )}
@@ -91,7 +57,7 @@ const DropdownMenuCheckboxItem = ({
 }: ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem>) => (
   <DropdownMenuPrimitive.CheckboxItem
     className={cx(
-      "relative flex cursor-pointer select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
       className,
     )}
     checked={checked}
@@ -99,7 +65,7 @@ const DropdownMenuCheckboxItem = ({
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <CheckIcon className="h-4 w-4" />
+        <CheckIcon />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
@@ -113,18 +79,53 @@ const DropdownMenuRadioItem = ({
 }: ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) => (
   <DropdownMenuPrimitive.RadioItem
     className={cx(
-      "relative flex cursor-pointer select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+      "relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-hidden transition-colors focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
       className,
     )}
     {...props}
   >
-    <span className="absolute left-2 grid place-items-center size-3.5">
+    <span className="absolute left-2 flex size-3.5 items-center justify-center">
       <DropdownMenuPrimitive.ItemIndicator>
-        <span className="size-2.5 rounded-full bg-primary" />
+        <CircleIcon className="fill-current size-2" />
       </DropdownMenuPrimitive.ItemIndicator>
     </span>
     {children}
   </DropdownMenuPrimitive.RadioItem>
+)
+
+const DropdownMenuSubTrigger = ({
+  className,
+  inset,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
+  inset?: boolean
+}) => (
+  <DropdownMenuPrimitive.SubTrigger
+    className={cx(
+      "flex cursor-pointer gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-hidden focus:bg-accent data-[state=open]:bg-accent [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      inset && "pl-8",
+      className,
+    )}
+    {...props}
+  >
+    {children}
+    <ChevronRightIcon className="ml-auto" />
+  </DropdownMenuPrimitive.SubTrigger>
+)
+
+const DropdownMenuSubContent = ({
+  className,
+  ...props
+}: ComponentProps<typeof DropdownMenuPrimitive.SubContent>) => (
+  <DropdownMenuPrimitive.SubContent
+    className={cx(
+      "z-50 min-w-40 rounded-md border bg-popover p-1 text-popover-foreground shadow-sm backdrop-blur-xs",
+      popoverAnimationClasses,
+      className,
+    )}
+    {...props}
+  />
 )
 
 const DropdownMenuLabel = ({
@@ -151,10 +152,7 @@ const DropdownMenuSeparator = ({
 )
 
 const DropdownMenuShortcut = ({ className, ...props }: ComponentProps<"kbd">) => (
-  <kbd
-    className={cx("ml-auto text-xs tracking-widest tabular-nums opacity-60", className)}
-    {...props}
-  />
+  <Kbd className={cx("ml-auto", className)} {...props} />
 )
 
 export {

@@ -1,7 +1,7 @@
 import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
-import { buttonVariants } from "@openads/ui/button"
+import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import {
   DropdownMenu,
@@ -13,15 +13,16 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useIsMobile } from "@openads/ui/hooks"
-import { Skeleton } from "@openads/ui/skeleton"
 import { useNavigate } from "@tanstack/react-router"
-import { Check, ChevronsUpDown, Plus } from "lucide-react"
+import { Check, ChevronDownIcon, Plus } from "lucide-react"
+import { ComponentProps } from "react"
+import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { trpc, trpcUtils } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
-export const WorkspaceMenu = () => {
+export const WorkspaceMenu = ({ className, ...props }: ComponentProps<typeof Button>) => {
   const isMobile = useIsMobile()
   const activeWorkspace = useWorkspace()
   const navigate = useNavigate()
@@ -51,51 +52,21 @@ export const WorkspaceMenu = () => {
   )
 
   if (isFetching) {
-    return (
-      <div
-        className={buttonVariants({
-          size: "sm",
-          variant: "outline",
-          className: "gap-2 pointer-events-none",
-        })}
-      >
-        <Skeleton className="size-7 rounded-full" />
-
-        <div className="grid gap-0.5 flex-1 text-left text-sm leading-tight">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-16" />
-        </div>
-
-        <ChevronsUpDown className="size-4" />
-      </div>
-    )
+    return <NavButtonSkeleton suffix={<ChevronDownIcon />} />
   }
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger
-        className={buttonVariants({ size: "sm", variant: "outline", className: "gap-2" })}
-      >
-        <Avatar className="size-7">
-          <AvatarImage src={getWorkspaceFaviconUrl(activeWorkspace)} />
-          <AvatarFallback>{activeWorkspace?.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-
-        <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
-          <span className="truncate text-sm/tight font-medium">{activeWorkspace?.name}</span>
-          <span className="truncate text-xs/tight text-muted-foreground/75 font-normal">
-            {activeWorkspace?.plan}
-          </span>
-        </div>
-        <ChevronsUpDown className="size-4" />
+      <DropdownMenuTrigger asChild>
+        <NavButton
+          title={activeWorkspace.name}
+          subtitle={`${activeWorkspace.plan} Plan`}
+          avatar={getWorkspaceFaviconUrl(activeWorkspace)}
+          suffix={<ChevronDownIcon />}
+        />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 space-y-1 rounded-lg"
-        align="start"
-        side={isMobile ? "bottom" : "right"}
-        sideOffset={4}
-      >
+      <DropdownMenuContent align="start" side="bottom" className="w-(--radix-popper-anchor-width)">
         <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
 
         {workspaces.map((workspace, index) => (
@@ -107,17 +78,12 @@ export const WorkspaceMenu = () => {
               workspace.slug === activeWorkspace.slug && "bg-accent opacity-75 pointer-events-none",
             )}
           >
-            <Avatar className="size-7">
+            <Avatar className="size-5 m-0.5">
               <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
 
-            <div className="grid gap-0.5 flex-1 text-left text-sm leading-none">
-              <span className="truncate text-sm/tight font-medium">{workspace.name}</span>
-              <span className="truncate text-xs/tight text-muted-foreground/75 font-normal">
-                {workspace.plan}
-              </span>
-            </div>
+            <span className="truncate text-sm/tight font-medium">{workspace.name}</span>
 
             {workspace.slug === activeWorkspace.slug ? (
               <Check className="ml-auto text-green-500" />

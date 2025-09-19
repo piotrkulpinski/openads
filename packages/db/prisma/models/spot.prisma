@@ -4,6 +4,7 @@ model Spot {
   description String   @default("")
   previewUrl  String   @default("")
   price       Int      @default(0)
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

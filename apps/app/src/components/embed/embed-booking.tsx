@@ -73,7 +73,7 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
               <div key={selection.spotId} className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span className="flex items-center gap-2 mr-auto">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     className="p-0.5"
                     aria-label={`Clear ${spot.name} selection`}

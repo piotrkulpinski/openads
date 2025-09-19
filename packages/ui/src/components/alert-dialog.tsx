@@ -81,7 +81,7 @@ const AlertDialogAction = ({ ...props }: ComponentProps<typeof Button>) => (
 
 const AlertDialogCancel = ({ ...props }: ComponentProps<typeof Button>) => (
   <AlertDialogPrimitive.Cancel asChild>
-    <Button variant="outline" {...props} />
+    <Button variant="secondary" {...props} />
   </AlertDialogPrimitive.Cancel>
 )
 

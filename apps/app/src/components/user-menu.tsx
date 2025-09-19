@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
+import { Button } from "@openads/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,49 +8,42 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { useRouter } from "@tanstack/react-router"
-import { BookOpenIcon, BugIcon, LifeBuoyIcon, LogOutIcon } from "lucide-react"
+import { BookOpenIcon, BugIcon, ChevronUpIcon, LifeBuoyIcon, LogOutIcon } from "lucide-react"
+import { ComponentProps } from "react"
+import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { authClient } from "~/lib/auth"
 
-export const UserMenu = () => {
+export const UserMenu = ({ className, ...props }: ComponentProps<typeof Button>) => {
   const { data: session, isPending } = authClient.useSession()
   const router = useRouter()
 
   if (!session?.user || isPending) {
-    return (
-      <Avatar className="size-7 -m-1">
-        <AvatarFallback />
-      </Avatar>
-    )
+    return <NavButtonSkeleton suffix={<ChevronUpIcon />} />
   }
 
   const handleLogout = () => {
     return authClient.signOut({ fetchOptions: { onSuccess: () => router.invalidate() } })
   }
 
+  const { image, name, email } = session.user
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="cursor-pointer" asChild>
-        <Avatar className="size-7 -m-1">
-          <AvatarImage src={session.user.image ?? undefined} />
-          <AvatarFallback className="text-xs">{session.user.name?.charAt(0)}</AvatarFallback>
-        </Avatar>
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <NavButton
+          title={name}
+          subtitle={email}
+          avatar={image ?? undefined}
+          suffix={<ChevronUpIcon />}
+        />
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="start">
-        <DropdownMenuLabel className="font-normal">
-          <div>
-            <p className="truncate text-sm font-medium">{session.user.name}</p>
-            <p className="truncate text-sm text-muted-foreground">{session.user.email}</p>
-          </div>
-        </DropdownMenuLabel>
-
-        <DropdownMenuSeparator />
-
+      <DropdownMenuContent align="start" side="top" className="w-(--radix-popper-anchor-width)">
         <DropdownMenuLabel>Resources</DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
           <a href="#" target="_blank" rel="noopener">
-            <BookOpenIcon className="size-4" />
+            <BookOpenIcon />
             Docs
           </a>
         </DropdownMenuItem>
@@ -61,14 +54,14 @@ export const UserMenu = () => {
             target="_blank"
             rel="noopener"
           >
-            <BugIcon className="size-4" />
+            <BugIcon />
             Report
           </a>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <a href="#" target="_blank" rel="noopener">
-            <LifeBuoyIcon className="size-4" />
+            <LifeBuoyIcon />
             Support
           </a>
         </DropdownMenuItem>
@@ -76,7 +69,7 @@ export const UserMenu = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuItem onClick={handleLogout}>
-          <LogOutIcon className="size-4" />
+          <LogOutIcon />
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
