@@ -175,7 +175,7 @@ export const SpotForm = ({
                   type="number"
                   placeholder="100"
                   min={0}
-                  onChange={e => onChange?.(parseInt(e.target.value, 10))}
+                  onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
                   {...field}
                 />
               </FormControl>

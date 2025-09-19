@@ -21,7 +21,7 @@ import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
-import { router } from "~/main"
+import type { router } from "~/main"
 
 type BookingFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
@@ -211,7 +211,7 @@ export const BookingForm = ({
                     type="number"
                     placeholder="Enter amount in cents"
                     min={0}
-                    onChange={e => onChange?.(parseInt(e.target.value, 10))}
+                    onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
                     {...field}
                   />
                 </FormControl>

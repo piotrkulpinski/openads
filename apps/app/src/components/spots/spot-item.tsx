@@ -12,7 +12,7 @@ import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
-import { trpc, type RouterOutputs } from "~/lib/trpc"
+import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type SpotItemProps = ComponentProps<"div"> & {
   spot: RouterOutputs["spot"]["getAll"][number]
@@ -54,7 +54,7 @@ const SpotItem = ({ spot, className, ...props }: SpotItemProps) => {
             aria-label="Open menu"
             variant="ghost"
             prefix={<MoreVerticalIcon />}
-            className="-my-1.5 data-[state=open]:bg-accent"
+            className="relative z-10 -my-1.5 data-[state=open]:bg-accent"
           />
         </DropdownMenuTrigger>
 

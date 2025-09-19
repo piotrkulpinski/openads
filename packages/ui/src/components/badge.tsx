@@ -1,38 +1,86 @@
-import type * as React from "react"
+import { Slot } from "radix-ui"
+import { type ComponentProps, isValidElement, type ReactNode } from "react"
 import { cva, cx, type VariantProps } from "../lib/cva"
+import { Slottable } from "./slottable"
 
 const badgeVariants = cva({
-  base: "inline-flex items-center border font-medium transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  base: "inline-flex items-center rounded-sm text-secondary-foreground font-display font-medium leading-tight border border-transparent whitespace-nowrap",
+
   variants: {
     variant: {
-      default:
-        "border-transparent bg-primary text-primary-foreground shadow-sm hover:[&[href],&[type]]:bg-primary/80",
-      secondary:
-        "border-transparent bg-secondary text-secondary-foreground hover:[&[href],&[type]]:bg-secondary/80",
+      primary: "bg-primary text-background hover:[&[href],&[type]]:bg-primary/75",
+      secondary: "bg-background border-border hover:[&[href],&[type]]:bg-muted",
+      soft: "bg-border/50 hover:[&[href],&[type]]:bg-border/75",
       success:
-        "border-transparent bg-green-500/75 text-background hover:[&[href],&[type]]:bg-green-500/85",
-      destructive:
-        "border-transparent bg-destructive text-white shadow-sm hover:[&[href],&[type]]:bg-destructive/80",
-      outline: "text-foreground",
+        "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-100 hover:[&[href],&[type]]:opacity-75",
+      warning:
+        "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-100 hover:[&[href],&[type]]:opacity-75",
+      info: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-100 hover:[&[href],&[type]]:opacity-75",
+      danger:
+        "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-100 hover:[&[href],&[type]]:opacity-75",
     },
     size: {
-      sm: "px-1 py-px gap-1 text-[0.625rem] rounded-sm",
-      md: "px-1.5 py-0.5 gap-1.5 text-xs rounded-sm",
+      sm: "px-1 py-px gap-1 text-[0.625rem]",
+      md: "px-1.5 py-0.5 gap-1.5 text-xs",
       lg: "px-2 py-1 gap-2 text-sm rounded-md",
     },
   },
+
   defaultVariants: {
-    variant: "default",
+    variant: "soft",
     size: "md",
   },
 })
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
+type BadgeProps = Omit<ComponentProps<"span">, "prefix"> &
+  VariantProps<typeof badgeVariants> & {
+    /**
+     * If set to `true`, the button will be rendered as a child within the component.
+     * This child component must be a valid React component.
+     */
+    asChild?: boolean
 
-function Badge({ className, variant, size, ...props }: BadgeProps) {
-  return <div className={cx(badgeVariants({ variant, size }), className)} {...props} />
+    /**
+     * The slot to be rendered before the label.
+     */
+    prefix?: ReactNode
+
+    /**
+     * The slot to be rendered after the label.
+     */
+    suffix?: ReactNode
+  }
+
+const badgeAffixVariants = cva({
+  base: "shrink-0 size-[1.1em]",
+})
+
+const Badge = ({
+  children,
+  className,
+  asChild,
+  variant,
+  size,
+  prefix,
+  suffix,
+  ...props
+}: BadgeProps) => {
+  const useAsChild = asChild && isValidElement(children)
+  const Comp = useAsChild ? Slot.Root : "span"
+
+  return (
+    <Comp className={cx(badgeVariants({ variant, size, className }))} {...props}>
+      <Slottable child={children} asChild={asChild}>
+        {child => (
+          <>
+            {prefix && <Slot.Root className={cx(badgeAffixVariants())}>{prefix}</Slot.Root>}
+            {child}
+            {suffix && <Slot.Root className={cx(badgeAffixVariants())}>{suffix}</Slot.Root>}
+          </>
+        )}
+      </Slottable>
+    </Comp>
+  )
 }
 
 export { Badge, badgeVariants }

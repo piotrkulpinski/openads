@@ -25,8 +25,8 @@
   --color-accent-foreground: oklch(0.21 0.006 285.885);
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-border: oklch(0.92 0 0);
-  --color-input: oklch(0.92 0 0);
-  --color-ring: oklch(0.5465 0.246 262.87);
+  --color-input: oklch(0.82 0 0);
+  --color-ring: oklch(0.82 0 0);
   --color-chart-1: oklch(0.646 0.222 41.116);
   --color-chart-2: oklch(0.6 0.118 184.704);
   --color-chart-3: oklch(0.398 0.07 227.392);
@@ -140,7 +140,7 @@
       --color-destructive: oklch(0.704 0.191 22.216);
       --color-border: oklch(1 0 0 / 10%);
       --color-input: oklch(1 0 0 / 15%);
-      --color-ring: oklch(0.488 0.243 264.376);
+      --color-ring: oklch(1 0 0 / 15%);
       --color-chart-1: oklch(0.488 0.243 264.376);
       --color-chart-2: oklch(0.696 0.17 162.48);
       --color-chart-3: oklch(0.769 0.188 70.08);
@@ -159,26 +159,15 @@
 }
 
 @layer base {
-  input,
-  textarea,
-  select,
-  button {
-    border: 0px solid var(--color-ring, currentColor);
-    border-radius: 0;
-    padding: 0;
-    color: inherit;
-    background-color: transparent;
-  }
-
   *,
   ::after,
   ::before,
-  ::backdrop {
-    border-color: var(--color-border, currentColor);
+  ::backdrop,
+  ::file-selector-button {
+    @apply border-border;
   }
 
   * {
-    @apply border-input;
     @apply break-words;
   }
 
@@ -197,14 +186,6 @@
 
   strong {
     @apply font-medium;
-  }
-
-  select:not([size]) {
-    @apply bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScyNCcgaGVpZ2h0PScyNCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPSdub25lJyBzdHJva2U9JyNmZmYnIHN0cm9rZS13aWR0aD0nMicgc3Ryb2tlLWxpbmVjYXA9J3JvdW5kJyBzdHJva2UtbGluZWpvaW49J3JvdW5kJyBjbGFzcz0nbHVjaWRlIGx1Y2lkZS1jaGV2cm9uLWRvd24nPjxwYXRoIGQ9J202IDkgNiA2IDYtNicvPjwvc3ZnPg==')];
-    @apply bg-no-repeat;
-    @apply bg-[right_0.75rem_center];
-    @apply bg-[length:1.25em_1.25em];
-    @apply pr-10;
   }
 
   /* Chrome, Safari, Edge, Opera */

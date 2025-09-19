@@ -5,14 +5,25 @@ import type { ComponentProps } from "react"
 import { cva, cx, type VariantProps } from "../lib/cva"
 
 const labelVariants = cva({
-  base: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+  base: "self-start text-sm font-medium text-foreground [&[for]]:cursor-pointer",
+
+  variants: {
+    isRequired: {
+      true: "after:ml-0.5 after:text-red-600 after:content-['*']",
+    },
+  },
 })
 
-const Label = ({
-  className,
-  ...props
-}: ComponentProps<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>) => (
-  <LabelPrimitive.Root className={cx(labelVariants(), className)} {...props} />
-)
+type LabelProps = ComponentProps<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
+
+const Label = ({ className, isRequired, ...props }: LabelProps) => {
+  return (
+    <LabelPrimitive.Root
+      className={cx(labelVariants({ isRequired, className }))}
+      aria-label="Label"
+      {...props}
+    />
+  )
+}
 
 export { Label }

@@ -11,10 +11,10 @@ type BookingItemProps = ComponentProps<typeof Link> & {
 
 export function BookingItem({ booking, className, ...props }: BookingItemProps) {
   const statusColor = {
-    pending: "bg-blue-500/7.5",
-    paid: "bg-green-500/7.5",
-    cancelled: "bg-red-500/7.5",
-    refunded: "bg-orange-500/7.5",
+    pending: "bg-blue-50 dark:bg-blue-950",
+    paid: "bg-green-50 dark:bg-green-950",
+    cancelled: "bg-red-50 dark:bg-red-950",
+    refunded: "bg-orange-50 dark:bg-orange-950",
   }[booking.status]
 
   return (
@@ -34,7 +34,7 @@ export function BookingItem({ booking, className, ...props }: BookingItemProps) 
       <div className="text-right">
         <p className="font-medium">${booking.amount / 100}</p>
 
-        <Badge size="sm" variant="secondary" className={cx("capitalize", statusColor)}>
+        <Badge size="sm" variant="soft" className={cx("capitalize", statusColor)}>
           {booking.status}
         </Badge>
       </div>

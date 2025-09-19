@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react"
 import { cx } from "../lib/cva"
 
-export const Skeleton = ({ className, ...props }: ComponentProps<"div">) => (
-  <div className={cx("animate-pulse rounded-md bg-primary/10", className)} {...props} />
-)
+export const Skeleton = ({ className, ...props }: ComponentProps<"div">) => {
+  return <div className={cx("animate-pulse rounded-md bg-foreground/10", className)} {...props} />
+}

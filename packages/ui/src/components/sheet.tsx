@@ -4,23 +4,20 @@ import { XIcon } from "lucide-react"
 import { Dialog as SheetPrimitive } from "radix-ui"
 import type { ComponentProps } from "react"
 import { cva, cx, type VariantProps } from "../lib/cva"
+import { Overlay } from "./overlay"
 
 const Sheet = SheetPrimitive.Root
 const SheetTrigger = SheetPrimitive.Trigger
 const SheetClose = SheetPrimitive.Close
 const SheetPortal = SheetPrimitive.Portal
 
-const SheetOverlay = ({ className, ...props }: ComponentProps<typeof SheetPrimitive.Overlay>) => (
-  <SheetPrimitive.Overlay
-    className={cx(
-      "fixed inset-0 z-50 bg-background/60 backdrop-blur-sm",
-      "data-[state=open]:animate-in data-[state=closed]:animate-out",
-      "data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
-      className,
-    )}
-    {...props}
-  />
-)
+const SheetOverlay = ({ ...props }: ComponentProps<typeof Overlay>) => {
+  return (
+    <SheetPrimitive.Overlay asChild>
+      <Overlay {...props} />
+    </SheetPrimitive.Overlay>
+  )
+}
 
 const sheetVariants = cva({
   base: "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -43,46 +40,56 @@ interface SheetContentProps
   extends ComponentProps<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
 
-const SheetContent = ({ side = "right", className, children, ...props }: SheetContentProps) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content className={cx(sheetVariants({ side }), className)} {...props}>
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <XIcon className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-)
+const SheetContent = ({ side = "right", className, children, ...props }: SheetContentProps) => {
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content className={cx(sheetVariants({ side }), className)} {...props}>
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <XIcon className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+}
 
-const SheetHeader = ({ className, ...props }: ComponentProps<"div">) => (
-  <div className={cx("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
-)
+const SheetHeader = ({ className, ...props }: ComponentProps<"div">) => {
+  return (
+    <div className={cx("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
+  )
+}
 
-const SheetFooter = ({ className, ...props }: ComponentProps<"div">) => (
-  <div
-    className={cx("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
-    {...props}
-  />
-)
+const SheetFooter = ({ className, ...props }: ComponentProps<"div">) => {
+  return (
+    <div
+      className={cx("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+      {...props}
+    />
+  )
+}
 
-const SheetTitle = ({ className, ...props }: ComponentProps<typeof SheetPrimitive.Title>) => (
-  <SheetPrimitive.Title
-    className={cx("text-lg font-semibold text-foreground", className)}
-    {...props}
-  />
-)
+const SheetTitle = ({ className, ...props }: ComponentProps<typeof SheetPrimitive.Title>) => {
+  return (
+    <SheetPrimitive.Title
+      className={cx("text-lg font-semibold text-foreground", className)}
+      {...props}
+    />
+  )
+}
 
 const SheetDescription = ({
   className,
   ...props
-}: ComponentProps<typeof SheetPrimitive.Description>) => (
-  <SheetPrimitive.Description
-    className={cx("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-)
+}: ComponentProps<typeof SheetPrimitive.Description>) => {
+  return (
+    <SheetPrimitive.Description
+      className={cx("text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
 
 export {
   Sheet,

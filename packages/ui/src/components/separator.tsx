@@ -9,17 +9,19 @@ const Separator = ({
   orientation = "horizontal",
   decorative = true,
   ...props
-}: ComponentProps<typeof SeparatorPrimitive.Root>) => (
-  <SeparatorPrimitive.Root
-    decorative={decorative}
-    orientation={orientation}
-    className={cx(
-      "shrink-0 bg-border",
-      orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-      className,
-    )}
-    {...props}
-  />
-)
+}: ComponentProps<typeof SeparatorPrimitive.Root>) => {
+  return (
+    <SeparatorPrimitive.Root
+      decorative={decorative}
+      orientation={orientation}
+      className={cx(
+        "shrink-0 bg-border",
+        orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
+        className,
+      )}
+      {...props}
+    />
+  )
+}
 
 export { Separator }

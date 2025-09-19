@@ -21,7 +21,7 @@ const TooltipContent = ({
       <TooltipPrimitive.Content
         sideOffset={sideOffset}
         className={cx(
-          "z-50 rounded-md bg-foreground px-3 py-1.5 text-xs text-background will-change-[transform,opacity]",
+          "z-50 max-w-60 inline-flex items-center gap-2 px-3 py-1.5 bg-foreground text-xs text-background text-center text-pretty rounded-md will-change-[transform,opacity]",
           popoverAnimationClasses,
           className,
         )}
@@ -36,16 +36,14 @@ type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> &
     tooltip: ReactNode
   }
 
-const TooltipBase = ({ children, className, delayDuration, tooltip, ...rest }: TooltipProps) => {
+const TooltipBase = ({ children, delayDuration, tooltip, ...rest }: TooltipProps) => {
   if (!tooltip) {
     return children
   }
 
   return (
     <TooltipRoot delayDuration={delayDuration}>
-      <TooltipTrigger className={className} asChild>
-        {children}
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
 
       <TooltipPortal>
         <TooltipContent {...rest}>
@@ -66,4 +64,4 @@ const Tooltip = Object.assign(TooltipBase, {
   Arrow: TooltipArrow,
 })
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipRoot, TooltipTrigger }
+export { Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, TooltipProvider }

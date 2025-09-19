@@ -183,7 +183,7 @@ const ChartTooltipContent = ({
                     !hideIndicator && (
                       <div
                         className={cx(
-                          "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                          "shrink-0 rounded-[2px] border-(--color-boder) bg-(--color-bg)",
                           {
                             "h-2.5 w-2.5": indicator === "dot",
                             "w-1": indicator === "line",
@@ -311,4 +311,4 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
   return configLabelKey in config ? config[configLabelKey] : config[key as keyof typeof config]
 }
 
-export { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent }
+export { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent }

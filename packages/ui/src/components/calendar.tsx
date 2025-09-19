@@ -7,16 +7,16 @@ import { buttonVariants } from "./button"
 
 const CalendarChevron = ({ orientation }: ComponentProps<typeof Chevron>) => {
   if (orientation === "left") {
-    return <ChevronLeftIcon className="size-4" />
+    return <ChevronLeftIcon />
   }
 
-  return <ChevronRightIcon className="size-4" />
+  return <ChevronRightIcon />
 }
 
 const Calendar = ({ classNames, ...props }: ComponentProps<typeof DayPicker>) => {
   const buttonClasses = buttonVariants({
     variant: "ghost",
-    className: "text-xs p-1 pointer-events-auto",
+    className: "text-lg p-1 pointer-events-auto",
   })
 
   return (

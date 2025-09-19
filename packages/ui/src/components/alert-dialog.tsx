@@ -13,12 +13,9 @@ const AlertDialogTrigger = AlertDialogPrimitive.Trigger
 const AlertDialogPortal = AlertDialogPrimitive.Portal
 const AlertDialogDescription = AlertDialogPrimitive.Description
 
-const AlertDialogOverlay = ({
-  className,
-  ...props
-}: ComponentProps<typeof AlertDialogPrimitive.Overlay>) => (
+const AlertDialogOverlay = ({ ...props }: ComponentProps<typeof Overlay>) => (
   <AlertDialogPrimitive.Overlay asChild>
-    <Overlay />
+    <Overlay {...props} />
   </AlertDialogPrimitive.Overlay>
 )
 

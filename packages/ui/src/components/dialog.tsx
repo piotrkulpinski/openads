@@ -14,11 +14,13 @@ const DialogPortal = DialogPrimitive.Portal
 const DialogTitle = DialogPrimitive.Title
 const DialogDescription = DialogPrimitive.Description
 
-const DialogOverlay = ({ className, ...props }: ComponentProps<typeof DialogPrimitive.Overlay>) => (
-  <DialogPrimitive.Overlay asChild>
-    <Overlay />
-  </DialogPrimitive.Overlay>
-)
+const DialogOverlay = ({ ...props }: ComponentProps<typeof Overlay>) => {
+  return (
+    <DialogPrimitive.Overlay asChild>
+      <Overlay {...props} />
+    </DialogPrimitive.Overlay>
+  )
+}
 
 const DialogContent = ({
   className,

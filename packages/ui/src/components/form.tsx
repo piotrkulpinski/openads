@@ -12,6 +12,7 @@ import {
 } from "react-hook-form"
 import { cx } from "../lib/cva"
 import { Label } from "./label"
+import { Stack } from "./stack"
 
 const Form = FormProvider
 
@@ -66,12 +67,12 @@ type FormItemContextValue = {
 
 const FormItemContext = createContext<FormItemContextValue>({} as FormItemContextValue)
 
-const FormItem = ({ className, ...props }: ComponentProps<"div">) => {
+const FormItem = ({ direction = "column", ...props }: ComponentProps<typeof Stack>) => {
   const id = useId()
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div className={cx("flex flex-col items-start gap-2", className)} {...props} />
+      <Stack direction={direction} {...props} />
     </FormItemContext.Provider>
   )
 }
