@@ -1,5 +1,5 @@
 {
-  "name": "@openads/trpc",
+  "name": "@openads/s3",
   "version": "0.0.0",
   "type": "module",
   "exports": {
@@ -7,14 +7,10 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@openads/auth": "*",
-    "@openads/db": "*",
-    "@openads/redis": "*",
-    "@openads/stripe": "*",
-    "@openads/s3": "*",
+    "@aws-sdk/client-s3": "^3.684.0",
+    "@aws-sdk/s3-request-presigner": "^3.684.0",
+    "@aws-sdk/s3-presigned-post": "^3.684.0",
     "@t3-oss/env-core": "^0.13.8",
-    "@trpc/server": "^11.5.1",
-    "superjson": "^2.2.2",
     "zod": "^4.1.8"
   },
   "devDependencies": {

@@ -4,14 +4,14 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "bun biome check --write .",
-    "format": "bun biome format --write .",
-    "db:generate": "bun --cwd packages/db db:generate",
-    "db:migrate": "bun --cwd packages/db db:migrate",
-    "db:studio": "bun --cwd packages/db db:studio",
-    "db:push": "bun --cwd packages/db db:push",
-    "db:reset": "bun --cwd packages/db db:reset",
-    "postinstall": "bun run db:generate"
+    "lint": "npm run biome check --write .",
+    "format": "npm run biome format --write .",
+    "db:generate": "npm run db:generate -w packages/db",
+    "db:migrate": "npm run db:migrate -w packages/db",
+    "db:studio": "npm run db:studio -w packages/db",
+    "db:push": "npm run db:push -w packages/db",
+    "db:reset": "npm run db:reset -w packages/db",
+    "postinstall": "npm run db:generate"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",

@@ -13,6 +13,7 @@
     "@openads/db": "*",
     "@openads/redis": "*",
     "@openads/stripe": "*",
+    "@openads/s3": "*",
     "@openads/trpc": "*",
     "@openads/utils": "*",
     "@t3-oss/env-core": "^0.13.8",

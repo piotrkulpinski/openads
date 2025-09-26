@@ -1,4 +1,3 @@
-import { Button } from "@openads/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -7,13 +6,13 @@ import {
   DialogTitle,
 } from "@openads/ui/dialog"
 import { ArrowRightIcon } from "lucide-react"
-import type { Dispatch, HTMLAttributes, SetStateAction } from "react"
+import type { Dispatch, SetStateAction } from "react"
 import { useCallback, useMemo, useState } from "react"
 import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
 import { LogoSymbol } from "~/components/ui/logo-symbol"
 import { siteConfig } from "~/config/site"
 
-type WelcomeModalProps = HTMLAttributes<HTMLButtonElement> & {
+type WelcomeModalProps = {
   showWelcomeModal: boolean
   setShowWelcomeModal: Dispatch<SetStateAction<boolean>>
   onClose?: () => void
@@ -47,10 +46,8 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
             </IntroDescription>
           </DialogDescription>
 
-          <DialogClose asChild>
-            <Button size="lg" className="mt-4 w-full" suffix={<ArrowRightIcon />}>
-              Get Started
-            </Button>
+          <DialogClose size="lg" className="mt-4 w-full" suffix={<ArrowRightIcon />}>
+            Get Started
           </DialogClose>
         </Intro>
       </DialogContent>

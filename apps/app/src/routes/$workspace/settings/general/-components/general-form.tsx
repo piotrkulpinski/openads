@@ -2,7 +2,7 @@ import { workspaceSchema } from "@openads/db/schema"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { useNavigate, useRouter } from "@tanstack/react-router"
-import type { HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
@@ -12,7 +12,7 @@ import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { trpc } from "~/lib/trpc"
 
-export const GeneralForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
+export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
   const trpcUtils = trpc.useUtils()
   const workspace = useWorkspace()
   const navigate = useNavigate()

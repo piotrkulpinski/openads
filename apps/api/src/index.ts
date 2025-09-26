@@ -2,12 +2,12 @@ import { trpcServer } from "@hono/trpc-server"
 import { appRouter } from "@openads/trpc/router"
 import { Hono } from "hono"
 import { showRoutes } from "hono/dev"
-import { logger } from "hono/logger"
 import { createContext } from "~/context"
 import { env } from "~/env"
 import { corsMiddleware } from "~/middleware/cors"
 import { onError } from "~/middleware/on-error"
 import { auth } from "~/services/auth"
+import { loggerMiddleware } from "./middleware/logger"
 
 const app = new Hono({
   strict: false,
@@ -16,7 +16,7 @@ const app = new Hono({
 app.get("/", c => c.text("OpenAds API"))
 
 // Middlewares
-app.use("*", logger())
+app.use("*", loggerMiddleware)
 app.use("*", corsMiddleware)
 
 // TRPC

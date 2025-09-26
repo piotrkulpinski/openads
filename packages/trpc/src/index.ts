@@ -2,11 +2,12 @@ import type { Session } from "@openads/auth/server"
 import type { db } from "@openads/db"
 import { Prisma } from "@openads/db/client"
 import type { RedisClient } from "@openads/redis"
+import type { S3BucketClient } from "@openads/s3"
 import type { StripeClient } from "@openads/stripe"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import { z, ZodError } from "zod"
+import { ZodError, z } from "zod"
 
 /**
  * Context type that the API will provide
@@ -16,6 +17,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   db: typeof db
   redis: RedisClient
   stripe: StripeClient
+  s3: S3BucketClient
   env: {
     APP_URL: string
     // Add other env vars as needed

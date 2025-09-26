@@ -6,6 +6,7 @@ import { fieldRouter } from "./routers/field"
 import { onboardingRouter } from "./routers/onboarding"
 import { spotRouter } from "./routers/spot"
 import { stripeRouter } from "./routers/stripe"
+import { storageRouter } from "./routers/storage"
 import { userRouter } from "./routers/user"
 import { workspaceRouter } from "./routers/workspace"
 
@@ -18,6 +19,7 @@ export const appRouter = router({
   spot: spotRouter,
   booking: bookingRouter,
   field: fieldRouter,
+  storage: storageRouter,
 })
 
 export type AppRouter = typeof appRouter

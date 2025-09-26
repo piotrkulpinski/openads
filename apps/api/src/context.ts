@@ -4,6 +4,7 @@ import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import { env } from "~/env"
 import { auth as betterAuth } from "~/services/auth"
 import { redis } from "~/services/redis"
+import { s3 } from "~/services/s3"
 import { stripe } from "~/services/stripe"
 
 /**
@@ -14,5 +15,5 @@ import { stripe } from "~/services/stripe"
 export const createContext = async (ctx: FetchCreateContextFnOptions): Promise<Context> => {
   const auth = await betterAuth.api.getSession({ headers: ctx.req.headers })
 
-  return { ...ctx, auth, db, redis, stripe, env }
+  return { ...ctx, auth, db, redis, s3, stripe, env }
 }

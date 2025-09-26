@@ -108,7 +108,10 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 
             {price.discountPercentage > 0 && (
               <Tooltip tooltip="Discount applied based on the order value. Max 30% off.">
-                <Badge variant="outline" className="-my-1 text-green-700/90 dark:text-green-300/90">
+                <Badge
+                  variant="secondary"
+                  className="-my-1 text-green-700/90 dark:text-green-300/90"
+                >
                   {price.discountPercentage}% off
                 </Badge>
               </Tooltip>

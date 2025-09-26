@@ -1,6 +1,6 @@
 import { Button } from "@openads/ui/button"
 import { useNavigate } from "@tanstack/react-router"
-import type { HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { Card } from "~/components/ui/card"
@@ -8,7 +8,7 @@ import { Header } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { trpc } from "~/lib/trpc"
 
-export const DeleteForm = (props: HTMLAttributes<HTMLElement>) => {
+export const DeleteForm = (props: ComponentProps<"div">) => {
   const trpcUtils = trpc.useUtils()
   const { id, slug } = useWorkspace()
   const navigate = useNavigate()

@@ -5,14 +5,14 @@ import { cx } from "@openads/ui/cva"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Switch } from "@openads/ui/switch"
-import type { HTMLAttributes } from "react"
+import type { ComponentProps, HTMLAttributes } from "react"
 import { useEffect } from "react"
 import { init } from "zod-empty"
 import { useFields } from "~/contexts/fields-context"
 import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
 
-type FieldsFormProps = HTMLAttributes<HTMLElement> & {
+type FieldsFormProps = ComponentProps<"div"> & {
   field: RouterOutputs["field"]["getAll"][number]
   index: number
 }

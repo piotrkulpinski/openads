@@ -10,22 +10,21 @@ import {
 } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import type { ComponentProps, HTMLAttributes, ReactNode } from "react"
+import type { ComponentProps, ReactNode } from "react"
 import { useState } from "react"
 import { z } from "zod"
 import { HeaderDescription, HeaderRoot, HeaderTitle } from "~/components/ui/header"
 import { useZodForm } from "~/hooks/use-zod-form"
 
-type ConfirmModalProps = HTMLAttributes<HTMLButtonElement> &
-  ComponentProps<typeof Button> & {
-    label?: ReactNode
-    title?: ReactNode
-    description?: string
-    cancelLabel?: ReactNode
-    isPending?: boolean
-    onConfirm: () => void
-    confirmText?: string
-  }
+type ConfirmModalProps = ComponentProps<typeof Button> & {
+  label?: ReactNode
+  title?: ReactNode
+  description?: string
+  cancelLabel?: ReactNode
+  isPending?: boolean
+  onConfirm: () => void
+  confirmText?: string
+}
 
 export const ConfirmModal = ({
   children,
@@ -80,11 +79,7 @@ export const ConfirmModal = ({
             )}
 
             <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="secondary" size="lg">
-                  {cancelLabel}
-                </Button>
-              </DialogClose>
+              <DialogClose>{cancelLabel}</DialogClose>
 
               <Button
                 variant={variant}

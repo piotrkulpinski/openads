@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { userSchema } from "@openads/db/schema"
 import { authProcedure, router } from "../index"
 
 export const userRouter = router({
@@ -10,11 +10,11 @@ export const userRouter = router({
   }),
 
   update: authProcedure
-    .input(z.object({ email: z.string().email().optional() }))
-    .mutation(async ({ ctx: { db, user }, input }) => {
+    .input(userSchema)
+    .mutation(async ({ ctx: { db, user }, input: { ...data } }) => {
       return db.user.update({
         where: { id: user.id },
-        data: input,
+        data,
       })
     }),
 })

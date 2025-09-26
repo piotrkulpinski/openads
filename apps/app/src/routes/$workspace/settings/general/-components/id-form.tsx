@@ -3,14 +3,14 @@ import { Button } from "@openads/ui/button"
 import { Input } from "@openads/ui/input"
 import { Tooltip } from "@openads/ui/tooltip"
 import { CheckIcon, CopyIcon } from "lucide-react"
-import type { HTMLAttributes } from "react"
+import type { ComponentProps, HTMLAttributes } from "react"
 import { Card } from "~/components/ui/card"
 import { Header } from "~/components/ui/header"
 import { Prose } from "~/components/ui/prose"
 import { siteConfig } from "~/config/site"
 import { useWorkspace } from "~/contexts/workspace-context"
 
-export const IdForm = ({ ...props }: HTMLAttributes<HTMLElement>) => {
+export const IdForm = ({ ...props }: ComponentProps<"div">) => {
   const workspace = useWorkspace()
   const clipboard = useClipboard({ timeout: 3000 })
 

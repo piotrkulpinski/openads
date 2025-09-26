@@ -1,12 +1,12 @@
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
-import type { HTMLAttributes } from "react"
+import type { ComponentProps, HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { StripeIcon } from "~/components/icons/stripe"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
-type StripeConnectButtonsProps = HTMLAttributes<HTMLElement> & {
+type StripeConnectButtonsProps = ComponentProps<"div"> & {
   workspace: NonNullable<RouterOutputs["workspace"]["getBySlug"]>
   onSuccess?: () => void
 }

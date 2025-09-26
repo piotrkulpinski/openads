@@ -11,7 +11,7 @@ type LoginButtonProps = ButtonProps & {
 
 export const LoginButton = ({
   provider,
-  variant = "outline",
+  variant = "secondary",
   prefix,
   callbackURL = siteConfig.url,
   ...props
