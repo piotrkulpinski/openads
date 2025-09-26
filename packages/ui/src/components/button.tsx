@@ -10,6 +10,7 @@ const buttonVariants = cva({
   base: [
     "group/button inline-flex items-center justify-center border-transparent! font-medium text-[0.8125rem]/tight text-start rounded-md overflow-clip hover:z-10 hover:border-transparent",
     "disabled:opacity-60 disabled:pointer-events-none",
+    "has-[.lucide-loader:last-child]:[&>*:not(.animate-spin)]:text-transparent select-none",
   ],
 
   variants: {
@@ -26,9 +27,6 @@ const buttonVariants = cva({
       sm: "px-2 py-1.5 gap-[0.66ch]",
       md: "px-3 py-2 gap-[0.75ch]",
       lg: "px-4 py-2.5 gap-[1ch] rounded-lg sm:text-sm/tight",
-    },
-    isPending: {
-      true: "[&>*:not(.animate-spin)]:text-transparent select-none",
     },
   },
 
@@ -87,16 +85,15 @@ const Button = ({
   return (
     <Comp
       disabled={disabled ?? isPending}
-      className={cx(
-        boxVariants({ hover, focus }),
-        buttonVariants({ variant, size, isPending, className }),
-      )}
+      className={cx(boxVariants({ hover, focus }), buttonVariants({ variant, size, className }))}
       {...props}
     >
       <Slottable child={children} asChild={asChild}>
         {child => (
           <>
-            <Slot.Root className={buttonAffixVariants()}>{prefix}</Slot.Root>
+            <Slot.Root className={buttonAffixVariants()}>
+              {prefix && isPending ? <LoaderIcon className="animate-spin" /> : prefix}
+            </Slot.Root>
 
             {Children.count(child) > 0 && (
               <Slot.Root className="flex-1 truncate only:text-center has-[div]:contents">
@@ -106,7 +103,9 @@ const Button = ({
 
             <Slot.Root className={buttonAffixVariants()}>{suffix}</Slot.Root>
 
-            {!!isPending && <LoaderIcon className="absolute size-[1.25em] animate-spin" />}
+            {!prefix && !!isPending && (
+              <LoaderIcon className="absolute size-[1.25em] animate-spin" />
+            )}
           </>
         )}
       </Slottable>

@@ -1,3 +1,4 @@
+import { isMimeTypeMatch } from "@primoui/utils"
 import { z } from "zod"
 
 export const reservedSlugs = [
@@ -22,6 +23,14 @@ export const reservedSlugs = [
   "host",
   "www",
 ]
+
+const MAX_IMAGE_SIZE_BYTES = 1024 * 1024
+
+export const fileSchema = z
+  .instanceof(File)
+  .refine(async ({ size }) => size > 0, "File cannot be empty")
+  .refine(async ({ size }) => size < MAX_IMAGE_SIZE_BYTES, "File size must be less than 1MB")
+  .refine(async ({ type }) => isMimeTypeMatch(type, ["image/*"]), "File type is not valid")
 
 export const domainNameRegex = /^((\*\.)|((?!-)[a-z0-9-]{0,63}[a-z0-9]\.))+[a-z]{2,63}$/i
 export const slugRegex = /^(?:[a-z0-9](-?[a-z0-9])*)?$/i

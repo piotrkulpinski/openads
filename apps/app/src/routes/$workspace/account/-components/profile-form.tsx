@@ -1,14 +1,14 @@
-import { userSchema } from "@openads/db/schema"
+import { fileSchema, userSchema } from "@openads/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { getInitials, slugify } from "@primoui/utils"
+import { getInitials } from "@primoui/utils"
 import { useRouter } from "@tanstack/react-router"
-import { ImageUpIcon, Loader2Icon, Trash2Icon } from "lucide-react"
+import { ImageUpIcon, Trash2Icon } from "lucide-react"
 import { type ChangeEvent, type ComponentProps, useRef, useState } from "react"
 import { toast } from "sonner"
-import type { z } from "zod"
+import { z } from "zod"
 import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
 import { Header } from "~/components/ui/header"
@@ -20,9 +20,8 @@ import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 
 type AvatarState = {
-  dataUrl?: string
-  fileName?: string
-  contentType?: string
+  file: File | null
+  previewUrl: string | null
   isDirty: boolean
   isRemoved: boolean
 }
@@ -43,14 +42,13 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
   })
 
   const [avatar, setAvatar] = useState<AvatarState>({
-    dataUrl: user.image ?? undefined,
-    fileName: undefined,
-    contentType: undefined,
+    file: null,
+    previewUrl: user.image,
     isDirty: false,
     isRemoved: !user.image,
   })
 
-  const uploadImage = trpc.storage.user.uploadImage.useMutation({
+  const uploadImage = trpc.storage.uploadUserImage.useMutation({
     onError: error => {
       console.error(error)
       toast.error("Failed to upload image")
@@ -63,22 +61,20 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
   const isSubmitting = uploadImage.isPending || updateProfile.isPending
 
-  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleFileChange = async ({ target }: ChangeEvent<HTMLInputElement>) => {
+    const { data: file, error } = await fileSchema.safeParseAsync(target.files?.[0])
 
-    if (!file) {
+    target.value = ""
+
+    if (error) {
+      toast.error(`The selected file is not valid: ${z.treeifyError(error).errors[0]}`)
       return
     }
 
-    event.target.value = ""
-
     try {
-      const dataUrl = await fileToDataUrl(file)
-
       setAvatar({
-        dataUrl,
-        fileName: file.name,
-        contentType: file.type || "image/png",
+        file,
+        previewUrl: await fileToDataUrl(file),
         isDirty: true,
         isRemoved: false,
       })
@@ -90,20 +86,11 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
   const handleRemoveAvatar = () => {
     setAvatar(() => ({
+      file: null,
       previewUrl: null,
-      dataUrl: undefined,
-      fileName: undefined,
-      contentType: undefined,
       isDirty: true,
       isRemoved: true,
     }))
-  }
-
-  const generateObjectKey = (fileName: string) => {
-    const extension = fileName.split(".").pop()?.toLowerCase() || "png"
-    const baseName = slugify(fileName.replace(/\.[^.]+$/, "")) || "avatar"
-
-    return `${baseName}-${Date.now()}.${extension}`
   }
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
@@ -112,12 +99,11 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
       if (avatar.isRemoved && (user.image || avatar.isDirty)) {
         imagePayload = null
-      } else if (avatar.isDirty && avatar.dataUrl && avatar.contentType && avatar.fileName) {
-        const key = generateObjectKey(avatar.fileName)
+      } else if (avatar.isDirty && avatar.file && avatar.previewUrl) {
         const uploadResult = await uploadImage.mutateAsync({
-          key,
-          contentType: avatar.contentType,
-          data: avatar.dataUrl,
+          file: avatar.previewUrl,
+          fileName: avatar.file.name,
+          contentType: avatar.file.type,
           cacheControl: "public, max-age=31536000",
         })
 
@@ -132,9 +118,8 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
       form.reset({}, { keepValues: true })
 
       setAvatar({
-        dataUrl: updatedUser.image ?? undefined,
-        fileName: undefined,
-        contentType: undefined,
+        file: null,
+        previewUrl: updatedUser.image,
         isDirty: false,
         isRemoved: !updatedUser.image,
       })
@@ -165,7 +150,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
             <div className="grid gap-6 max-w-xl">
               <Stack size="lg" direction="column">
                 <Avatar className="size-14">
-                  <AvatarImage src={avatar.dataUrl ?? undefined} />
+                  <AvatarImage src={avatar.previewUrl ?? undefined} />
                   <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
 
@@ -182,20 +167,15 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
                     type="button"
                     size="sm"
                     variant="secondary"
-                    prefix={
-                      uploadImage.isPending ? (
-                        <Loader2Icon className="animate-spin" />
-                      ) : (
-                        <ImageUpIcon />
-                      )
-                    }
+                    prefix={<ImageUpIcon />}
                     onClick={() => fileInputRef.current?.click()}
+                    isPending={isSubmitting}
                     disabled={isSubmitting}
                   >
                     Change photo
                   </Button>
 
-                  {avatar.dataUrl && (
+                  {avatar.previewUrl && (
                     <Button
                       type="button"
                       size="sm"

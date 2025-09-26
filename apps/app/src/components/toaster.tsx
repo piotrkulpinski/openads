@@ -18,7 +18,7 @@ function Toaster({ className, ...props }: ComponentProps<typeof Sonner>) {
           default: "bg-background border border-border text-foreground ring-0",
           info: "bg-foreground text-background!",
           success: "bg-green-600 text-white!",
-          error: "bg-destructive text-destructive-foreground!",
+          error: "bg-destructive text-white!",
           content: "w-full",
           description: "text-muted-foreground",
           icon: "mt-0.5",
