@@ -19,7 +19,7 @@ import type {
   SignedUploadUrlOptions,
   UploadObjectOptions,
   UploadResult,
-} from "~/types"
+} from "./types"
 
 const DEFAULT_SIGNED_URL_TTL_SECONDS = 900
 

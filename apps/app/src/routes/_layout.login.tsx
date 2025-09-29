@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 import { z } from "zod"
 import { LoginButton } from "~/components/auth/login-button"
-import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { siteConfig } from "~/config/site"
 
 export const Route = createFileRoute("/_layout/login")({
@@ -11,8 +11,6 @@ export const Route = createFileRoute("/_layout/login")({
 
   loader: async ({ context }) => {
     const session = await context.trpcUtils.auth.getSession.fetch()
-
-    console.log(session)
 
     if (session?.user) {
       throw redirect({ to: "/" })
@@ -26,9 +24,9 @@ function App() {
   const { callbackURL } = Route.useSearch()
 
   return (
-    <Intro alignment="center">
-      <IntroTitle>Login to {siteConfig.name}.</IntroTitle>
-      <IntroDescription>{siteConfig.tagline}</IntroDescription>
+    <Header gap="sm" alignment="center">
+      <HeaderTitle>Login to {siteConfig.name}.</HeaderTitle>
+      <HeaderDescription>{siteConfig.tagline}</HeaderDescription>
 
       <LoginButton
         provider="google"
@@ -36,6 +34,6 @@ function App() {
         prefix={<img src="/google.svg" alt="" width={20} height={20} />}
         className="mt-6"
       />
-    </Intro>
+    </Header>
   )
 }

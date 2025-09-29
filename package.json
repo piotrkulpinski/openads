@@ -4,8 +4,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "npm run biome check --write .",
-    "format": "npm run biome format --write .",
+    "lint": "biome check --write .",
+    "format": "biome format --write .",
     "db:generate": "npm run db:generate -w packages/db",
     "db:migrate": "npm run db:migrate -w packages/db",
     "db:studio": "npm run db:studio -w packages/db",

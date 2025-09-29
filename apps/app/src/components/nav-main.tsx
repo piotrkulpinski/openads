@@ -4,7 +4,7 @@ import { TooltipContent, TooltipRoot, TooltipTrigger } from "@openads/ui/tooltip
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps, ReactNode } from "react"
 
-type NavMainItem = Omit<ComponentProps<typeof Link>, "prefix"> & {
+export type NavMainItem = Omit<ComponentProps<typeof Link>, "prefix"> & {
   prefix?: ReactNode
   label?: string
 }

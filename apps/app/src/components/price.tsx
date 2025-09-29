@@ -10,6 +10,7 @@ const defaultFormat: Format = {
   currency: "USD",
   notation: "standard",
   maximumFractionDigits: 2,
+  // @ts-expect-error - trailingZeroDisplay is not a valid property in the Format type
   trailingZeroDisplay: "stripIfInteger",
 }
 

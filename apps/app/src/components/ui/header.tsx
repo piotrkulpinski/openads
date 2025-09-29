@@ -1,7 +1,7 @@
 import { cva, cx, type VariantProps } from "@openads/ui/cva"
 import { Stack } from "@openads/ui/stack"
 import { Slot } from "radix-ui"
-import { type ComponentProps, type HTMLAttributes, isValidElement, type ReactNode } from "react"
+import { type ComponentProps, isValidElement } from "react"
 import { Heading, type HeadingProps } from "~/components/ui/heading"
 import { Prose } from "~/components/ui/prose"
 
@@ -34,11 +34,7 @@ const headerVariants = cva({
   },
 })
 
-const headerDescriptionVariants = cva({
-  base: "w-full text-pretty",
-})
-
-type HeaderRootProps = HTMLAttributes<HTMLDivElement> &
+type HeaderProps = ComponentProps<"div"> &
   VariantProps<typeof headerVariants> & {
     /**
      * If set to `true`, the button will be rendered as a child within the component.
@@ -47,27 +43,15 @@ type HeaderRootProps = HTMLAttributes<HTMLDivElement> &
     asChild?: boolean
   }
 
-export type HeaderProps = Omit<HeaderRootProps & HeadingProps, "title"> & {
-  /**
-   * Represents the title displayed on the Header.
-   */
-  title?: ReactNode
-
-  /**
-   * Represents the description displayed on the Header.
-   */
-  description?: string
-}
-
-const HeaderRoot = ({
+const Header = ({
   className,
   alignment = "left",
   gap,
   separated,
   sticky,
-  asChild = false,
+  asChild,
   ...props
-}: HeaderRootProps) => {
+}: HeaderProps) => {
   const useAsChild = asChild && isValidElement(props.children)
   const Component = useAsChild ? Slot.Root : "div"
 
@@ -83,40 +67,16 @@ const HeaderTitle = ({ size = "h3", ...props }: HeadingProps) => {
   return <Heading size={size} {...props} />
 }
 
-const HeaderDescription = ({
-  className,
-  ...props
-}: ComponentProps<typeof Prose> & VariantProps<typeof headerDescriptionVariants>) => {
+const HeaderDescription = ({ ...props }: ComponentProps<typeof Prose>) => {
   return (
     <div className="w-full">
-      <Prose className={cx(headerDescriptionVariants({ className }))} {...props} />
+      <Prose {...props} />
     </div>
   )
 }
 
-const HeaderBase = ({
-  children,
-  title,
-  description,
-  size = "h3",
-  alignment = "left",
-  gap = "lg",
-  separated = false,
-  ...props
-}: HeaderProps) => {
-  return (
-    <HeaderRoot alignment={alignment} gap={gap} separated={separated} {...props}>
-      {title && <HeaderTitle size={size}>{title}</HeaderTitle>}
-      {children && <Stack>{children}</Stack>}
-      {description && <HeaderDescription>{description}</HeaderDescription>}
-    </HeaderRoot>
-  )
+const HeaderActions = ({ className, ...props }: ComponentProps<typeof Stack>) => {
+  return <Stack className={cx("-my-0.5", className)} {...props} />
 }
 
-const Header = Object.assign(HeaderBase, {
-  Root: HeaderRoot,
-  Title: HeaderTitle,
-  Description: HeaderDescription,
-})
-
-export { HeaderRoot, HeaderTitle, HeaderDescription, Header }
+export { Header, HeaderTitle, HeaderDescription, HeaderActions }

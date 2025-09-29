@@ -4,7 +4,7 @@ import type { Field } from "@openads/db/client"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { GripVerticalIcon, Rows3Icon } from "lucide-react"
-import type { ComponentProps, HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { fieldsConfig } from "~/config/fields"
 import { useFields } from "~/contexts/fields-context"
 

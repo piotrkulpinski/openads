@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Loader2Icon, PlusIcon, Rows3Icon, TrashIcon } from "lucide-react"
-import type { ComponentProps, HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H6 } from "~/components/ui/heading"
 import { fieldsConfig } from "~/config/fields"

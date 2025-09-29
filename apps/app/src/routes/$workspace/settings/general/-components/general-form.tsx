@@ -2,12 +2,11 @@ import { workspaceSchema } from "@openads/db/schema"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { useNavigate, useRouter } from "@tanstack/react-router"
-import { CheckIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
-import { Header } from "~/components/ui/header"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
@@ -53,11 +52,10 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
       >
         <Form {...form}>
           <Card.Section>
-            <Header
-              size="h4"
-              title="Update Workspace"
-              description="View and update your workspace details."
-            />
+            <Header>
+              <HeaderTitle size="h4">Update Workspace</HeaderTitle>
+              <HeaderDescription>View and update your workspace details.</HeaderDescription>
+            </Header>
 
             <div className="grid gap-6 sm:grid-cols-2 max-w-xl">
               <FormField

@@ -3,9 +3,9 @@ import { Button } from "@openads/ui/button"
 import { Input } from "@openads/ui/input"
 import { Tooltip } from "@openads/ui/tooltip"
 import { CheckIcon, CopyIcon } from "lucide-react"
-import type { ComponentProps, HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { Card } from "~/components/ui/card"
-import { Header } from "~/components/ui/header"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { Prose } from "~/components/ui/prose"
 import { siteConfig } from "~/config/site"
 import { useWorkspace } from "~/contexts/workspace-context"
@@ -17,11 +17,10 @@ export const IdForm = ({ ...props }: ComponentProps<"div">) => {
   return (
     <Card {...props}>
       <Card.Section>
-        <Header
-          size="h4"
-          title="Workspace ID"
-          description={`Unique ID of your workspace on ${siteConfig.name}.`}
-        />
+        <Header>
+          <HeaderTitle size="h4">Workspace ID</HeaderTitle>
+          <HeaderDescription>Unique ID of your workspace on {siteConfig.name}.</HeaderDescription>
+        </Header>
 
         <div className="relative max-w-xl">
           <Input readOnly value={workspace.id} />

@@ -8,7 +8,7 @@ import {
 import { ArrowRightIcon } from "lucide-react"
 import type { Dispatch, SetStateAction } from "react"
 import { useCallback, useMemo, useState } from "react"
-import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { LogoSymbol } from "~/components/ui/logo-symbol"
 import { siteConfig } from "~/config/site"
 
@@ -34,22 +34,22 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
           <LogoSymbol className="size-12" />
         </div>
 
-        <Intro alignment="center" className="max-w-sm mx-auto">
+        <Header gap="sm" alignment="center" className="max-w-sm mx-auto">
           <DialogTitle asChild>
-            <IntroTitle>Welcome to {siteConfig.name}!</IntroTitle>
+            <HeaderTitle>Welcome to {siteConfig.name}!</HeaderTitle>
           </DialogTitle>
 
           <DialogDescription asChild>
-            <IntroDescription className="max-w-md">
+            <HeaderDescription className="max-w-md">
               Thanks for signing up – your account is ready to go! You now have a central, organized
               place to manage all your ad zones and campaigns.
-            </IntroDescription>
+            </HeaderDescription>
           </DialogDescription>
 
           <DialogClose size="lg" className="mt-4 w-full" suffix={<ArrowRightIcon />}>
             Get Started
           </DialogClose>
-        </Intro>
+        </Header>
       </DialogContent>
     </Dialog>
   )

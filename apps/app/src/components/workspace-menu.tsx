@@ -48,7 +48,7 @@ export const WorkspaceMenu = () => {
   )
 
   if (isFetching) {
-    return <NavButtonSkeleton suffix={<ChevronDownIcon />} />
+    return <NavButtonSkeleton />
   }
 
   return (

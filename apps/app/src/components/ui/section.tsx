@@ -1,6 +1,6 @@
 import { cva, cx, type VariantProps } from "@openads/ui/cva"
 import { Slot } from "radix-ui"
-import { type ComponentProps, type HTMLAttributes, isValidElement } from "react"
+import { type ComponentProps, isValidElement } from "react"
 
 const sectionVariants = cva({
   base: "@container/section flex flex-col gap-6 md:gap-8",

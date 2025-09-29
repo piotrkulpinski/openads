@@ -29,7 +29,7 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
   const { data: user, isFetching } = trpc.user.me.useQuery()
 
   if (!user || isFetching) {
-    return <NavButtonSkeleton suffix={<ChevronUpIcon />} />
+    return <NavButtonSkeleton />
   }
 
   const handleLogout = () => {

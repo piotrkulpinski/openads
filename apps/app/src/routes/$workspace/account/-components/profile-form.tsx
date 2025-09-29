@@ -12,7 +12,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
-import { Header } from "~/components/ui/header"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { fileToDataUrl } from "~/lib/helpers"
@@ -141,11 +141,13 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
       <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <Form {...form}>
           <Card.Section>
-            <Header
-              size="h4"
-              title="Profile"
-              description="Update your personal details and how other users see you across the platform."
-            />
+            <Header>
+              <HeaderTitle size="h4">Profile</HeaderTitle>
+
+              <HeaderDescription>
+                Update your personal details and how other users see you across the platform.
+              </HeaderDescription>
+            </Header>
 
             <div className="grid gap-6 max-w-xl">
               <Stack size="lg" direction="column">

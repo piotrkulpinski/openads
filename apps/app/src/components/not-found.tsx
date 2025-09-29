@@ -1,20 +1,20 @@
 import { Button } from "@openads/ui/button"
 import { Link } from "@tanstack/react-router"
-import { Intro, IntroDescription, IntroTitle } from "~/components/ui/intro"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 
 export const NotFound = () => {
   return (
-    <Intro className="mx-auto w-full lg:max-w-3xl">
-      <IntroTitle>404 Not Found</IntroTitle>
+    <Header>
+      <HeaderTitle>404 Not Found</HeaderTitle>
 
-      <IntroDescription className="max-w-md">
+      <HeaderDescription size="md" className="max-w-lg">
         We're sorry, but the page could not be found. You may have mistyped the address or the page
         may have moved.
-      </IntroDescription>
+      </HeaderDescription>
 
-      <Button size="lg" className="mt-4" asChild>
+      <Button size="lg" className="mt-2" asChild>
         <Link to="/">Go back home</Link>
       </Button>
-    </Intro>
+    </Header>
   )
 }

@@ -1,25 +1,61 @@
 import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
+import { Skeleton } from "@openads/ui/skeleton"
 import {
-  CalendarDays,
-  Code2,
+  CalendarDaysIcon,
+  Code2Icon,
   LayoutDashboardIcon,
-  Megaphone,
-  MousePointer2,
-  Settings,
+  MegaphoneIcon,
+  MousePointer2Icon,
+  SettingsIcon,
 } from "lucide-react"
-import { type HTMLAttributes, useState } from "react"
-import { EmbedModal } from "~/components/modals/embed-modal"
+import { type ComponentProps, Fragment } from "react"
 import { Nav } from "~/components/nav"
-import { NavMain } from "~/components/nav-main"
+import { NavButtonSkeleton } from "~/components/nav-button"
+import { NavMain, type NavMainItem } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 import { useWorkspace } from "~/contexts/workspace-context"
 
-export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
-  const { slug: workspaceSlug } = useWorkspace()
-  const [embedOpen, setEmbedOpen] = useState(false)
+const navs: NavMainItem[][] = [
+  [
+    {
+      title: "Dashboard",
+      to: "/",
+      prefix: <LayoutDashboardIcon />,
+      activeOptions: { exact: true },
+    },
+    {
+      title: "Ad Zones",
+      to: "/zones",
+      prefix: <MousePointer2Icon />,
+    },
+    {
+      title: "Campaigns",
+      to: "/campaigns",
+      prefix: <CalendarDaysIcon />,
+    },
+    {
+      title: "Advertisers",
+      to: "/advertisers",
+      prefix: <MegaphoneIcon />,
+    },
+    {
+      title: "Settings",
+      to: "/settings",
+      prefix: <SettingsIcon />,
+    },
+  ],
+  [
+    {
+      title: "Embed",
+      to: "/embed",
+      prefix: <Code2Icon />,
+    },
+  ],
+]
 
+const SidebarWrapper = ({ className, ...props }: ComponentProps<"div">) => {
   return (
     <div
       className={cx(
@@ -27,66 +63,60 @@ export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>)
         className,
       )}
       {...props}
-    >
+    />
+  )
+}
+
+const Sidebar = ({ ...props }: ComponentProps<typeof SidebarWrapper>) => {
+  const { slug: workspaceSlug } = useWorkspace()
+
+  return (
+    <SidebarWrapper {...props}>
       <Nav>
         <WorkspaceMenu />
       </Nav>
 
-      <Separator />
+      {navs.map((nav, index) => (
+        <Fragment key={index}>
+          <Separator />
 
-      <Nav>
-        <NavMain
-          items={[
-            {
-              title: "Dashboard",
-              to: `/${workspaceSlug}`,
-              prefix: <LayoutDashboardIcon />,
-              activeOptions: { exact: true },
-            },
-            {
-              title: "Ad Zones",
-              to: `/${workspaceSlug}/zones`,
-              prefix: <MousePointer2 />,
-            },
-            {
-              title: "Campaigns",
-              to: `/${workspaceSlug}/campaigns`,
-              prefix: <CalendarDays />,
-            },
-            {
-              title: "Advertisers",
-              to: `/${workspaceSlug}/advertisers`,
-              prefix: <Megaphone />,
-            },
-            {
-              title: "Settings",
-              to: `/${workspaceSlug}/settings`,
-              prefix: <Settings />,
-            },
-          ]}
-        />
-      </Nav>
-
-      <Separator />
-
-      <Nav>
-        <NavMain
-          items={[
-            {
-              title: "Embed",
-              to: "#",
-              prefix: <Code2 />,
-              onClick: () => setEmbedOpen(true),
-            },
-          ]}
-        />
-      </Nav>
-
-      <EmbedModal open={embedOpen} onOpenChange={setEmbedOpen} />
+          <Nav>
+            <NavMain items={nav.map(link => ({ ...link, to: `/${workspaceSlug}${link.to}` }))} />
+          </Nav>
+        </Fragment>
+      ))}
 
       <Nav className="mt-auto">
         <UserMenu />
       </Nav>
-    </div>
+    </SidebarWrapper>
   )
 }
+
+const SidebarSkeleton = ({ ...props }: ComponentProps<typeof SidebarWrapper>) => {
+  return (
+    <SidebarWrapper {...props}>
+      <Nav>
+        <NavButtonSkeleton />
+      </Nav>
+
+      {navs.map((nav, index) => (
+        <Fragment key={index}>
+          <Separator />
+
+          <Nav>
+            {Array.from({ length: nav.length }).map((_, index) => (
+              <Skeleton key={index} className="h-10" />
+            ))}
+          </Nav>
+        </Fragment>
+      ))}
+
+      <Nav className="mt-auto">
+        <NavButtonSkeleton />
+      </Nav>
+    </SidebarWrapper>
+  )
+}
+
+export { Sidebar, SidebarSkeleton }

@@ -1,10 +1,9 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
-import { Stack } from "@openads/ui/stack"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { PlusIcon } from "lucide-react"
 import { QueryCell } from "~/components/query-cell"
-import { H3 } from "~/components/ui/heading"
+import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { ZoneItem } from "~/components/zones/zone-item"
 import { trpc } from "~/lib/trpc"
 
@@ -18,15 +17,17 @@ function ZonesIndexPage() {
 
   return (
     <>
-      <Stack className="justify-between">
-        <H3>Ad Zones</H3>
+      <Header>
+        <HeaderTitle>Ad Zones</HeaderTitle>
 
-        <Button prefix={<PlusIcon />} className="-my-1" asChild>
-          <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
-            Create Zone
-          </Link>
-        </Button>
-      </Stack>
+        <HeaderActions>
+          <Button prefix={<PlusIcon />} asChild>
+            <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+              Create Zone
+            </Link>
+          </Button>
+        </HeaderActions>
+      </Header>
 
       <QueryCell
         query={zonesQuery}

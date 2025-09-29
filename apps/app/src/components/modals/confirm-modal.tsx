@@ -13,7 +13,7 @@ import { Input } from "@openads/ui/input"
 import type { ComponentProps, ReactNode } from "react"
 import { useState } from "react"
 import { z } from "zod"
-import { HeaderDescription, HeaderRoot, HeaderTitle } from "~/components/ui/header"
+import { HeaderDescription, Header, HeaderTitle } from "~/components/ui/header"
 import { useZodForm } from "~/hooks/use-zod-form"
 
 type ConfirmModalProps = ComponentProps<typeof Button> & {
@@ -50,7 +50,7 @@ export const ConfirmModal = ({
       <Form {...form}>
         <DialogContent>
           <form onSubmit={form.handleSubmit(onConfirm)} className="flex flex-col gap-6">
-            <HeaderRoot>
+            <Header>
               <DialogTitle asChild>
                 <HeaderTitle size="h4">{title}</HeaderTitle>
               </DialogTitle>
@@ -58,7 +58,7 @@ export const ConfirmModal = ({
               <DialogDescription asChild>
                 <HeaderDescription>{description}</HeaderDescription>
               </DialogDescription>
-            </HeaderRoot>
+            </Header>
 
             {!!confirmText && (
               <FormField

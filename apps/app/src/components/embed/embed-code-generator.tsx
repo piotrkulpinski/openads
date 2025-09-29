@@ -8,34 +8,33 @@ import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import { useState } from "react"
-import { QueryCell } from "~/components/query-cell"
-import { trpc } from "~/lib/trpc"
+import { useWorkspace } from "~/contexts/workspace-context"
+import type { RouterOutputs } from "~/lib/trpc"
 
 interface Props {
-  workspaceId: string
+  zones: RouterOutputs["zone"]["getAll"]
 }
 
-export function EmbedCodeGenerator({ workspaceId }: Props) {
+export function EmbedCodeGenerator({ zones }: Props) {
   const clipboard = useClipboard({ timeout: 3000 })
+  const workspace = useWorkspace()
   const [theme, setTheme] = useState("light")
   const [layout, setLayout] = useState("default")
   const [width, setWidth] = useState("100%")
   const [height, setHeight] = useState("500px")
-  const [selectedZoneIds, setSelectedZoneIds] = useState<string[]>([])
-
-  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId })
+  const [selectedZones, setSelectedZones] = useState<string[]>(zones.map(zone => zone.id))
 
   const elementId = "openads-inline"
 
   const embedCode = `<!-- OpenAds Embed Code -->
 <div style="width:${width};height:${height};overflow:scroll" id="${elementId}"></div>
 <script type="text/javascript">
-  (function(O,A,L){let p=function(a,ar){a.q.push(ar);};let d=O.document;O.OpenAds=O.OpenAds||function(){if(!O._openAdsAPI){O._openAdsAPI=new OpenAdsAPI();}p(O._openAdsAPI,Array.from(arguments));};class OpenAdsAPI{constructor(){this.q=[];this.processQueue();}processQueue(){while(this.q.length>0){const args=this.q.shift();const[method,...params]=args;if(method===L){const[{workspaceId,elementOrSelector,zoneIds=[],theme,layout}]=params;if(!workspaceId){console.error("OpenAds: workspaceId is required");return;}const element=typeof elementOrSelector==="string"?d.querySelector(elementOrSelector):elementOrSelector;if(!element){console.error("OpenAds: Element not found:",elementOrSelector);return;}const params=new URLSearchParams({workspaceId,zoneIds:zoneIds.join(","),theme,layout});const wrapper=d.createElement("div");wrapper.style.cssText="width:100%;height:100%;overflow:scroll";this.frame=d.createElement("iframe");this.frame.style.cssText="border:none;width:100%;height:100%;min-height:400px";this.frame.src=\`${window.location.origin}/embed?\${params}\`;wrapper.appendChild(this.frame);element.appendChild(wrapper);O.addEventListener("message",event=>{if(event.origin!==O.location.origin)return;if(event.data.type==="resize"&&this.frame){this.frame.style.height=\`\${event.data.height}px\`;}});}}}};})(window,"${window.location.origin}/embed.js","init");
+  (function(O,A,L){let p=function(a,ar){a.q.push(ar);};let d=O.document;O.OpenAds=O.OpenAds||function(){if(!O._openAdsAPI){O._openAdsAPI=new OpenAdsAPI();}p(O._openAdsAPI,Array.from(arguments));};class OpenAdsAPI{constructor(){this.q=[];this.processQueue();}processQueue(){while(this.q.length>0){const args=this.q.shift();const[method,...params]=args;if(method===L){const[{workspace,elementOrSelector,zones=[],theme,layout}]=params;if(!workspace){console.error("OpenAds: workspace is required");return;}const element=typeof elementOrSelector==="string"?d.querySelector(elementOrSelector):elementOrSelector;if(!element){console.error("OpenAds: Element not found:",elementOrSelector);return;}const params=new URLSearchParams({workspace,zones:zones.join(","),theme,layout});const wrapper=d.createElement("div");wrapper.style.cssText="width:100%;height:100%;overflow:scroll";this.frame=d.createElement("iframe");this.frame.style.cssText="border:none;width:100%;height:100%;min-height:400px";this.frame.src=\`${window.location.origin}/embed?\${params}\`;wrapper.appendChild(this.frame);element.appendChild(wrapper);O.addEventListener("message",event=>{if(event.origin!==O.location.origin)return;if(event.data.type==="resize"&&this.frame){this.frame.style.height=\`\${event.data.height}px\`;}});}}}};})(window,"${window.location.origin}/embed.js","init");
 
   OpenAds("init", {
-    workspaceId: "${workspaceId}",
     elementOrSelector: "#${elementId}",
-    zoneIds: ${JSON.stringify(selectedZoneIds)},
+    workspace: "${workspace.id}",
+    zones: ${JSON.stringify(selectedZones)},
     theme: "${theme}",
     layout: "${layout}"
   });
@@ -43,8 +42,16 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
 <!-- OpenAds Embed Code End -->`
 
   const toggleZone = (zoneId: string) => {
-    setSelectedZoneIds(prev =>
+    setSelectedZones(prev =>
       prev.includes(zoneId) ? prev.filter(id => id !== zoneId) : [...prev, zoneId],
+    )
+  }
+
+  if (zones.length === 0) {
+    return (
+      <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+        No ad zones available yet. Create a zone to embed it here.
+      </div>
     )
   }
 
@@ -53,27 +60,21 @@ export function EmbedCodeGenerator({ workspaceId }: Props) {
       <Stack size="lg" direction="column">
         <Label>Select Ad Zones</Label>
 
-        <QueryCell
-          query={zonesQuery}
-          pending={() => <div className="p-4">Loading zones...</div>}
-          success={({ data }) => (
-            <Stack direction="column">
-              {data.map(zone => (
-                <div key={zone.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={zone.id}
-                    checked={selectedZoneIds.includes(zone.id)}
-                    onCheckedChange={() => toggleZone(zone.id)}
-                  />
+        <Stack direction="column">
+          {zones.map(({ id, name }) => (
+            <div key={id} className="flex items-center space-x-2">
+              <Checkbox
+                id={id}
+                checked={selectedZones.includes(id)}
+                onCheckedChange={() => toggleZone(id)}
+              />
 
-                  <Label htmlFor={zone.id} className="font-normal">
-                    {zone.name}
-                  </Label>
-                </div>
-              ))}
-            </Stack>
-          )}
-        />
+              <Label htmlFor={id} className="font-normal">
+                {name}
+              </Label>
+            </div>
+          ))}
+        </Stack>
       </Stack>
 
       <div className="grid grid-cols-2 gap-4">

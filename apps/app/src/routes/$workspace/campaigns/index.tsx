@@ -1,11 +1,10 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
-import { Stack } from "@openads/ui/stack"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { PlusIcon } from "lucide-react"
 import { CampaignItem } from "~/components/campaigns/campaign-item"
 import { QueryCell } from "~/components/query-cell"
-import { H3 } from "~/components/ui/heading"
+import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspace/campaigns/")({
@@ -18,15 +17,17 @@ function CampaignsIndexPage() {
 
   return (
     <>
-      <Stack className="justify-between">
-        <H3>Campaigns</H3>
+      <Header>
+        <HeaderTitle>Campaigns</HeaderTitle>
 
-        <Button prefix={<PlusIcon />} className="-my-1" asChild>
-          <Link to="/$workspace/campaigns/new" params={{ workspace: workspace.slug }}>
-            Create Campaign
-          </Link>
-        </Button>
-      </Stack>
+        <HeaderActions>
+          <Button prefix={<PlusIcon />} asChild>
+            <Link to="/$workspace/campaigns/new" params={{ workspace: workspace.slug }}>
+              Create Campaign
+            </Link>
+          </Button>
+        </HeaderActions>
+      </Header>
 
       <QueryCell
         query={campaignsQuery}
