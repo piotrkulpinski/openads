@@ -44,13 +44,13 @@ export const Sidebar = ({ className, ...props }: HTMLAttributes<HTMLDivElement>)
               activeOptions: { exact: true },
             },
             {
-              title: "Ad Spots",
-              to: `/${workspaceSlug}/spots`,
+              title: "Ad Zones",
+              to: `/${workspaceSlug}/zones`,
               prefix: <MousePointer2 />,
             },
             {
-              title: "Bookings",
-              to: `/${workspaceSlug}/bookings`,
+              title: "Campaigns",
+              to: `/${workspaceSlug}/campaigns`,
               prefix: <CalendarDays />,
             },
             {

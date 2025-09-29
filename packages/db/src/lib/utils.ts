@@ -16,8 +16,9 @@ export const generateId = (prefix?: string, length = 21) => {
     Session: "ses",
     Verification: "ver",
     Workspace: "ws",
-    Spot: "spt",
-    Booking: "bkg",
+    Advertiser: "adv",
+    Zone: "zne",
+    Campaign: "cmp",
     Field: "fld",
     Subscription: "sub",
   }

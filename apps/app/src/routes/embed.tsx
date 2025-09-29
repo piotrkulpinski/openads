@@ -1,16 +1,16 @@
+import { Stack } from "@openads/ui/stack"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
 import { LoaderIcon } from "lucide-react"
 import { z } from "zod"
-import { EmbedBooking } from "~/components/embed/embed-booking"
+import { EmbedCampaign } from "~/components/embed/embed-campaign"
 import { QueryCell } from "~/components/query-cell"
 import { Logo } from "~/components/ui/logo"
-import { Stack } from "~/components/ui/stack"
-import { BookingProvider } from "~/contexts/booking-context"
+import { CampaignProvider } from "~/contexts/campaign-context"
 import { trpc } from "~/lib/trpc"
 
 const defaultValues = {
   workspaceId: "",
-  spotIds: "",
+  zoneIds: "",
   theme: "auto",
   layout: "default",
 } as const
@@ -18,7 +18,7 @@ const defaultValues = {
 export const Route = createFileRoute("/embed")({
   validateSearch: z.object({
     workspaceId: z.string().default(defaultValues.workspaceId),
-    spotIds: z.string().default(defaultValues.spotIds),
+    zoneIds: z.string().default(defaultValues.zoneIds),
     theme: z.enum(["auto", "light", "dark"]).catch(defaultValues.theme),
     layout: z.enum(["default", "grid"]).catch(defaultValues.layout),
   }),
@@ -27,10 +27,10 @@ export const Route = createFileRoute("/embed")({
     middlewares: [stripSearchParams(defaultValues)],
   },
 
-  component: SpotEmbed,
+  component: ZoneEmbed,
 })
 
-function SpotEmbed() {
+function ZoneEmbed() {
   const { workspaceId } = Route.useSearch()
 
   // useEffect(() => {
@@ -46,7 +46,7 @@ function SpotEmbed() {
   //   return () => observer.disconnect()
   // }, [])
 
-  const spotsQuery = trpc.spot.public.getAll.useQuery({ workspaceId }, { enabled: !!workspaceId })
+  const zonesQuery = trpc.zone.public.getAll.useQuery({ workspaceId }, { enabled: !!workspaceId })
 
   if (!workspaceId) {
     return (
@@ -59,20 +59,20 @@ function SpotEmbed() {
   return (
     <>
       <QueryCell
-        query={spotsQuery}
+        query={zonesQuery}
         pending={() => <LoaderIcon className="animate-spin mx-auto mt-[5vh]" />}
         error={() => (
-          <p className="text-red-500 text-center">There was an error loading the ad spots.</p>
+          <p className="text-red-500 text-center">There was an error loading the ad zones.</p>
         )}
         empty={() => (
           <p className="text-muted-foreground text-center">
-            No ad spots added for this workspace yet.
+            No ad zones added for this workspace yet.
           </p>
         )}
         success={({ data }) => (
-          <BookingProvider spots={data}>
-            <EmbedBooking />
-          </BookingProvider>
+          <CampaignProvider zones={data}>
+            <EmbedCampaign />
+          </CampaignProvider>
         )}
       />
 

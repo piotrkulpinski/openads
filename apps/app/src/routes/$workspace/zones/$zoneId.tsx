@@ -1,39 +1,39 @@
 import { Button } from "@openads/ui/button"
+import { Stack } from "@openads/ui/stack"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { Rows3Icon } from "lucide-react"
 import { FieldsModal } from "~/components/modals/fields-modal"
-import { SpotForm } from "~/components/spots/spot-form"
 import { H3 } from "~/components/ui/heading"
-import { Stack } from "~/components/ui/stack"
+import { ZoneForm } from "~/components/zones/zone-form"
 import { FieldsProvider } from "~/contexts/fields-context"
 
-export const Route = createFileRoute("/$workspace/spots/$spotId")({
-  loader: async ({ context: { trpcUtils, workspace }, params: { spotId } }) => {
-    const spot = await trpcUtils.spot.getById.fetch({
-      id: spotId,
+export const Route = createFileRoute("/$workspace/zones/$zoneId")({
+  loader: async ({ context: { trpcUtils, workspace }, params: { zoneId } }) => {
+    const zone = await trpcUtils.zone.getById.fetch({
+      id: zoneId,
       workspaceId: workspace.id,
     })
 
-    if (!spot) {
+    if (!zone) {
       throw notFound()
     }
 
-    return { spot }
+    return { zone }
   },
 
-  component: SpotsEditPage,
+  component: ZonesEditPage,
 })
 
-function SpotsEditPage() {
+function ZonesEditPage() {
   const { workspace } = Route.useRouteContext()
-  const { spot } = Route.useLoaderData()
+  const { zone } = Route.useLoaderData()
 
   return (
     <>
       <Stack className="justify-between">
-        <H3>Edit Ad Spot</H3>
+        <H3>Edit Ad Zone</H3>
 
-        <FieldsProvider spot={spot}>
+        <FieldsProvider zone={zone}>
           <FieldsModal>
             <Button prefix={<Rows3Icon />} className="-my-1">
               Edit Custom Fields
@@ -42,9 +42,9 @@ function SpotsEditPage() {
         </FieldsProvider>
       </Stack>
 
-      <SpotForm
+      <ZoneForm
         workspaceId={workspace.id}
-        spot={spot}
+        zone={zone}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"
       />

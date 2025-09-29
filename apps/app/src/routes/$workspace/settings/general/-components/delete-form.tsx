@@ -35,7 +35,7 @@ export const DeleteForm = (props: ComponentProps<"div">) => {
         <Header
           size="h4"
           title="Delete Workspace"
-          description="The will permanently delete the current workspace, including its ad spots and bookings. This action cannot be undone - please proceed with caution."
+          description="The will permanently delete the current workspace, including its ad zones and campaigns. This action cannot be undone - please proceed with caution."
         />
       </Card.Panel>
 

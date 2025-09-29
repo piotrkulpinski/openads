@@ -76,18 +76,18 @@ async function handleConnectAccountUpdate(account: Stripe.Account) {
 }
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const booking = await db.booking.findFirst({
+  const campaign = await db.campaign.findFirst({
     where: { stripePaymentIntentId: paymentIntent.id },
   })
 
-  if (!booking) return
+  if (!campaign) return
 
   // Calculate fees
   const stripeFee = Math.round(paymentIntent.application_fee_amount || 0)
-  const platformFee = Math.round((booking.amount * 10) / 100) // 10% platform fee
+  const platformFee = Math.round((campaign.amount * 10) / 100) // 10% platform fee
 
-  await db.booking.update({
-    where: { id: booking.id },
+  await db.campaign.update({
+    where: { id: campaign.id },
     data: {
       status: "paid",
       stripeFee,
@@ -97,14 +97,14 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 }
 
 async function handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
-  const booking = await db.booking.findFirst({
+  const campaign = await db.campaign.findFirst({
     where: { stripePaymentIntentId: paymentIntent.id },
   })
 
-  if (!booking) return
+  if (!campaign) return
 
-  await db.booking.update({
-    where: { id: booking.id },
+  await db.campaign.update({
+    where: { id: campaign.id },
     data: {
       status: "failed",
     },
@@ -112,15 +112,15 @@ async function handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
 }
 
 async function handleTransferCreated(transfer: Stripe.Transfer) {
-  // Find booking by payment intent ID from metadata
-  const booking = await db.booking.findFirst({
+  // Find campaign by payment intent ID from metadata
+  const campaign = await db.campaign.findFirst({
     where: { stripePaymentIntentId: transfer.metadata?.payment_intent },
   })
 
-  if (!booking) return
+  if (!campaign) return
 
-  await db.booking.update({
-    where: { id: booking.id },
+  await db.campaign.update({
+    where: { id: campaign.id },
     data: { stripeTransferId: transfer.id },
   })
 }

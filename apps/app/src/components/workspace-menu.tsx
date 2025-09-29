@@ -1,7 +1,6 @@
 import { useHotkeys } from "@mantine/hooks"
 import type { Workspace } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
-import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import {
   DropdownMenu,
@@ -12,18 +11,15 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
-import { useIsMobile } from "@openads/ui/hooks"
 import { useNavigate } from "@tanstack/react-router"
 import { Check, ChevronDownIcon, Plus } from "lucide-react"
-import { ComponentProps } from "react"
 import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { trpc, trpcUtils } from "~/lib/trpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
-export const WorkspaceMenu = ({ className, ...props }: ComponentProps<typeof Button>) => {
-  const isMobile = useIsMobile()
+export const WorkspaceMenu = () => {
   const activeWorkspace = useWorkspace()
   const navigate = useNavigate()
 

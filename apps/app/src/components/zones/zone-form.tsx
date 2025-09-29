@@ -1,9 +1,10 @@
-import { type SpotSchema, spotSchema } from "@openads/db/schema"
+import { type ZoneSchema, zoneSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
+import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
 import { Tooltip } from "@openads/ui/tooltip"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
@@ -13,20 +14,19 @@ import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
-import { Stack } from "~/components/ui/stack"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 import type { router } from "~/main"
 
-type SpotFormProps = HTMLAttributes<HTMLFormElement> & {
+type ZoneFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
 
   /**
-   * The spot to edit
+   * The zone to edit
    */
-  spot?: RouterOutputs["spot"]["getAll"][number]
+  zone?: RouterOutputs["zone"]["getAll"][number]
 
   /**
    * Allows to redirect to a url after the mutation is successful
@@ -36,40 +36,40 @@ type SpotFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
    * A callback to call when the mutation is successful
    */
-  onSuccess?: (data: RouterOutputs["spot"]["create"]) => void
+  onSuccess?: (data: RouterOutputs["zone"]["create"]) => void
 }
 
-export const SpotForm = ({
+export const ZoneForm = ({
   children,
   className,
   workspaceId,
-  spot,
+  zone,
   nextUrl,
   onSuccess: onSuccessCallback,
   ...props
-}: SpotFormProps) => {
+}: ZoneFormProps) => {
   const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
-  const isEditing = !!spot?.id
+  const isEditing = !!zone?.id
 
-  const form = useZodForm(spotSchema, {
+  const form = useZodForm(zoneSchema, {
     defaultValues: {
-      ...init(spotSchema),
-      ...spot,
+      ...init(zoneSchema),
+      ...zone,
     },
   })
 
-  const onSuccess = async (data: RouterOutputs["spot"]["create"]) => {
+  const onSuccess = async (data: RouterOutputs["zone"]["create"]) => {
     // If we have a nextUrl, navigate to it
     nextUrl && navigate(nextUrl)
 
     // Show a success toast
-    toast.success(`Spot ${isEditing ? "updated" : "created"} successfully`)
+    toast.success(`Zone ${isEditing ? "updated" : "created"} successfully`)
 
-    // Invalidate the spots cache
-    await utils.spot.getAll.invalidate({ workspaceId })
-    await utils.spot.getById.invalidate({ id: spot?.id, workspaceId })
+    // Invalidate the zones cache
+    await utils.zone.getAll.invalidate({ workspaceId })
+    await utils.zone.getById.invalidate({ id: zone?.id, workspaceId })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
@@ -82,17 +82,17 @@ export const SpotForm = ({
     handleError({ error, form })
   }
 
-  const createSpot = trpc.spot.create.useMutation({ onSuccess, onError })
-  const updateSpot = trpc.spot.update.useMutation({ onSuccess, onError })
-  const isPending = createSpot.isPending || updateSpot.isPending
+  const createZone = trpc.zone.create.useMutation({ onSuccess, onError })
+  const updateZone = trpc.zone.update.useMutation({ onSuccess, onError })
+  const isPending = createZone.isPending || updateZone.isPending
 
   // Handle the form submission
-  const onSubmit = (data: SpotSchema) => {
+  const onSubmit = (data: ZoneSchema) => {
     if (isEditing) {
-      return updateSpot.mutate({ ...data, id: spot.id, workspaceId })
+      return updateZone.mutate({ ...data, id: zone.id, workspaceId })
     }
 
-    return createSpot.mutate({ ...data, workspaceId })
+    return createZone.mutate({ ...data, workspaceId })
   }
 
   return (
@@ -186,9 +186,8 @@ export const SpotForm = ({
         />
 
         <DialogFooter className="mt-2 col-span-full">
+          <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Zone</FormButton>
           {children}
-
-          <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Spot</FormButton>
         </DialogFooter>
       </form>
     </Form>

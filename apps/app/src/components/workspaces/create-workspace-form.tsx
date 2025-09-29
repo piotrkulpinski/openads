@@ -1,10 +1,12 @@
 import { workspaceSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
+import { Avatar, AvatarImage } from "@openads/ui/avatar"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { slugify } from "@primoui/utils"
+import { Stack } from "@openads/ui/stack"
+import { isValidUrl, slugify } from "@primoui/utils"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
@@ -13,6 +15,7 @@ import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
+import { getWebsiteFavicon } from "~/lib/helpers"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
@@ -124,9 +127,17 @@ export const CreateWorkspaceForm = ({
             <FormItem className="col-span-full">
               <FormLabel>Website URL</FormLabel>
 
-              <FormControl>
-                <Input type="url" placeholder="https://acme.com" {...field} />
-              </FormControl>
+              <Stack className="w-full" wrap={false}>
+                <FormControl>
+                  <Input type="url" placeholder="https://acme.com" {...field} />
+                </FormControl>
+
+                {isValidUrl(field.value) && (
+                  <Avatar className="size-8">
+                    <AvatarImage src={getWebsiteFavicon(field.value)} />
+                  </Avatar>
+                )}
+              </Stack>
 
               <FormMessage />
             </FormItem>

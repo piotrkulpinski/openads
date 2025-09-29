@@ -14,20 +14,20 @@ import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
-type SpotItemProps = ComponentProps<"div"> & {
-  spot: RouterOutputs["spot"]["getAll"][number]
+type ZoneItemProps = ComponentProps<"div"> & {
+  zone: RouterOutputs["zone"]["getAll"][number]
 }
 
-const SpotItem = ({ spot, className, ...props }: SpotItemProps) => {
+const ZoneItem = ({ zone, className, ...props }: ZoneItemProps) => {
   const utils = trpc.useUtils()
 
-  const { mutate, isPending } = trpc.spot.delete.useMutation({
+  const { mutate, isPending } = trpc.zone.delete.useMutation({
     onSuccess: ({ workspaceId }) => {
       // Show a success toast
-      toast.success("Spot deleted successfully")
+      toast.success("Zone deleted successfully")
 
-      // Invalidate the bookings cache
-      utils.spot.getAll.invalidate({ workspaceId })
+      // Invalidate the campaigns cache
+      utils.zone.getAll.invalidate({ workspaceId })
     },
 
     onError: ({ message }) => {
@@ -43,8 +43,8 @@ const SpotItem = ({ spot, className, ...props }: SpotItemProps) => {
       )}
       {...props}
     >
-      <Link to={spot.id} from="/$workspace/spots">
-        <H5 className="truncate">{spot.name}</H5>
+      <Link to={zone.id} from="/$workspace/zones">
+        <H5 className="truncate">{zone.name}</H5>
         <span className="absolute inset-0" />
       </Link>
 
@@ -60,9 +60,9 @@ const SpotItem = ({ spot, className, ...props }: SpotItemProps) => {
 
         <DropdownMenuContent align="end">
           <ConfirmModal
-            key={spot.id}
+            key={zone.id}
             isPending={isPending}
-            onConfirm={() => mutate({ id: spot.id, workspaceId: spot.workspaceId })}
+            onConfirm={() => mutate({ id: zone.id, workspaceId: zone.workspaceId })}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Trash2 />
@@ -75,4 +75,4 @@ const SpotItem = ({ spot, className, ...props }: SpotItemProps) => {
   )
 }
 
-export { SpotItem }
+export { ZoneItem }

@@ -2,6 +2,7 @@ import type { RouterOutputs } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { Calendar } from "@openads/ui/calendar"
 import { cx } from "@openads/ui/cva"
+import { Stack } from "@openads/ui/stack"
 import { Tooltip } from "@openads/ui/tooltip"
 import { differenceInDays, endOfDay, startOfDay } from "date-fns"
 import { EyeIcon } from "lucide-react"
@@ -10,36 +11,39 @@ import { useCallback, useMemo } from "react"
 import type { DateRange } from "react-day-picker"
 import { Price } from "~/components/price"
 import { H4 } from "~/components/ui/heading"
-import { Stack } from "~/components/ui/stack"
-import { useBooking } from "~/contexts/booking-context"
-import { getFirstAvailableBookingMonth } from "~/lib/bookings"
+import { useCampaign } from "~/contexts/campaign-context"
+import { getFirstAvailableCampaignMonth } from "~/lib/campaigns"
 import { trpc } from "~/lib/trpc"
 
-type EmbedBookingCalendarProps = HTMLAttributes<HTMLDivElement> & {
-  spot: RouterOutputs["spot"]["getAll"][number]
+type EmbedCampaignCalendarProps = HTMLAttributes<HTMLDivElement> & {
+  zone: RouterOutputs["zone"]["getAll"][number]
 }
 
-export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBookingCalendarProps) => {
-  const { price, selections, clearSelection, updateSelection } = useBooking()
-  const selection = selections.find(s => s.spotId === spot.id)
+export const EmbedCampaignCalendar = ({
+  className,
+  zone,
+  ...props
+}: EmbedCampaignCalendarProps) => {
+  const { price, selections, clearSelection, updateSelection } = useCampaign()
+  const selection = selections.find(s => s.zoneId === zone.id)
 
-  const { data: bookings } = trpc.booking.public.getAllBySpotId.useQuery(
-    { spotId: spot.id },
+  const { data: campaigns } = trpc.campaign.public.getAllByZoneId.useQuery(
+    { zoneId: zone.id },
     { initialData: [] },
   )
 
   const booked = useMemo(
     () =>
-      bookings
-        .filter(({ spotId }) => spotId === spot.id)
+      campaigns
+        .filter(({ zoneId }) => zoneId === zone.id)
         .map(({ startsAt, endsAt }) => ({
           from: startOfDay(startsAt),
           to: startOfDay(endsAt),
         })),
-    [bookings, spot.id],
+    [campaigns, zone.id],
   )
 
-  const firstAvailableMonth = useMemo(() => getFirstAvailableBookingMonth(booked), [booked])
+  const firstAvailableMonth = useMemo(() => getFirstAvailableCampaignMonth(booked), [booked])
 
   const calculateDuration = useCallback(
     (range: DateRange) => {
@@ -69,40 +73,40 @@ export const EmbedBookingCalendar = ({ className, spot, ...props }: EmbedBooking
 
   const handleSelect = useCallback((dateRange?: DateRange) => {
     if (!dateRange?.from || !dateRange?.to) {
-      clearSelection(spot.id)
+      clearSelection(zone.id)
       return
     }
 
     updateSelection({
-      spotId: spot.id,
+      zoneId: zone.id,
       dateRange,
       duration: calculateDuration(dateRange),
     })
   }, [])
 
   const discountedPrice = price?.discountPercentage
-    ? spot.price * (1 - price.discountPercentage / 100)
-    : spot.price
+    ? zone.price * (1 - price.discountPercentage / 100)
+    : zone.price
 
   return (
     <div className={cx("flex flex-col w-full divide-y", className)} {...props}>
       <Stack size="sm" direction="column" className="items-stretch py-2 px-4">
         <Stack>
-          <H4 as="h3">{spot.name}</H4>
+          <H4 as="h3">{zone.name}</H4>
 
           {price && <Price price={discountedPrice} interval="day" className="ml-auto text-sm" />}
         </Stack>
 
         <Stack size="sm">
-          {spot.previewUrl && (
+          {zone.previewUrl && (
             <Tooltip tooltip="Preview this ad">
-              <Button variant="secondary" size="sm" prefix={<EyeIcon />} isAffixOnly asChild>
-                <a href={spot.previewUrl} target="_blank" rel="noopener noreferrer nofollow" />
+              <Button variant="secondary" size="sm" prefix={<EyeIcon />} asChild>
+                <a href={zone.previewUrl} target="_blank" rel="noopener noreferrer nofollow" />
               </Button>
             </Tooltip>
           )}
 
-          <p className="flex-1 text-muted-foreground text-sm text-pretty">{spot.description}</p>
+          <p className="flex-1 text-muted-foreground text-sm text-pretty">{zone.description}</p>
         </Stack>
       </Stack>
 

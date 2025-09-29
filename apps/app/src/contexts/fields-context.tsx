@@ -6,7 +6,7 @@ import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 
 type FieldsContext = {
-  spot: NonNullable<RouterOutputs["spot"]["getById"]>
+  zone: NonNullable<RouterOutputs["zone"]["getById"]>
   fields: RouterOutputs["field"]["getAll"]
   isPending: boolean
   selectedField: Field | null
@@ -20,14 +20,14 @@ type FieldsContext = {
 const FieldsContext = createContext<FieldsContext>(null!)
 
 type FieldsProviderProps = PropsWithChildren<{
-  spot: NonNullable<RouterOutputs["spot"]["getById"]>
+  zone: NonNullable<RouterOutputs["zone"]["getById"]>
 }>
 
-export const FieldsProvider = ({ spot, ...props }: FieldsProviderProps) => {
+export const FieldsProvider = ({ zone, ...props }: FieldsProviderProps) => {
   const [selectedField, setSelectedField] = useState<Field | null>(null)
 
   const { data: fields, refetch } = trpc.field.getAll.useQuery(
-    { spotId: spot.id },
+    { zoneId: zone.id },
     { initialData: [] },
   )
 
@@ -63,7 +63,7 @@ export const FieldsProvider = ({ spot, ...props }: FieldsProviderProps) => {
       type,
       name: `${type} Field`,
       order: fields.length,
-      spotId: spot.id,
+      zoneId: zone.id,
     }
 
     addFieldMutation.mutate(newField)
@@ -75,19 +75,19 @@ export const FieldsProvider = ({ spot, ...props }: FieldsProviderProps) => {
       updateFieldMutation.mutate({
         ...field,
         id: selectedField.id,
-        spotId: spot.id,
+        zoneId: zone.id,
       })
   }
 
   // Remove field
   const onRemoveField = (field: Field) => {
-    deleteFieldMutation.mutate({ id: field.id, spotId: spot.id })
+    deleteFieldMutation.mutate({ id: field.id, zoneId: zone.id })
   }
 
   // Reorder fields
   const onReorderFields = (fields: Field[]) => {
     const updatedFields = fields.map(({ id }, index) => ({ id, order: index }))
-    reorderFieldsMutation.mutate({ fields: updatedFields, spotId: spot.id })
+    reorderFieldsMutation.mutate({ fields: updatedFields, zoneId: zone.id })
   }
 
   const isPending =
@@ -99,7 +99,7 @@ export const FieldsProvider = ({ spot, ...props }: FieldsProviderProps) => {
   return (
     <FieldsContext.Provider
       value={{
-        spot,
+        zone,
         fields,
         isPending,
         selectedField,

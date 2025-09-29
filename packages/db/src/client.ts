@@ -1,15 +1,15 @@
 export type {
   Account,
-  Booking,
+  Campaign,
   Field,
   Meta,
   Session,
-  Spot,
   Subscription,
   User,
   Verification,
   Workspace,
   WorkspaceMember,
+  Zone,
 } from "@prisma/client"
 
 export {

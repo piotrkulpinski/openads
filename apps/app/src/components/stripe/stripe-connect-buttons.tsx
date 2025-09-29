@@ -1,6 +1,6 @@
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
-import type { ComponentProps, HTMLAttributes } from "react"
+import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { StripeIcon } from "~/components/icons/stripe"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
@@ -53,6 +53,7 @@ export const StripeConnectButtons = ({
           onClick={() => connectAccount.mutate({ workspaceId: workspace.id })}
           isPending={connectAccount.isPending}
           prefix={<StripeIcon className="size-4" />}
+          className="min-w-48"
         >
           Connect with Stripe
         </Button>

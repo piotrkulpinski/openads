@@ -6,9 +6,9 @@ import { OnboardingLaterButton } from "~/components/onboarding/later-button"
 import { OnboardingNextButton } from "~/components/onboarding/next-button"
 import { OnboardingStep } from "~/components/onboarding/step"
 import { QueryCell } from "~/components/query-cell"
-import { SpotForm } from "~/components/spots/spot-form"
 import { StripeConnectButtons } from "~/components/stripe/stripe-connect-buttons"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
+import { ZoneForm } from "~/components/zones/zone-form"
 import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 import { trpc } from "~/lib/trpc"
@@ -61,14 +61,14 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("spot", slug)} />
+          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("zone", slug)} />
         </OnboardingStep>
       )
 
-    case "spot":
+    case "zone":
       return (
         <OnboardingStep
-          title="Create your first ad spot"
+          title="Create your first ad zone"
           description="A single ad unit that you can use to display ads on your website. Don't worry, you can always edit it later."
         >
           <QueryCell
@@ -76,9 +76,9 @@ function OnboardingStepPage() {
             pending={() => <LoaderIcon className="mx-auto animate-spin" />}
             empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
             success={({ data }) => (
-              <SpotForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", slug)}>
+              <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", slug)}>
                 <OnboardingLaterButton step="stripe" slug={slug} />
-              </SpotForm>
+              </ZoneForm>
             )}
           />
         </OnboardingStep>
@@ -88,7 +88,7 @@ function OnboardingStepPage() {
       return (
         <OnboardingStep
           title="Connect your Stripe account"
-          description="Connect your Stripe account to start receiving payments for your ad spots."
+          description="Connect your Stripe account to start receiving payments for your ad zones."
         >
           <QueryCell
             query={query}
@@ -115,11 +115,11 @@ function OnboardingStepPage() {
     //         pending={() => <LoaderIcon className="mx-auto animate-spin" />}
     //         empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
     //         success={({ data }) => (
-    //           <SpotForm workspaceId={data?.id} onSuccess={() => continueTo("plan", { slug })}>
+    //           <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("plan", { slug })}>
     //             <OnboardingLaterButton step="completed" slug={slug}>
     //               I'll pick a plan later
     //             </OnboardingLaterButton>
-    //           </SpotForm>
+    //           </ZoneForm>
     //         )}
     //       />
     //     </OnboardingStep>

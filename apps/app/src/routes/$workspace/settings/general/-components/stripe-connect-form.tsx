@@ -13,7 +13,7 @@ export const StripeConnectForm = ({ ...props }: ComponentProps<"div">) => {
         <Header
           size="h4"
           title="Stripe Connect"
-          description="Connect your Stripe account to receive payments for your ad spots."
+          description="Connect your Stripe account to receive payments for your ad zones."
         />
 
         <StripeConnectButtons workspace={workspace} className="space-y-4" />

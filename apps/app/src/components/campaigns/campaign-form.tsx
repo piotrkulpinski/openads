@@ -1,4 +1,4 @@
-import { bookingSchema } from "@openads/db/schema"
+import { campaignSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { Calendar } from "@openads/ui/calendar"
@@ -23,13 +23,13 @@ import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 import type { router } from "~/main"
 
-type BookingFormProps = HTMLAttributes<HTMLFormElement> & {
+type CampaignFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
 
   /**
-   * The spot to edit
+   * The zone to edit
    */
-  booking?: RouterOutputs["booking"]["getAll"][number]
+  campaign?: RouterOutputs["campaign"]["getAll"][number]
 
   /**
    * Allows to redirect to a url after the mutation is successful
@@ -39,42 +39,42 @@ type BookingFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
    * A callback to call when the mutation is successful
    */
-  onSuccess?: (data: RouterOutputs["booking"]["create"]) => void
+  onSuccess?: (data: RouterOutputs["campaign"]["create"]) => void
 }
 
-export const BookingForm = ({
+export const CampaignForm = ({
   children,
   className,
   workspaceId,
-  booking,
+  campaign,
   nextUrl,
   onSuccess: onSuccessCallback,
   ...props
-}: BookingFormProps) => {
+}: CampaignFormProps) => {
   const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
-  const isEditing = !!booking?.id
+  const isEditing = !!campaign?.id
 
-  const spotsQuery = trpc.spot.getAll.useQuery({ workspaceId })
+  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId })
 
-  const form = useZodForm(bookingSchema, {
+  const form = useZodForm(campaignSchema, {
     defaultValues: {
-      ...init(bookingSchema),
-      ...booking,
+      ...init(campaignSchema),
+      ...campaign,
     },
   })
 
-  const onSuccess = async (data: RouterOutputs["booking"]["create"]) => {
+  const onSuccess = async (data: RouterOutputs["campaign"]["create"]) => {
     // If we have a nextUrl, navigate to it
     nextUrl && navigate(nextUrl)
 
     // Show a success toast
-    toast.success(`Booking ${isEditing ? "updated" : "created"} successfully`)
+    toast.success(`Campaign ${isEditing ? "updated" : "created"} successfully`)
 
-    // Invalidate the bookings cache
-    await utils.booking.getAll.invalidate({ workspaceId })
-    await utils.booking.getById.invalidate({ id: booking?.id, workspaceId })
+    // Invalidate the campaigns cache
+    await utils.campaign.getAll.invalidate({ workspaceId })
+    await utils.campaign.getById.invalidate({ id: campaign?.id, workspaceId })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
@@ -87,17 +87,17 @@ export const BookingForm = ({
     handleError({ error, form })
   }
 
-  const createBooking = trpc.booking.create.useMutation({ onSuccess, onError })
-  const updateBooking = trpc.booking.update.useMutation({ onSuccess, onError })
-  const isPending = createBooking.isPending || updateBooking.isPending
+  const createCampaign = trpc.campaign.create.useMutation({ onSuccess, onError })
+  const updateCampaign = trpc.campaign.update.useMutation({ onSuccess, onError })
+  const isPending = createCampaign.isPending || updateCampaign.isPending
 
   // Handle the form submission
   const handleSubmit = form.handleSubmit(data => {
     if (isEditing) {
-      return updateBooking.mutate({ ...data, id: booking.id, workspaceId })
+      return updateCampaign.mutate({ ...data, id: campaign.id, workspaceId })
     }
 
-    return createBooking.mutate({ ...data, workspaceId })
+    return createCampaign.mutate({ ...data, workspaceId })
   })
 
   const [startsAt, endsAt] = form.watch(["startsAt", "endsAt"])
@@ -174,21 +174,21 @@ export const BookingForm = ({
 
           <FormField
             control={form.control}
-            name="spotId"
+            name="zoneId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Spot</FormLabel>
+                <FormLabel>Zone</FormLabel>
 
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a spot" />
+                      <SelectValue placeholder="Select a zone" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {spotsQuery.data?.map(spot => (
-                      <SelectItem key={spot.id} value={spot.id}>
-                        {spot.name}
+                    {zonesQuery.data?.map(zone => (
+                      <SelectItem key={zone.id} value={zone.id}>
+                        {zone.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -224,7 +224,9 @@ export const BookingForm = ({
           <DialogFooter className="mt-2 col-span-full">
             {children}
 
-            <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Booking</FormButton>
+            <FormButton isPending={isPending}>
+              {isEditing ? "Update" : "Create"} Campaign
+            </FormButton>
           </DialogFooter>
         </div>
 

@@ -1,0 +1,15 @@
+model Advertiser {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId String
+  campaigns   Campaign[]
+
+  // Indexes
+  @@index([workspaceId])
+}

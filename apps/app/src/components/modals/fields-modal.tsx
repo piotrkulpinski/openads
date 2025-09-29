@@ -20,7 +20,7 @@ export const FieldsModal = ({ children }: PropsWithChildren) => {
         <AlertDialogTitle className="sr-only">Edit Custom Fields</AlertDialogTitle>
 
         <AlertDialogDescription className="sr-only">
-          Manage the custom fields of your ad spot
+          Manage the custom fields of your ad zone
         </AlertDialogDescription>
 
         <FieldsHead />

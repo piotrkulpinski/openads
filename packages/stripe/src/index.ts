@@ -17,7 +17,7 @@ export type StripeClient = ReturnType<typeof createStripeClient>
 export interface CreatePaymentIntentProps {
   amount: number
   workspaceId: string
-  bookingId: string
+  campaignId: string
   stripeConnectId: string
 }
 
@@ -26,7 +26,7 @@ export async function createPaymentIntent(
   config: StripeConfig,
   props: CreatePaymentIntentProps,
 ) {
-  const { amount, workspaceId, bookingId, stripeConnectId } = props
+  const { amount, workspaceId, campaignId, stripeConnectId } = props
   const applicationFeeAmount = Math.round((amount * config.STRIPE_PLATFORM_FEE_PERCENT) / 100)
 
   return stripe.paymentIntents.create({
@@ -35,7 +35,7 @@ export async function createPaymentIntent(
     payment_method_types: ["card"],
     application_fee_amount: applicationFeeAmount,
     transfer_data: { destination: stripeConnectId },
-    metadata: { workspaceId, bookingId },
+    metadata: { workspaceId, campaignId },
   })
 }
 

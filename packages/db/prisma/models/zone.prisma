@@ -1,4 +1,4 @@
-model Spot {
+model Zone {
   id          String   @id @default(cuid())
   name        String
   description String   @default("")
@@ -9,9 +9,9 @@ model Spot {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
-  bookings    Booking[]
+  campaigns   Campaign[]
   fields      Field[]
 
   // Indexes

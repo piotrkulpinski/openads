@@ -1,25 +1,25 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import { router } from "./index"
 import { authRouter } from "./routers/auth"
-import { bookingRouter } from "./routers/booking"
+import { campaignRouter } from "./routers/campaign"
 import { fieldRouter } from "./routers/field"
 import { onboardingRouter } from "./routers/onboarding"
-import { spotRouter } from "./routers/spot"
-import { stripeRouter } from "./routers/stripe"
 import { storageRouter } from "./routers/storage"
+import { stripeRouter } from "./routers/stripe"
 import { userRouter } from "./routers/user"
 import { workspaceRouter } from "./routers/workspace"
+import { zoneRouter } from "./routers/zone"
 
 export const appRouter = router({
   auth: authRouter,
   stripe: stripeRouter,
+  storage: storageRouter,
   user: userRouter,
   onboarding: onboardingRouter,
   workspace: workspaceRouter,
-  spot: spotRouter,
-  booking: bookingRouter,
+  zone: zoneRouter,
+  campaign: campaignRouter,
   field: fieldRouter,
-  storage: storageRouter,
 })
 
 export type AppRouter = typeof appRouter

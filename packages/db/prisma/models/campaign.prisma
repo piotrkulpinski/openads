@@ -1,4 +1,4 @@
-model Booking {
+model Campaign {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -15,15 +15,18 @@ model Booking {
   platformFee           Int? // Our platform fee in cents
 
   // Relations
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId String
-  spot        Spot      @relation(fields: [spotId], references: [id], onDelete: Cascade)
-  spotId      String
-  meta        Meta[]
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId  String
+  zone         Zone        @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zoneId       String
+  advertiser   Advertiser? @relation(fields: [advertiserId], references: [id], onDelete: SetNull)
+  advertiserId String?
+  meta         Meta[]
 
   // Indexes
   @@index([workspaceId])
-  @@index([spotId])
+  @@index([zoneId])
   @@index([stripePaymentIntentId])
   @@index([status])
+  @@index([advertiserId])
 }

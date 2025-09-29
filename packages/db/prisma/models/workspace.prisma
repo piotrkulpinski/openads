@@ -20,10 +20,11 @@ model Workspace {
   stripeConnectData    Json? // Additional Stripe account data
 
   // Relations
-  members    WorkspaceMember[]
-  defaultFor User[]
-  spots      Spot[]
-  bookings   Booking[]
+  members     WorkspaceMember[]
+  defaultFor  User[]
+  zones       Zone[]
+  campaigns   Campaign[]
+  advertisers Advertiser[]
 
   // Indexes
   @@unique([name, slug])

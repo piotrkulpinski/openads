@@ -1,47 +1,47 @@
-import { bookingSchema, idSchema } from "@openads/db/schema"
+import { campaignSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { publicProcedure, router, spotProcedure, workspaceProcedure } from "../index"
+import { publicProcedure, router, workspaceProcedure, zoneProcedure } from "../index"
 
-export const bookingRouter = router({
+export const campaignRouter = router({
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
-    return await db.booking.findMany({
+    return await db.campaign.findMany({
       where,
       orderBy: { startsAt: "asc" },
-      include: { spot: true },
+      include: { zone: true },
     })
   }),
 
-  getAllBySpotId: spotProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
-    return await db.booking.findMany({
+  getAllByZoneId: zoneProcedure.query(async ({ ctx: { db }, input: { ...where } }) => {
+    return await db.campaign.findMany({
       where,
       orderBy: { startsAt: "asc" },
-      include: { spot: true },
+      include: { zone: true },
     })
   }),
 
   getById: workspaceProcedure
     .input(idSchema)
     .query(async ({ ctx: { db }, input: { ...where } }) => {
-      return await db.booking.findUnique({
+      return await db.campaign.findUnique({
         where,
-        include: { spot: true },
+        include: { zone: true },
       })
     }),
 
   create: workspaceProcedure
-    .input(bookingSchema)
+    .input(campaignSchema)
     .mutation(async ({ ctx: { db }, input: { ...data } }) => {
-      const booking = await db.booking.create({
+      const campaign = await db.campaign.create({
         data,
       })
 
-      return booking
+      return campaign
     }),
 
   update: workspaceProcedure
-    .input(bookingSchema.partial().extend(idSchema.shape))
+    .input(campaignSchema.partial().extend(idSchema.shape))
     .mutation(async ({ ctx: { db }, input: { id, workspaceId, ...data } }) => {
-      return await db.booking.update({
+      return await db.campaign.update({
         where: { id, workspaceId },
         data,
       })
@@ -50,20 +50,20 @@ export const bookingRouter = router({
   delete: workspaceProcedure
     .input(idSchema)
     .mutation(async ({ ctx: { db }, input: { ...where } }) => {
-      return await db.booking.delete({
+      return await db.campaign.delete({
         where,
       })
     }),
 
   // Public routes
   public: router({
-    getAllBySpotId: publicProcedure
-      .input(z.object({ spotId: z.string() }))
+    getAllByZoneId: publicProcedure
+      .input(z.object({ zoneId: z.string() }))
       .query(async ({ ctx: { db }, input: { ...where } }) => {
-        return await db.booking.findMany({
+        return await db.campaign.findMany({
           where,
           orderBy: { startsAt: "asc" },
-          include: { spot: true },
+          include: { zone: true },
         })
       }),
   }),

@@ -33,7 +33,7 @@ export const FieldsList = () => {
 
       {!fields.length && (
         <FieldsEmptyState>
-          Use this view to add, edit and reorder the custom fields of your ad spot.
+          Use this view to add, edit and reorder the custom fields of your ad zone.
         </FieldsEmptyState>
       )}
     </div>

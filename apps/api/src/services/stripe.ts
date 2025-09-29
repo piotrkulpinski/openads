@@ -14,7 +14,7 @@ const stripeConfig = {
 export type CreatePaymentIntentProps = {
   amount: number
   workspaceId: string
-  bookingId: string
+  campaignId: string
   stripeConnectId: string
 }
 

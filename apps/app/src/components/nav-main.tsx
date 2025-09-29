@@ -40,7 +40,7 @@ export const NavMain = ({ items }: NavMainProps) => {
             prefix={prefix}
             suffix={
               label && (
-                <Badge variant="outline" className="ml-auto px-1.5 size-auto">
+                <Badge variant="secondary" className="ml-auto px-1.5 size-auto">
                   {label}
                 </Badge>
               )

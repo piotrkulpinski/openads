@@ -21,7 +21,7 @@ export function EmbedModal({ open, onOpenChange }: Props) {
 
           <DialogDescription asChild>
             <HeaderDescription>
-              Customize how your ad spots widget will appear on your website.
+              Customize how your ad zones widget will appear on your website.
             </HeaderDescription>
           </DialogDescription>
         </HeaderRoot>

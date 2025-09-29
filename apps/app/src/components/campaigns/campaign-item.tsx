@@ -5,37 +5,37 @@ import { Link } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 import type { RouterOutputs } from "~/lib/trpc"
 
-type BookingItemProps = ComponentProps<typeof Link> & {
-  booking: RouterOutputs["booking"]["getAll"][number]
+type CampaignItemProps = ComponentProps<typeof Link> & {
+  campaign: RouterOutputs["campaign"]["getAll"][number]
 }
 
-export function BookingItem({ booking, className, ...props }: BookingItemProps) {
+export function CampaignItem({ campaign, className, ...props }: CampaignItemProps) {
   const statusColor = {
     pending: "bg-blue-50 dark:bg-blue-950",
     paid: "bg-green-50 dark:bg-green-950",
     cancelled: "bg-red-50 dark:bg-red-950",
     refunded: "bg-orange-50 dark:bg-orange-950",
-  }[booking.status]
+  }[campaign.status]
 
   return (
     <Link
-      to={booking.id}
-      from="/$workspace/bookings"
+      to={campaign.id}
+      from="/$workspace/campaigns"
       className={cx("flex items-center justify-between px-4 py-3 hover:bg-muted/50", className)}
       {...props}
     >
       <div className="space-y-1">
-        <p className="font-medium">{booking.spot.name}</p>
+        <p className="font-medium">{campaign.zone.name}</p>
         <p className="text-sm text-muted-foreground">
-          {formatDateRange(booking.startsAt, booking.endsAt)}
+          {formatDateRange(campaign.startsAt, campaign.endsAt)}
         </p>
       </div>
 
       <div className="text-right">
-        <p className="font-medium">${booking.amount / 100}</p>
+        <p className="font-medium">${campaign.amount / 100}</p>
 
         <Badge size="sm" variant="soft" className={cx("capitalize", statusColor)}>
-          {booking.status}
+          {campaign.status}
         </Badge>
       </div>
     </Link>

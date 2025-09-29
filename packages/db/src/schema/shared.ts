@@ -32,6 +32,7 @@ export const fileSchema = z
   .refine(async ({ size }) => size < MAX_IMAGE_SIZE_BYTES, "File size must be less than 1MB")
   .refine(async ({ type }) => isMimeTypeMatch(type, ["image/*"]), "File type is not valid")
 
+export const urlSchema = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/i
 export const domainNameRegex = /^((\*\.)|((?!-)[a-z0-9-]{0,63}[a-z0-9]\.))+[a-z]{2,63}$/i
 export const slugRegex = /^(?:[a-z0-9](-?[a-z0-9])*)?$/i
 export const colorRegex = /^#(?:(?:[\da-f]{3}){1,2}|(?:[\da-f]{4}){1,2})$/gi

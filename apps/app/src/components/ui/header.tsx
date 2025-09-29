@@ -1,9 +1,9 @@
 import { cva, cx, type VariantProps } from "@openads/ui/cva"
+import { Stack } from "@openads/ui/stack"
 import { Slot } from "radix-ui"
 import { type ComponentProps, type HTMLAttributes, isValidElement, type ReactNode } from "react"
 import { Heading, type HeadingProps } from "~/components/ui/heading"
 import { Prose } from "~/components/ui/prose"
-import { Stack } from "~/components/ui/stack"
 
 const headerVariants = cva({
   base: "@container/header flex flex-wrap items-center w-full min-w-0",

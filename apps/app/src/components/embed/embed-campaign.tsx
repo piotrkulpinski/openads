@@ -1,18 +1,18 @@
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
+import { Stack } from "@openads/ui/stack"
 import { Tooltip } from "@openads/ui/tooltip"
 import { formatDateRange } from "@primoui/utils"
 import { endOfDay, startOfDay } from "date-fns"
 import { XIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
-import { EmbedBookingCalendar } from "~/components/embed/embed-booking-calendar"
+import { EmbedCampaignCalendar } from "~/components/embed/embed-campaign-calendar"
 import { Price } from "~/components/price"
-import { Stack } from "~/components/ui/stack"
-import { useBooking } from "~/contexts/booking-context"
+import { useCampaign } from "~/contexts/campaign-context"
 
-export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
-  const { spots, price, selections, findBookingSpot, clearSelection } = useBooking()
+export const EmbedCampaign = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  const { zones, price, selections, findCampaignZone, clearSelection } = useCampaign()
   const isPending = false
 
   // const { mutate, isPending } = trpc.stripe.checkout.create.useMutation({
@@ -29,14 +29,14 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
 
   // const handleCheckout = () => {
   //   const checkoutData = selections.map(selection => {
-  //     const spot = findBookingSpot(selection.spotId)
+  //     const zone = findCampaignZone(selection.zoneId)
 
   //     const discountedPrice = price?.discountPercentage
-  //       ? spot.price * (1 - price.discountPercentage / 100)
-  //       : spot.price
+  //       ? zone.price * (1 - price.discountPercentage / 100)
+  //       : zone.price
 
   //     return {
-  //       spotId: selection.spotId,
+  //       zoneId: selection.zoneId,
   //       price: discountedPrice,
   //       duration: selection.duration ?? 0,
   //       metadata: {
@@ -53,8 +53,8 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
   return (
     <div className={cx("flex flex-col w-full border divide-y rounded-md", className)} {...props}>
       <div className="flex flex-col w-full sm:flex-row sm:divide-x max-sm:divide-y">
-        {spots.map(spot => (
-          <EmbedBookingCalendar key={spot.id} spot={spot} />
+        {zones.map(zone => (
+          <EmbedCampaignCalendar key={zone.id} zone={zone} />
         ))}
       </div>
 
@@ -65,24 +65,24 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
               return null
             }
 
-            const spot = findBookingSpot(selection.spotId)
+            const zone = findCampaignZone(selection.zoneId)
             const from = startOfDay(selection.dateRange.from)
             const to = endOfDay(selection.dateRange.to)
 
             return (
-              <div key={selection.spotId} className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div key={selection.zoneId} className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <span className="flex items-center gap-2 mr-auto">
                   <Button
                     variant="secondary"
                     size="sm"
                     className="p-0.5"
-                    aria-label={`Clear ${spot.name} selection`}
+                    aria-label={`Clear ${zone.name} selection`}
                     prefix={<XIcon />}
-                    onClick={() => clearSelection(selection.spotId)}
+                    onClick={() => clearSelection(selection.zoneId)}
                   />
 
                   <div>
-                    <strong className="font-medium text-foreground">{spot.name}</strong> – (
+                    <strong className="font-medium text-foreground">{zone.name}</strong> – (
                     {selection.duration} {selection.duration === 1 ? "day" : "days"})
                   </div>
                 </span>
@@ -118,7 +118,7 @@ export const EmbedBooking = ({ className, ...props }: HTMLAttributes<HTMLDivElem
             )}
           </>
         ) : (
-          <p>Please select dates for at least one ad spot.</p>
+          <p>Please select dates for at least one ad zone.</p>
         )}
 
         <Button

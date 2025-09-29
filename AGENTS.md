@@ -17,7 +17,7 @@
 - **Types**: Use `@t3-oss/env-core` for env vars; prefer explicit types over `any`
 - **Error Handling**: Use try/catch for async operations; throw descriptive errors
 - **React**: Functional components with hooks; avoid default exports; use TypeScript FC types
-- **API**: tRPC procedures with Zod schemas; workspace/spot procedures for auth checks
+- **API**: tRPC procedures with Zod schemas; workspace/zone procedures for auth checks
 
 ## Development Workflow
 - Run `npm run lint` before commits

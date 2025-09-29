@@ -105,19 +105,19 @@ export const workspaceProcedure = authProcedure
     })
   })
 
-// procedure that checks if a user has access to a specific spot
-export const spotProcedure = authProcedure
-  .input(z.object({ spotId: z.string() }))
-  .use(async ({ ctx: { db, user }, input: { spotId }, next }) => {
-    const spot = await db.spot.findFirst({
-      where: { AND: [{ id: spotId }, db.spot.belongsTo(user.id)] },
+// procedure that checks if a user has access to a specific zone
+export const zoneProcedure = authProcedure
+  .input(z.object({ zoneId: z.string() }))
+  .use(async ({ ctx: { db, user }, input: { zoneId }, next }) => {
+    const zone = await db.zone.findFirst({
+      where: { AND: [{ id: zoneId }, db.zone.belongsTo(user.id)] },
     })
 
-    if (!spot) {
+    if (!zone) {
       throw new TRPCError({ code: "FORBIDDEN" })
     }
 
     return next({
-      ctx: { spot },
+      ctx: { zone },
     })
   })

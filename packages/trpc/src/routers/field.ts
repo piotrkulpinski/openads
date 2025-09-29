@@ -1,37 +1,37 @@
 import { fieldSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { router, spotProcedure } from "../index"
+import { router, zoneProcedure } from "../index"
 
 export const fieldRouter = router({
-  getAll: spotProcedure.query(async ({ ctx: { db }, input: { spotId } }) => {
+  getAll: zoneProcedure.query(async ({ ctx: { db }, input: { zoneId } }) => {
     return await db.field.findMany({
-      where: { spotId },
+      where: { zoneId },
       orderBy: { order: "asc" },
     })
   }),
 
-  create: spotProcedure.input(fieldSchema).mutation(async ({ ctx: { db }, input: { ...data } }) => {
+  create: zoneProcedure.input(fieldSchema).mutation(async ({ ctx: { db }, input: { ...data } }) => {
     return await db.field.create({
       data,
     })
   }),
 
-  update: spotProcedure
+  update: zoneProcedure
     .input(fieldSchema.partial().extend(idSchema.shape))
-    .mutation(async ({ ctx: { db }, input: { id, spotId, ...data } }) => {
+    .mutation(async ({ ctx: { db }, input: { id, zoneId, ...data } }) => {
       return await db.field.update({
-        where: { id, spotId },
+        where: { id, zoneId },
         data,
       })
     }),
 
-  delete: spotProcedure.input(idSchema).mutation(async ({ ctx: { db }, input: { ...where } }) => {
+  delete: zoneProcedure.input(idSchema).mutation(async ({ ctx: { db }, input: { ...where } }) => {
     return await db.field.delete({
       where,
     })
   }),
 
-  reorder: spotProcedure
+  reorder: zoneProcedure
     .input(
       z.object({
         fields: z.array(
@@ -42,11 +42,11 @@ export const fieldRouter = router({
         ),
       }),
     )
-    .mutation(async ({ ctx: { db, spot }, input: { fields } }) => {
+    .mutation(async ({ ctx: { db, zone }, input: { fields } }) => {
       await Promise.all(
         fields.map(({ id, order }) =>
           db.field.update({
-            where: { id, spotId: spot.id },
+            where: { id, zoneId: zone.id },
             data: { order },
           }),
         ),

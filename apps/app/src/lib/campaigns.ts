@@ -14,12 +14,12 @@ type PricingItem = {
 }
 
 /**
- * Calculate the booking price based on the duration
+ * Calculate the campaign price based on the duration
  * @param selections - An array of { price, duration } objects
- * @param basePrice - The base price of the booking
+ * @param basePrice - The base price of the campaign
  * @returns The price, full price, discount amount, discount percentage, and duration
  */
-export const calculateBookingPrice = (selections: PricingItem[], basePrice: number) => {
+export const calculateCampaignPrice = (selections: PricingItem[], basePrice: number) => {
   // Calculate raw total before discounts
   const totalPrice = selections.reduce(
     (sum, { price, duration }) => sum + price * (duration || 0),
@@ -46,11 +46,11 @@ export const calculateBookingPrice = (selections: PricingItem[], basePrice: numb
 }
 
 /**
- * Get the first available month for booking
+ * Get the first available month for campaign
  * @param dates - An array of date ranges to exclude
  * @returns The first available month
  */
-export const getFirstAvailableBookingMonth = (dates: { from: Date; to: Date }[]) => {
+export const getFirstAvailableCampaignMonth = (dates: { from: Date; to: Date }[]) => {
   let firstAvailableMonth = startOfMonth(new Date())
 
   function isDateDisabled(date: Date) {

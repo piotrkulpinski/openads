@@ -16,7 +16,7 @@
         const [method, ...params] = args
 
         if (method === L) {
-          const [{ workspaceId, elementOrSelector, spotIds = [], ...config }] = params
+          const [{ workspaceId, elementOrSelector, zoneIds = [], ...config }] = params
 
           if (!workspaceId) {
             console.error("OpenAds: workspaceId is required")
@@ -35,7 +35,7 @@
 
           const params = new URLSearchParams({
             workspaceId,
-            spotIds: spotIds.join(","),
+            zoneIds: zoneIds.join(","),
             ...config,
           })
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-OpenAds is an advertising marketplace platform built as a monorepo using Bun and Turbo. It enables workspaces to create advertising spots, manage bookings, and process payments through Stripe Connect.
+OpenAds is an advertising marketplace platform built as a monorepo using Bun and Turbo. It enables workspaces to create advertising zones, manage campaigns, and process payments through Stripe Connect.
 
 ## Architecture
 
@@ -74,8 +74,8 @@ bun format
 
 The core data model consists of:
 - **Workspace**: Multi-tenant workspaces with Free/Pro plans
-- **Spot**: Advertising spots with custom pricing
-- **Booking**: Bookings with Stripe payment integration
+- **Zone**: Advertising zones with custom pricing
+- **Campaign**: Campaigns with Stripe payment integration
 - **Field/Meta**: Dynamic custom fields system
 - **WorkspaceMember**: Role-based access (Owner/Manager/Advertiser)
 
@@ -85,8 +85,8 @@ The core data model consists of:
 The API uses tRPC routers organized by domain:
 - Auth endpoints via Better Auth
 - Workspace management
-- Spot CRUD operations
-- Booking system with calendar logic
+- Zone CRUD operations
+- Campaign system with calendar logic
 - Stripe webhooks and Connect integration
 
 ### Frontend Routing
@@ -104,7 +104,7 @@ Uses TanStack Router with file-based routing:
 ### Payment Integration
 - Stripe Connect for marketplace functionality
 - Workspace-level Stripe accounts
-- Booking payments flow through platform
+- Campaign payments flow through platform
 - Webhook handling for payment events
 
 ## Code Style

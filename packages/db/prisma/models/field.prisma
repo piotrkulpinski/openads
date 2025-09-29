@@ -18,12 +18,12 @@ model Field {
   updatedAt   DateTime  @updatedAt
 
   // Relations
-  spot   Spot   @relation(fields: [spotId], references: [id], onDelete: Cascade)
-  spotId String
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zoneId String
   items  Meta[]
 
   // Indexes
-  @@index([spotId])
+  @@index([zoneId])
 }
 
 model Meta {
@@ -31,13 +31,13 @@ model Meta {
   value Json
 
   // Relations
-  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-  bookingId String
-  field     Field   @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  fieldId   String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId String
+  field      Field    @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  fieldId    String
 
   // Indexes
-  @@unique([bookingId, fieldId])
-  @@index([bookingId])
+  @@unique([campaignId, fieldId])
+  @@index([campaignId])
   @@index([fieldId])
 }

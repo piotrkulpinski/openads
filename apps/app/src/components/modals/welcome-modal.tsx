@@ -41,8 +41,8 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
 
           <DialogDescription asChild>
             <IntroDescription className="max-w-md">
-              Thanks for signing up – your account is ready to go! Now you have one central,
-              organized place to manage all your ad spots and bookings.
+              Thanks for signing up – your account is ready to go! You now have a central, organized
+              place to manage all your ad zones and campaigns.
             </IntroDescription>
           </DialogDescription>
 
