@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "includes": ["**/*.{ts,tsx,js,jsx}", "!apps/app/public/embed.js"]
+    "includes": ["**/*.{ts,tsx,js,jsx}", "!apps/app/public/embed.js", "!node_modules"]
   },
   "assist": {
     "actions": {

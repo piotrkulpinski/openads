@@ -6,45 +6,55 @@ import { Label } from "@openads/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
+import { slugify } from "@primoui/utils"
 import { CheckIcon, CopyIcon } from "lucide-react"
 import { useState } from "react"
+import { siteConfig } from "~/config/site"
 import { useWorkspace } from "~/contexts/workspace-context"
 import type { RouterOutputs } from "~/lib/trpc"
 
-interface Props {
+type EmbedCodeGeneratorProps = {
   zones: RouterOutputs["zone"]["getAll"]
 }
 
-export function EmbedCodeGenerator({ zones }: Props) {
+type EmbedOptions = {
+  width: string
+  height: string
+  theme: "light" | "dark"
+  layout: "default" | "grid"
+  zones: string[]
+}
+
+export function EmbedCodeGenerator({ zones }: EmbedCodeGeneratorProps) {
   const clipboard = useClipboard({ timeout: 3000 })
   const workspace = useWorkspace()
-  const [theme, setTheme] = useState("light")
-  const [layout, setLayout] = useState("default")
-  const [width, setWidth] = useState("100%")
-  const [height, setHeight] = useState("500px")
-  const [selectedZones, setSelectedZones] = useState<string[]>(zones.map(zone => zone.id))
+  const [options, setOptions] = useState<EmbedOptions>({
+    width: "100%",
+    height: "500px",
+    theme: "light",
+    layout: "default",
+    zones: zones.map(zone => zone.id),
+  })
 
-  const elementId = "openads-inline"
+  const elementId = `${slugify(siteConfig.name)}-widget`
 
   const embedCode = `<!-- OpenAds Embed Code -->
-<div style="width:${width};height:${height};overflow:scroll" id="${elementId}"></div>
+<div style="width:${options.width};height:${options.height};overflow:scroll" id="${elementId}"></div>
 <script type="text/javascript">
   (function(O,A,L){let p=function(a,ar){a.q.push(ar);};let d=O.document;O.OpenAds=O.OpenAds||function(){if(!O._openAdsAPI){O._openAdsAPI=new OpenAdsAPI();}p(O._openAdsAPI,Array.from(arguments));};class OpenAdsAPI{constructor(){this.q=[];this.processQueue();}processQueue(){while(this.q.length>0){const args=this.q.shift();const[method,...params]=args;if(method===L){const[{workspace,elementOrSelector,zones=[],theme,layout}]=params;if(!workspace){console.error("OpenAds: workspace is required");return;}const element=typeof elementOrSelector==="string"?d.querySelector(elementOrSelector):elementOrSelector;if(!element){console.error("OpenAds: Element not found:",elementOrSelector);return;}const params=new URLSearchParams({workspace,zones:zones.join(","),theme,layout});const wrapper=d.createElement("div");wrapper.style.cssText="width:100%;height:100%;overflow:scroll";this.frame=d.createElement("iframe");this.frame.style.cssText="border:none;width:100%;height:100%;min-height:400px";this.frame.src=\`${window.location.origin}/embed?\${params}\`;wrapper.appendChild(this.frame);element.appendChild(wrapper);O.addEventListener("message",event=>{if(event.origin!==O.location.origin)return;if(event.data.type==="resize"&&this.frame){this.frame.style.height=\`\${event.data.height}px\`;}});}}}};})(window,"${window.location.origin}/embed.js","init");
 
   OpenAds("init", {
     elementOrSelector: "#${elementId}",
     workspace: "${workspace.id}",
-    zones: ${JSON.stringify(selectedZones)},
-    theme: "${theme}",
-    layout: "${layout}"
+    zones: ${JSON.stringify(options.zones)},
+    theme: "${options.theme}",
+    layout: "${options.layout}"
   });
 </script>
 <!-- OpenAds Embed Code End -->`
 
-  const toggleZone = (zoneId: string) => {
-    setSelectedZones(prev =>
-      prev.includes(zoneId) ? prev.filter(id => id !== zoneId) : [...prev, zoneId],
-    )
+  const onParamChange = (key: keyof EmbedOptions, value: string | string[]) => {
+    setOptions(prev => ({ ...prev, [key]: value }))
   }
 
   if (zones.length === 0) {
@@ -65,8 +75,15 @@ export function EmbedCodeGenerator({ zones }: Props) {
             <div key={id} className="flex items-center space-x-2">
               <Checkbox
                 id={id}
-                checked={selectedZones.includes(id)}
-                onCheckedChange={() => toggleZone(id)}
+                checked={options.zones.includes(id)}
+                onCheckedChange={() =>
+                  onParamChange(
+                    "zones",
+                    options.zones.includes(id)
+                      ? options.zones.filter(z => z !== id)
+                      : [...options.zones, id],
+                  )
+                }
               />
 
               <Label htmlFor={id} className="font-normal">
@@ -82,8 +99,8 @@ export function EmbedCodeGenerator({ zones }: Props) {
           <Label htmlFor="width">Width</Label>
           <Input
             name="width"
-            value={width}
-            onChange={e => setWidth(e.target.value)}
+            value={options.width}
+            onChange={e => onParamChange("width", e.target.value)}
             placeholder="e.g. 100%, 500px"
           />
         </div>
@@ -92,15 +109,15 @@ export function EmbedCodeGenerator({ zones }: Props) {
           <Label htmlFor="height">Height</Label>
           <Input
             name="height"
-            value={height}
-            onChange={e => setHeight(e.target.value)}
+            value={options.height}
+            onChange={e => onParamChange("height", e.target.value)}
             placeholder="e.g. 500px, auto"
           />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="theme">Theme</Label>
-          <Select value={theme} onValueChange={setTheme}>
+          <Select value={options.theme} onValueChange={value => onParamChange("theme", value)}>
             <SelectTrigger name="theme">
               <SelectValue />
             </SelectTrigger>
@@ -113,7 +130,7 @@ export function EmbedCodeGenerator({ zones }: Props) {
 
         <div className="space-y-2">
           <Label htmlFor="layout">Layout</Label>
-          <Select value={layout} onValueChange={setLayout}>
+          <Select value={options.layout} onValueChange={value => onParamChange("layout", value)}>
             <SelectTrigger name="layout">
               <SelectValue />
             </SelectTrigger>
