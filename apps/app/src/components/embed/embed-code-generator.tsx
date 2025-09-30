@@ -64,7 +64,7 @@ export function EmbedCodeGenerator({ zones }: EmbedCodeGeneratorProps) {
       <Callout variant="warning" prefix={<BoxIcon />}>
         <CalloutText>
           No ad zones available yet.{" "}
-          <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+          <Link to="/$workspaceId/zones/new" params={{ workspaceId: workspace.id }}>
             Create your first zone
           </Link>{" "}
           to embed it here.

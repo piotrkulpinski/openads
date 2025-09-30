@@ -54,7 +54,7 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
         <DropdownMenuLabel>Account</DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
-          <Link to="/$workspace/account" params={{ workspace: workspace.slug }}>
+          <Link to="/$workspaceId/account" params={{ workspaceId: workspace.id }}>
             <UserRoundIcon />
             Account settings
           </Link>

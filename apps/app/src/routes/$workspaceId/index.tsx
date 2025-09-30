@@ -4,7 +4,7 @@ import { z } from "zod"
 import { useWelcomeModal } from "~/components/modals/welcome-modal"
 import { H3 } from "~/components/ui/heading"
 
-export const Route = createFileRoute("/$workspace/")({
+export const Route = createFileRoute("/$workspaceId/")({
   validateSearch: z.object({
     onboarded: z.boolean().optional(),
   }),

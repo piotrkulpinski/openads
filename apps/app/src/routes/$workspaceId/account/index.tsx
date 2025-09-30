@@ -3,7 +3,7 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { Section } from "~/components/ui/section"
 import { AccountProfileForm } from "./-components/profile-form"
 
-export const Route = createFileRoute("/$workspace/account/")({
+export const Route = createFileRoute("/$workspaceId/account/")({
   loader: async ({ context }) => {
     const user = await context.trpcUtils.user.me.fetch()
 

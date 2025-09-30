@@ -8,10 +8,10 @@ import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { trpc } from "~/lib/trpc"
 
-export const Route = createFileRoute("/$workspace/campaigns/")({
-  loader: async ({ context: { trpcUtils, workspace } }) => {
+export const Route = createFileRoute("/$workspaceId/campaigns/")({
+  loader: async ({ context: { trpcUtils }, params: { workspaceId } }) => {
     const zones = await trpcUtils.zone.getAll.fetch({
-      workspaceId: workspace.id,
+      workspaceId,
     })
 
     return { zones }
@@ -21,10 +21,10 @@ export const Route = createFileRoute("/$workspace/campaigns/")({
 })
 
 function CampaignsIndexPage() {
-  const { workspace } = Route.useRouteContext()
+  const { workspaceId } = Route.useParams()
   const { zones } = Route.useLoaderData()
 
-  const campaignsQuery = trpc.campaign.getAll.useQuery({ workspaceId: workspace.id })
+  const campaignsQuery = trpc.campaign.getAll.useQuery({ workspaceId })
 
   return (
     <>
@@ -33,7 +33,7 @@ function CampaignsIndexPage() {
 
         <HeaderActions>
           <Button prefix={<PlusIcon />} disabled={!zones.length} asChild>
-            <Link to="/$workspace/campaigns/new" params={{ workspace: workspace.slug }}>
+            <Link to="/$workspaceId/campaigns/new" params={{ workspaceId }}>
               Create Campaign
             </Link>
           </Button>
@@ -56,7 +56,7 @@ function CampaignsIndexPage() {
               <CalloutText>
                 No campaigns scheduled for this workspace yet. They will appear here once an ad is
                 purchased and scheduled. You can also{" "}
-                <Link to="/$workspace/campaigns/new" params={{ workspace: workspace.slug }}>
+                <Link to="/$workspaceId/campaigns/new" params={{ workspaceId }}>
                   add a campaign manually
                 </Link>
                 .
@@ -75,7 +75,7 @@ function CampaignsIndexPage() {
         <Callout variant="warning" prefix={<InfoIcon />}>
           <CalloutText>
             Create an ad zone before scheduling campaigns. You can{" "}
-            <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+            <Link to="/$workspaceId/zones/new" params={{ workspaceId }}>
               create your first zone
             </Link>
             .

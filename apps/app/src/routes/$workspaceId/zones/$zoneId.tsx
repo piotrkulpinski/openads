@@ -7,11 +7,11 @@ import { H3 } from "~/components/ui/heading"
 import { ZoneForm } from "~/components/zones/zone-form"
 import { FieldsProvider } from "~/contexts/fields-context"
 
-export const Route = createFileRoute("/$workspace/zones/$zoneId")({
-  loader: async ({ context: { trpcUtils, workspace }, params: { zoneId } }) => {
+export const Route = createFileRoute("/$workspaceId/zones/$zoneId")({
+  loader: async ({ context: { trpcUtils }, params: { workspaceId, zoneId } }) => {
     const zone = await trpcUtils.zone.getById.fetch({
       id: zoneId,
-      workspaceId: workspace.id,
+      workspaceId,
     })
 
     if (!zone) {
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/$workspace/zones/$zoneId")({
 })
 
 function ZonesEditPage() {
-  const { workspace } = Route.useRouteContext()
+  const { workspaceId } = Route.useParams()
   const { zone } = Route.useLoaderData()
 
   return (
@@ -43,7 +43,7 @@ function ZonesEditPage() {
       </Stack>
 
       <ZoneForm
-        workspaceId={workspace.id}
+        workspaceId={workspaceId}
         zone={zone}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"

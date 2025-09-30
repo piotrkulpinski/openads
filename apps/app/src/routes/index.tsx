@@ -8,13 +8,21 @@ export const Route = createFileRoute("/")({
     ])
 
     if (user.defaultWorkspace) {
-      throw redirect({ to: "/$workspace", params: { workspace: user.defaultWorkspace.slug } })
+      throw redirect({
+        to: "/$workspaceId",
+        params: { workspaceId: user.defaultWorkspace.id },
+      })
     }
 
     if (workspaces[0]) {
-      throw redirect({ to: "/$workspace", params: { workspace: workspaces[0].slug } })
+      throw redirect({
+        to: "/$workspaceId",
+        params: { workspaceId: workspaces[0].id },
+      })
     }
 
-    throw redirect({ to: "/onboarding" })
+    throw redirect({
+      to: "/onboarding",
+    })
   },
 })

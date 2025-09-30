@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 import type { RouterOutputs } from "~/lib/trpc"
 
-type CampaignItemProps = ComponentProps<typeof Link> & {
+type CampaignItemProps = ComponentProps<"a"> & {
   campaign: RouterOutputs["campaign"]["getAll"][number]
 }
 
@@ -19,8 +19,8 @@ export function CampaignItem({ campaign, className, ...props }: CampaignItemProp
 
   return (
     <Link
-      to={campaign.id}
-      from="/$workspace/campaigns"
+      to="/$workspaceId/campaigns/$campaignId"
+      params={{ workspaceId: campaign.workspaceId, campaignId: campaign.id }}
       className={cx("flex items-center justify-between px-4 py-3 hover:bg-muted/50", className)}
       {...props}
     >

@@ -24,9 +24,9 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
   })
 
   const { mutate: updateWorkspace, isPending } = trpc.workspace.update.useMutation({
-    onSuccess: async ({ slug }) => {
-      if (workspace.slug !== slug) {
-        navigate({ to: "/$workspace/settings/general", params: { workspace: slug } })
+    onSuccess: async ({ id }) => {
+      if (workspace.id !== id) {
+        navigate({ to: "/$workspaceId/settings/general", params: { workspaceId: id } })
       }
 
       // Show a success toast
@@ -34,7 +34,7 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
 
       // Invalidate the workspace list
       await trpcUtils.workspace.getAll.invalidate()
-      await trpcUtils.workspace.getBySlug.invalidate({ slug })
+      await trpcUtils.workspace.getById.invalidate({ id })
 
       // Invalidate the workspace settings
       router.invalidate()

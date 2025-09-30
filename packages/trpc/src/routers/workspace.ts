@@ -1,5 +1,5 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
-import { workspaceSchema } from "@openads/db/schema"
+import { idSchema, workspaceSchema } from "@openads/db/schema"
 import { authProcedure, router, workspaceProcedure } from "../index"
 
 export const workspaceRouter = router({
@@ -10,13 +10,11 @@ export const workspaceRouter = router({
     })
   }),
 
-  getBySlug: authProcedure
-    .input(workspaceSchema.pick({ slug: true }))
-    .query(async ({ ctx: { db, user }, input: { slug } }) => {
-      return await db.workspace.findFirst({
-        where: { AND: [{ slug }, db.workspace.belongsTo(user.id)] },
-      })
-    }),
+  getById: authProcedure.input(idSchema).query(async ({ ctx: { db, user }, input: { id } }) => {
+    return await db.workspace.findFirst({
+      where: { AND: [{ id }, db.workspace.belongsTo(user.id)] },
+    })
+  }),
 
   create: authProcedure
     .input(workspaceSchema)

@@ -7,7 +7,7 @@ import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type StripeConnectButtonsProps = ComponentProps<"div"> & {
-  workspace: NonNullable<RouterOutputs["workspace"]["getBySlug"]>
+  workspace: NonNullable<RouterOutputs["workspace"]["getById"]>
   onSuccess?: () => void
 }
 
@@ -22,7 +22,7 @@ export const StripeConnectButtons = ({
 
   const connectAccount = trpc.stripe.connect.create.useMutation({
     onSuccess: data => {
-      utils.workspace.getBySlug.invalidate({ slug: workspace.slug })
+      utils.workspace.getById.invalidate({ id: workspace.id })
       onSuccess?.()
       window.location.href = data.url
     },
@@ -35,7 +35,7 @@ export const StripeConnectButtons = ({
 
   const disconnectAccount = trpc.stripe.connect.delete.useMutation({
     onSuccess: () => {
-      utils.workspace.getBySlug.invalidate({ slug: workspace.slug })
+      utils.workspace.getById.invalidate({ id: workspace.id })
       onSuccess?.()
     },
 

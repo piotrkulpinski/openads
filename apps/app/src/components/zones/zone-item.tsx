@@ -43,7 +43,7 @@ const ZoneItem = ({ zone, className, ...props }: ZoneItemProps) => {
       )}
       {...props}
     >
-      <Link to={zone.id} from="/$workspace/zones">
+      <Link to={zone.id} from="/$workspaceId/zones">
         <H5 className="truncate">{zone.name}</H5>
         <span className="absolute inset-0" />
       </Link>

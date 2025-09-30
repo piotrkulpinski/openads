@@ -8,13 +8,13 @@ import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { ZoneItem } from "~/components/zones/zone-item"
 import { trpc } from "~/lib/trpc"
 
-export const Route = createFileRoute("/$workspace/zones/")({
+export const Route = createFileRoute("/$workspaceId/zones/")({
   component: ZonesIndexPage,
 })
 
 function ZonesIndexPage() {
-  const { workspace } = Route.useRouteContext()
-  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId: workspace.id })
+  const { workspaceId } = Route.useParams()
+  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId })
 
   return (
     <>
@@ -23,7 +23,7 @@ function ZonesIndexPage() {
 
         <HeaderActions>
           <Button prefix={<PlusIcon />} asChild>
-            <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+            <Link to="/$workspaceId/zones/new" params={{ workspaceId }}>
               Create Zone
             </Link>
           </Button>
@@ -44,7 +44,7 @@ function ZonesIndexPage() {
           <Callout variant="info" prefix={<BoxIcon />}>
             <CalloutText>
               No ad zones added for this workspace yet.{" "}
-              <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+              <Link to="/$workspaceId/zones/new" params={{ workspaceId }}>
                 Create your first zone here
               </Link>
               .

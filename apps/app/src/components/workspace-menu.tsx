@@ -37,7 +37,7 @@ export const WorkspaceMenu = () => {
     if (!workspace || workspace.slug === activeWorkspace.slug) return
 
     changeDefaultWorkspace.mutate({ workspaceId: workspace.id })
-    navigate({ to: "/$workspace", params: { workspace: workspace.slug } })
+    navigate({ to: "/$workspaceId", params: { workspaceId: workspace.id } })
   }
 
   useHotkeys(
@@ -71,7 +71,7 @@ export const WorkspaceMenu = () => {
             onClick={() => changeWorkspace(workspace)}
             className={cx(
               "gap-2 p-2",
-              workspace.slug === activeWorkspace.slug && "bg-accent opacity-75 pointer-events-none",
+              workspace.id === activeWorkspace.id && "bg-accent opacity-75 pointer-events-none",
             )}
           >
             <Avatar className="size-5 m-0.5">
@@ -81,7 +81,7 @@ export const WorkspaceMenu = () => {
 
             <span className="truncate text-sm/tight font-medium">{workspace.name}</span>
 
-            {workspace.slug === activeWorkspace.slug ? (
+            {workspace.id === activeWorkspace.id ? (
               <Check className="ml-auto text-green-500" />
             ) : (
               index < 9 && <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>

@@ -68,7 +68,7 @@ const SidebarWrapper = ({ className, ...props }: ComponentProps<"div">) => {
 }
 
 const Sidebar = ({ ...props }: ComponentProps<typeof SidebarWrapper>) => {
-  const { slug: workspaceSlug } = useWorkspace()
+  const workspace = useWorkspace()
 
   return (
     <SidebarWrapper {...props}>
@@ -81,7 +81,7 @@ const Sidebar = ({ ...props }: ComponentProps<typeof SidebarWrapper>) => {
           <Separator />
 
           <Nav>
-            <NavMain items={nav.map(link => ({ ...link, to: `/${workspaceSlug}${link.to}` }))} />
+            <NavMain items={nav.map(link => ({ ...link, to: `/${workspace.id}${link.to}` }))} />
           </Nav>
         </Fragment>
       ))}

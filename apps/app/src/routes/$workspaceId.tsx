@@ -3,11 +3,9 @@ import { createFileRoute, notFound, Outlet } from "@tanstack/react-router"
 import { Sidebar, SidebarSkeleton } from "~/components/sidebar"
 import { WorkspaceContext } from "~/contexts/workspace-context"
 
-export const Route = createFileRoute("/$workspace")({
-  beforeLoad: async ({ context, params: { workspace: slug } }) => {
-    const workspace = await context.trpcUtils.workspace.getBySlug.fetch({
-      slug,
-    })
+export const Route = createFileRoute("/$workspaceId")({
+  beforeLoad: async ({ context, params: { workspaceId } }) => {
+    const workspace = await context.trpcUtils.workspace.getById.fetch({ id: workspaceId })
 
     if (!workspace) {
       throw notFound()
@@ -36,8 +34,7 @@ function WorkspaceLayoutPending() {
 }
 
 function WorkspaceLayout() {
-  const routeContext = Route.useRouteContext()
-  const workspace = routeContext?.workspace
+  const { workspace } = Route.useRouteContext()
 
   if (!workspace) {
     return <WorkspaceLayoutPending />

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { EmbedCodeGenerator } from "~/components/embed/embed-code-generator"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 
-export const Route = createFileRoute("/$workspace/embed")({
+export const Route = createFileRoute("/$workspaceId/embed")({
   loader: async ({ context: { trpcUtils, workspace } }) => {
     const zones = await trpcUtils.zone.getAll.fetch({
       workspaceId: workspace.id,

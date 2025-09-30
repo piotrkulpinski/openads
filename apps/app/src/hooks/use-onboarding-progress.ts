@@ -16,17 +16,17 @@ export function useOnboardingProgress() {
   })
 
   const continueTo = useCallback(
-    async (step: OnboardingStep, slug?: string) => {
+    async (step: OnboardingStep, id?: string) => {
       // Update the onboarding progress
       await mutateAsync({ step })
 
       // If we're on the last step, navigate to the workspace
       if (step === "completed") {
         // If we have a workspace, navigate to it
-        if (slug) {
+        if (id) {
           return navigate({
-            to: "/$workspace",
-            params: { workspace: slug },
+            to: "/$workspaceId",
+            params: { workspaceId: id },
             search: { onboarded: true },
           })
         }
@@ -38,7 +38,7 @@ export function useOnboardingProgress() {
       return navigate({
         to: "/onboarding/$step",
         params: { step },
-        search: { workspace: preWorkspaceSteps.includes(step) ? undefined : slug },
+        search: { workspaceId: preWorkspaceSteps.includes(step) ? undefined : id },
       })
     },
     [mutateAsync, navigate],

@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_layout/onboarding/$step")({
   },
 
   validateSearch: z.object({
-    workspace: z.string().optional(),
+    workspaceId: z.string().optional(),
   }),
 
   onError: error => {
@@ -33,10 +33,10 @@ export const Route = createFileRoute("/_layout/onboarding/$step")({
 
 function OnboardingStepPage() {
   const { step } = Route.useParams()
-  const { workspace: slug } = Route.useSearch()
+  const { workspaceId } = Route.useSearch()
   const { continueTo } = useOnboardingProgress()
 
-  const query = trpc.workspace.getBySlug.useQuery({ slug: slug! }, { enabled: !!slug })
+  const query = trpc.workspace.getById.useQuery({ id: workspaceId! }, { enabled: !!workspaceId })
 
   switch (step) {
     case "welcome":
@@ -61,7 +61,7 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm onSuccess={({ slug }) => continueTo("zone", slug)} />
+          <CreateWorkspaceForm onSuccess={({ id }) => continueTo("zone", id)} />
         </OnboardingStep>
       )
 
@@ -76,8 +76,8 @@ function OnboardingStepPage() {
             pending={() => <LoaderIcon className="mx-auto animate-spin" />}
             empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
             success={({ data }) => (
-              <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", slug)}>
-                <OnboardingLaterButton step="stripe" slug={slug} />
+              <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", workspaceId)}>
+                <OnboardingLaterButton step="stripe" slug={workspaceId} />
               </ZoneForm>
             )}
           />
@@ -98,7 +98,7 @@ function OnboardingStepPage() {
               <div className="space-y-4">
                 <StripeConnectButtons workspace={data} />
 
-                <OnboardingLaterButton step="completed" slug={slug}>
+                <OnboardingLaterButton step="completed" id={workspaceId}>
                   I'll connect Stripe later
                 </OnboardingLaterButton>
               </div>
@@ -115,8 +115,8 @@ function OnboardingStepPage() {
     //         pending={() => <LoaderIcon className="mx-auto animate-spin" />}
     //         empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
     //         success={({ data }) => (
-    //           <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("plan", { slug })}>
-    //             <OnboardingLaterButton step="completed" slug={slug}>
+    //           <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("plan", { id })}>
+    //             <OnboardingLaterButton step="completed" id={workspaceId}>
     //               I'll pick a plan later
     //             </OnboardingLaterButton>
     //           </ZoneForm>

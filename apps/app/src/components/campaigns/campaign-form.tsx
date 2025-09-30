@@ -26,6 +26,8 @@ import { trpc } from "~/lib/trpc"
 import type { router } from "~/main"
 
 type CampaignFormProps = HTMLAttributes<HTMLFormElement> & {
+  workspaceId: string
+
   /**
    * The zone to edit
    */
@@ -45,6 +47,7 @@ type CampaignFormProps = HTMLAttributes<HTMLFormElement> & {
 export const CampaignForm = ({
   children,
   className,
+  workspaceId,
   campaign,
   nextUrl,
   onSuccess: onSuccessCallback,
@@ -57,7 +60,7 @@ export const CampaignForm = ({
   const isEditing = !!campaign?.id
 
   const { data: zones, isFetched: isZonesFetched } = trpc.zone.getAll.useQuery(
-    { workspaceId: workspace.id },
+    { workspaceId },
     { initialData: [] },
   )
 
@@ -79,8 +82,8 @@ export const CampaignForm = ({
     toast.success(`Campaign ${isEditing ? "updated" : "created"} successfully`)
 
     // Invalidate the campaigns cache
-    await utils.campaign.getAll.invalidate({ workspaceId: workspace.id })
-    await utils.campaign.getById.invalidate({ id: campaign?.id, workspaceId: workspace.id })
+    await utils.campaign.getAll.invalidate({ workspaceId })
+    await utils.campaign.getById.invalidate({ id: campaign?.id, workspaceId })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
@@ -129,7 +132,7 @@ export const CampaignForm = ({
             <Callout variant="warning" prefix={<InfoIcon />}>
               <CalloutText>
                 Create an ad zone before scheduling campaigns. You can{" "}
-                <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+                <Link to="/$workspaceId/zones/new" params={{ workspaceId }}>
                   create your first zone
                 </Link>
                 .

@@ -35,9 +35,9 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
         </Header>
 
         <CreateWorkspaceForm
-          onSuccess={({ slug }) => {
+          onSuccess={({ id }) => {
             toast.success("Workspace created successfully")
-            navigate({ to: "/$workspace", params: { workspace: slug } })
+            navigate({ to: "/$workspaceId", params: { workspaceId: id } })
           }}
         >
           <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
