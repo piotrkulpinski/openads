@@ -9,7 +9,7 @@ import { Slottable } from "./slottable"
 const buttonVariants = cva({
   base: [
     "group/button inline-flex items-center justify-center border-transparent! font-medium text-[0.8125rem]/tight text-start rounded-md overflow-clip hover:z-10 hover:border-transparent",
-    "disabled:opacity-60 disabled:pointer-events-none",
+    "disabled:opacity-60 disabled:pointer-events-none aria-disabled:opacity-60 aria-disabled:pointer-events-none",
     "has-[.lucide-loader:last-child]:[&>*:not(.animate-spin)]:text-transparent select-none",
   ],
 

@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "@tanstack/react-router"
 import { type PropsWithChildren, useState } from "react"
 import { toast } from "sonner"
-import { HeaderDescription, Header, HeaderTitle } from "~/components/ui/header"
+import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 
 export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {

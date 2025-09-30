@@ -3,7 +3,7 @@ import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
 import { getInitials } from "@primoui/utils"
-import { ComponentProps } from "react"
+import type { ComponentProps } from "react"
 
 type NavButtonProps = ComponentProps<typeof Button> & {
   title: string

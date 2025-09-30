@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { EmbedCodeGenerator } from "~/components/embed/embed-code-generator"
-import { QueryCell } from "~/components/query-cell"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
-import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspace/embed")({
   loader: async ({ context: { trpcUtils, workspace } }) => {
@@ -17,8 +15,7 @@ export const Route = createFileRoute("/$workspace/embed")({
 })
 
 function RouteComponent() {
-  const { workspace } = Route.useRouteContext()
-  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId: workspace.id })
+  const { zones } = Route.useLoaderData()
 
   return (
     <>
@@ -30,13 +27,7 @@ function RouteComponent() {
         </HeaderDescription>
       </Header>
 
-      <QueryCell
-        query={zonesQuery}
-        pending={() => <p className="text-sm text-muted-foreground">Loading zones…</p>}
-        error={() => <p className="text-red-500">There was an error loading the zones.</p>}
-        empty={() => <EmbedCodeGenerator zones={[]} />}
-        success={({ data }) => <EmbedCodeGenerator zones={data} />}
-      />
+      <EmbedCodeGenerator zones={zones} />
     </>
   )
 }

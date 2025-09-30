@@ -1,7 +1,7 @@
 import { cva, cx, type VariantProps } from "@openads/ui/cva"
 import { Stack } from "@openads/ui/stack"
 import { Slot } from "radix-ui"
-import type { ComponentProps } from "react"
+import type { ComponentProps, ReactNode } from "react"
 import { Prose } from "~/components/ui/prose"
 
 const calloutVariants = cva({
@@ -25,24 +25,35 @@ const calloutVariants = cva({
   },
 })
 
-type CalloutProps = ComponentProps<typeof Stack> & VariantProps<typeof calloutVariants>
+type CalloutProps = Omit<ComponentProps<typeof Stack>, "prefix" | "suffix"> &
+  VariantProps<typeof calloutVariants> & {
+    /**
+     * The slot to be rendered before the content.
+     */
+    prefix?: ReactNode
 
-const Callout = ({ className, variant, ...props }: CalloutProps) => (
+    /**
+     * The slot to be rendered after the content.
+     */
+    suffix?: ReactNode
+  }
+
+const Callout = ({ children, className, variant, prefix, suffix, ...props }: CalloutProps) => (
   <Stack
     size="sm"
-    role="alert"
     wrap={false}
+    role="alert"
     className={cx(calloutVariants({ variant }), className)}
     {...props}
-  />
+  >
+    <Slot.Root className="mt-0.5 self-start shrink-0 size-4.5">{prefix}</Slot.Root>
+    {children}
+    <Slot.Root className="mt-0.5 self-start shrink-0 size-4.5">{suffix}</Slot.Root>
+  </Stack>
 )
 
 const CalloutText = ({ className, ...props }: ComponentProps<typeof Prose>) => (
   <Prose className={cx("font-medium text-current", className)} {...props} />
 )
 
-const CalloutIcon = ({ className, ...props }: ComponentProps<typeof Slot.Root>) => (
-  <Slot.Root className={cx("mt-0.5 self-start shrink-0", className)} {...props} />
-)
-
-export { Callout, CalloutText, CalloutIcon }
+export { Callout, CalloutText }
