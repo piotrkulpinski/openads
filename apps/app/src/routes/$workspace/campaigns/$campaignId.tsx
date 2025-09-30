@@ -20,7 +20,6 @@ export const Route = createFileRoute("/$workspace/campaigns/$campaignId")({
 })
 
 function CampaignEditPage() {
-  const { workspace } = Route.useRouteContext()
   const { campaign } = Route.useLoaderData()
 
   return (
@@ -28,7 +27,6 @@ function CampaignEditPage() {
       <H3>Edit Campaign</H3>
 
       <CampaignForm
-        workspaceId={workspace.id}
         campaign={campaign}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"

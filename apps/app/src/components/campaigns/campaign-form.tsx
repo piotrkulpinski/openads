@@ -9,14 +9,16 @@ import { Input } from "@openads/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@openads/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import type { NavigateOptions } from "@tanstack/react-router"
-import { useNavigate } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, InfoIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
+import { Callout, CalloutText } from "~/components/ui/callout"
+import { useWorkspace } from "~/contexts/workspace-context"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import type { RouterOutputs } from "~/lib/trpc"
@@ -24,8 +26,6 @@ import { trpc } from "~/lib/trpc"
 import type { router } from "~/main"
 
 type CampaignFormProps = HTMLAttributes<HTMLFormElement> & {
-  workspaceId: string
-
   /**
    * The zone to edit
    */
@@ -45,18 +45,24 @@ type CampaignFormProps = HTMLAttributes<HTMLFormElement> & {
 export const CampaignForm = ({
   children,
   className,
-  workspaceId,
   campaign,
   nextUrl,
   onSuccess: onSuccessCallback,
   ...props
 }: CampaignFormProps) => {
   const utils = trpc.useUtils()
+  const workspace = useWorkspace()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
   const isEditing = !!campaign?.id
 
-  const zonesQuery = trpc.zone.getAll.useQuery({ workspaceId })
+  const { data: zones, isFetched: isZonesFetched } = trpc.zone.getAll.useQuery(
+    { workspaceId: workspace.id },
+    { initialData: [] },
+  )
+
+  const hasZones = zones.length > 0
+  const canSubmit = isEditing || hasZones
 
   const form = useZodForm(campaignSchema, {
     defaultValues: {
@@ -73,8 +79,8 @@ export const CampaignForm = ({
     toast.success(`Campaign ${isEditing ? "updated" : "created"} successfully`)
 
     // Invalidate the campaigns cache
-    await utils.campaign.getAll.invalidate({ workspaceId })
-    await utils.campaign.getById.invalidate({ id: campaign?.id, workspaceId })
+    await utils.campaign.getAll.invalidate({ workspaceId: workspace.id })
+    await utils.campaign.getById.invalidate({ id: campaign?.id, workspaceId: workspace.id })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
@@ -93,11 +99,19 @@ export const CampaignForm = ({
 
   // Handle the form submission
   const handleSubmit = form.handleSubmit(data => {
-    if (isEditing) {
-      return updateCampaign.mutate({ ...data, id: campaign.id, workspaceId })
+    if (!canSubmit) {
+      if (!isZonesFetched) {
+        toast.error("Create an ad zone before creating a campaign.")
+      }
+
+      return
     }
 
-    return createCampaign.mutate({ ...data, workspaceId })
+    if (isEditing) {
+      return updateCampaign.mutate({ ...data, id: campaign.id, workspaceId: workspace.id })
+    }
+
+    return createCampaign.mutate({ ...data, workspaceId: workspace.id })
   })
 
   const [startsAt, endsAt] = form.watch(["startsAt", "endsAt"])
@@ -111,6 +125,18 @@ export const CampaignForm = ({
         {...props}
       >
         <div className="grid gap-4 col-span-2">
+          {!isEditing && isZonesFetched && !hasZones && (
+            <Callout variant="warning" prefix={<InfoIcon />}>
+              <CalloutText>
+                Create an ad zone before scheduling campaigns. You can{" "}
+                <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+                  create your first zone
+                </Link>
+                .
+              </CalloutText>
+            </Callout>
+          )}
+
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
@@ -179,14 +205,20 @@ export const CampaignForm = ({
               <FormItem>
                 <FormLabel>Zone</FormLabel>
 
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={!hasZones}
+                >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a zone" />
+                      <SelectValue
+                        placeholder={hasZones ? "Select a zone" : "No ad zones available"}
+                      />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {zonesQuery.data?.map(zone => (
+                    {zones.map(zone => (
                       <SelectItem key={zone.id} value={zone.id}>
                         {zone.name}
                       </SelectItem>
@@ -224,7 +256,7 @@ export const CampaignForm = ({
           <DialogFooter className="mt-2 col-span-full">
             {children}
 
-            <FormButton isPending={isPending}>
+            <FormButton isPending={isPending} disabled={!canSubmit}>
               {isEditing ? "Update" : "Create"} Campaign
             </FormButton>
           </DialogFooter>

@@ -7,17 +7,11 @@ export const Route = createFileRoute("/$workspace/campaigns/new")({
 })
 
 function CampaignsNewPage() {
-  const { workspace } = Route.useRouteContext()
-
   return (
     <>
       <H3>New Campaign</H3>
 
-      <CampaignForm
-        workspaceId={workspace.id}
-        nextUrl={{ from: Route.fullPath, to: ".." }}
-        className="mt-4"
-      />
+      <CampaignForm nextUrl={{ from: Route.fullPath, to: ".." }} className="mt-4" />
     </>
   )
 }

@@ -3,7 +3,7 @@ import { Skeleton } from "@openads/ui/skeleton"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { BoxIcon, PlusIcon } from "lucide-react"
 import { QueryCell } from "~/components/query-cell"
-import { Callout, CalloutIcon, CalloutText } from "~/components/ui/callout"
+import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { ZoneItem } from "~/components/zones/zone-item"
 import { trpc } from "~/lib/trpc"
@@ -33,13 +33,15 @@ function ZonesIndexPage() {
       <QueryCell
         query={zonesQuery}
         pending={() => [...Array(3)].map((_, i) => <Skeleton key={i} className="h-10" />)}
-        error={() => <p className="text-red-500">There was an error loading the ad zones.</p>}
+        error={() => (
+          <Callout variant="danger">
+            <CalloutText>
+              We could not load ad zones for this workspace. Please try again later.
+            </CalloutText>
+          </Callout>
+        )}
         empty={() => (
-          <Callout variant="info">
-            <CalloutIcon>
-              <BoxIcon />
-            </CalloutIcon>
-
+          <Callout variant="info" prefix={<BoxIcon />}>
             <CalloutText>
               No ad zones added for this workspace yet.{" "}
               <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
