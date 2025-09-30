@@ -7,8 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
 import { slugify } from "@primoui/utils"
-import { CheckIcon, CopyIcon } from "lucide-react"
+import { Link } from "@tanstack/react-router"
+import { BoxIcon, CheckIcon, CopyIcon } from "lucide-react"
 import { useState } from "react"
+import { Callout, CalloutIcon, CalloutText } from "~/components/ui/callout"
 import { siteConfig } from "~/config/site"
 import { useWorkspace } from "~/contexts/workspace-context"
 import type { RouterOutputs } from "~/lib/trpc"
@@ -59,9 +61,19 @@ export function EmbedCodeGenerator({ zones }: EmbedCodeGeneratorProps) {
 
   if (zones.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-        No ad zones available yet. Create a zone to embed it here.
-      </div>
+      <Callout variant="info">
+        <CalloutIcon>
+          <BoxIcon />
+        </CalloutIcon>
+
+        <CalloutText>
+          No ad zones available yet.{" "}
+          <Link to="/$workspace/zones/new" params={{ workspace: workspace.slug }}>
+            Create a zone
+          </Link>{" "}
+          to embed it here.
+        </CalloutText>
+      </Callout>
     )
   }
 

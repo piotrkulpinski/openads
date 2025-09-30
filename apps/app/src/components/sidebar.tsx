@@ -2,12 +2,12 @@ import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import { Skeleton } from "@openads/ui/skeleton"
 import {
-  CalendarDaysIcon,
+  AppWindowIcon,
   Code2Icon,
   LayoutDashboardIcon,
   MegaphoneIcon,
-  MousePointer2Icon,
   SettingsIcon,
+  UsersIcon,
 } from "lucide-react"
 import { type ComponentProps, Fragment } from "react"
 import { Nav } from "~/components/nav"
@@ -28,17 +28,17 @@ const navs: NavMainItem[][] = [
     {
       title: "Ad Zones",
       to: "/zones",
-      prefix: <MousePointer2Icon />,
+      prefix: <AppWindowIcon />,
     },
     {
       title: "Campaigns",
       to: "/campaigns",
-      prefix: <CalendarDaysIcon />,
+      prefix: <MegaphoneIcon />,
     },
     {
       title: "Advertisers",
       to: "/advertisers",
-      prefix: <MegaphoneIcon />,
+      prefix: <UsersIcon />,
     },
     {
       title: "Settings",

@@ -49,7 +49,7 @@ function WorkspaceLayout() {
         <Sidebar />
 
         <div className="p-4 flex-1 min-w-xl sm:px-6 lg:px-10 lg:py-6">
-          <div className="flex flex-col gap-4 mx-auto w-full max-w-6xl">
+          <div className="flex flex-col gap-4 mx-auto w-full max-w-5xl">
             <Outlet />
           </div>
         </div>

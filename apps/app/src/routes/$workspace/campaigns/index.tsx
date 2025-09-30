@@ -1,9 +1,10 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { PlusIcon } from "lucide-react"
+import { BoxIcon, PlusIcon } from "lucide-react"
 import { CampaignItem } from "~/components/campaigns/campaign-item"
 import { QueryCell } from "~/components/query-cell"
+import { Callout, CalloutIcon, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { trpc } from "~/lib/trpc"
 
@@ -34,7 +35,20 @@ function CampaignsIndexPage() {
         pending={() => [...Array(3)].map((_, i) => <Skeleton key={i} className="h-10" />)}
         error={() => <p className="text-red-500">There was an error loading the campaigns.</p>}
         empty={() => (
-          <p className="text-muted-foreground">No campaigns scheduled for this workspace yet.</p>
+          <Callout variant="info">
+            <CalloutIcon>
+              <BoxIcon />
+            </CalloutIcon>
+
+            <CalloutText>
+              No campaigns scheduled for this workspace yet. They will appear here once an ad is
+              purchased and scheduled. You can also{" "}
+              <Link to="/$workspace/campaigns/new" params={{ workspace: workspace.slug }}>
+                add a campaign manually
+              </Link>
+              .
+            </CalloutText>
+          </Callout>
         )}
         success={({ data }) => (
           <div className="flex flex-col border rounded-lg divide-y">
