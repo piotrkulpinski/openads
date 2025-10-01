@@ -19,8 +19,8 @@ export function CampaignItem({ campaign, className, ...props }: CampaignItemProp
 
   return (
     <Link
-      to="/$workspaceId/campaigns/$campaignId"
-      params={{ workspaceId: campaign.workspaceId, campaignId: campaign.id }}
+      to={campaign.id}
+      from="/$workspaceId/campaigns"
       className={cx("flex items-center justify-between px-4 py-3 hover:bg-muted/50", className)}
       {...props}
     >

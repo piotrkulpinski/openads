@@ -9,8 +9,8 @@ import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspaceId/campaigns/")({
-  loader: async ({ context: { trpcUtils }, params: { workspaceId } }) => {
-    const zones = await trpcUtils.zone.getAll.fetch({
+  loader: async ({ context: { trpc }, params: { workspaceId } }) => {
+    const zones = await trpc.zone.getAll.fetch({
       workspaceId,
     })
 

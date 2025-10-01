@@ -5,7 +5,7 @@ import type { ComponentProps, ReactNode } from "react"
 import { Prose } from "~/components/ui/prose"
 
 const calloutVariants = cva({
-  base: "w-full rounded-lg border px-3.5 py-2.5 **:[&[href]]:underline **:[&[href]]:underline-offset-2 **:[&[href]]:hover:text-foreground",
+  base: "w-full rounded-lg border px-3.5 py-2.5",
 
   variants: {
     variant: {

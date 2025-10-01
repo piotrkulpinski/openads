@@ -4,7 +4,8 @@ import { LoaderIcon } from "lucide-react"
 import type { PropsWithChildren } from "react"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
-import { NotFound } from "~/components/not-found"
+import { ErrorRoute } from "~/components/errors/error"
+import { NotFoundRoute } from "~/components/errors/not-found"
 import { queryClient, trpc, trpcClient, trpcUtils } from "~/lib/trpc"
 import { routeTree } from "~/routeTree.gen"
 import "./styles.css"
@@ -12,11 +13,11 @@ import "./styles.css"
 // Create a new router instance
 export const router = createRouter({
   routeTree,
-  // defaultPreload: "intent",
   defaultPendingMinMs: 0,
   defaultStaleTime: Number.POSITIVE_INFINITY,
-  context: { trpcUtils },
-  defaultNotFoundComponent: () => <NotFound />,
+  context: { trpc: trpcUtils },
+  defaultNotFoundComponent: NotFoundRoute,
+  defaultErrorComponent: ErrorRoute,
   defaultPendingComponent: () => <LoaderIcon className="animate-spin mx-auto mt-[5vh]" />,
   Wrap: ({ children }: PropsWithChildren) => {
     return (

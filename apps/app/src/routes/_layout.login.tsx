@@ -9,8 +9,8 @@ export const Route = createFileRoute("/_layout/login")({
     callbackURL: z.string().optional(),
   }),
 
-  loader: async ({ context }) => {
-    const session = await context.trpcUtils.auth.getSession.fetch()
+  loader: async ({ context: { trpc } }) => {
+    const session = await trpc.auth.getSession.fetch()
 
     if (session?.user) {
       throw redirect({ to: "/" })

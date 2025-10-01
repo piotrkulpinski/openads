@@ -1,8 +1,8 @@
 import { Button } from "@openads/ui/button"
-import { Link } from "@tanstack/react-router"
+import { Link, type NotFoundRouteComponent } from "@tanstack/react-router"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 
-export const NotFound = () => {
+export const NotFoundRoute: NotFoundRouteComponent = () => {
   return (
     <Header>
       <HeaderTitle>404 Not Found</HeaderTitle>

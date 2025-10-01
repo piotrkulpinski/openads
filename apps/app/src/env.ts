@@ -2,7 +2,7 @@ import { createEnv } from "@t3-oss/env-core"
 import { z } from "zod"
 
 export const env = createEnv({
-  server: {
+  shared: {
     PORT: z.coerce.number().default(5183),
     MODE: z.enum(["development", "production"]).default("development"),
   },

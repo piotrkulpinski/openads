@@ -4,8 +4,8 @@ import { Section } from "~/components/ui/section"
 import { AccountProfileForm } from "./-components/profile-form"
 
 export const Route = createFileRoute("/$workspaceId/account/")({
-  loader: async ({ context }) => {
-    const user = await context.trpcUtils.user.me.fetch()
+  loader: async ({ context: { trpc } }) => {
+    const user = await trpc.user.me.fetch()
 
     return { user }
   },

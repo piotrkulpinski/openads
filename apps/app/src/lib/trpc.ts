@@ -14,12 +14,11 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       retry: false,
-      // staleTime: 30_000, // 30 seconds
     },
   },
 
   queryCache: new QueryCache({
-    onError: ({ message }) => toast.error(`Something went wrong: ${message}`),
+    onError: () => toast.error("Something went wrong. Please try again later."),
   }),
 })
 

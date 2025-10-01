@@ -8,8 +8,8 @@ import { ZoneForm } from "~/components/zones/zone-form"
 import { FieldsProvider } from "~/contexts/fields-context"
 
 export const Route = createFileRoute("/$workspaceId/zones/$zoneId")({
-  loader: async ({ context: { trpcUtils }, params: { workspaceId, zoneId } }) => {
-    const zone = await trpcUtils.zone.getById.fetch({
+  loader: async ({ context: { trpc }, params: { workspaceId, zoneId } }) => {
+    const zone = await trpc.zone.getById.fetch({
       id: zoneId,
       workspaceId,
     })

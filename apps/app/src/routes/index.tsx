@@ -1,10 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/")({
-  loader: async ({ context: { trpcUtils } }) => {
+  loader: async ({ context: { trpc } }) => {
     const [user, workspaces] = await Promise.all([
-      trpcUtils.user.me.fetch(),
-      trpcUtils.workspace.getAll.fetch(),
+      trpc.user.me.fetch(),
+      trpc.workspace.getAll.fetch(),
     ])
 
     if (user.defaultWorkspace) {

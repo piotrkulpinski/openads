@@ -10,16 +10,16 @@ import { env } from "~/env"
 import type { trpcUtils } from "~/lib/trpc"
 
 export type RouterAppContext = {
-  trpcUtils: typeof trpcUtils
+  trpc: typeof trpcUtils
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  beforeLoad: async ({ context, location: { pathname, searchStr } }) => {
+  beforeLoad: async ({ context: { trpc }, location: { pathname, searchStr } }) => {
     if (["/login", "/embed"].includes(pathname)) {
       return
     }
 
-    const session = await context.trpcUtils.auth.getSession.fetch()
+    const session = await trpc.auth.getSession.fetch()
 
     if (!session?.user) {
       const callbackURL = new URL(pathname + searchStr, siteConfig.url).toString()

@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
-    "@upstash/redis": "^1.35.3",
-    "zod": "^4.1.8"
+    "@upstash/redis": "^1.35.4",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
-    "@types/node": "^24.5.0",
-    "typescript": "^5.9.2"
+    "@types/node": "^24.6.1",
+    "typescript": "^5.9.3"
   }
 }

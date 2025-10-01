@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+@plugin "@tailwindcss/typography";
 
 @source "../../../packages/ui/src/components";
 
@@ -185,7 +186,7 @@
   }
 
   strong {
-    @apply font-medium;
+    @apply font-semibold;
   }
 
   /* Chrome, Safari, Edge, Opera */
