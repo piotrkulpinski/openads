@@ -5,13 +5,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "biome check --write .",
-    "format": "biome format --write .",
-    "db:generate": "npm run db:generate -w packages/db",
-    "db:migrate": "npm run db:migrate -w packages/db",
-    "db:studio": "npm run db:studio -w packages/db",
-    "db:push": "npm run db:push -w packages/db",
-    "db:reset": "npm run db:reset -w packages/db",
-    "postinstall": "npm run db:generate"
+    "format": "biome format --write ."
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.4",
