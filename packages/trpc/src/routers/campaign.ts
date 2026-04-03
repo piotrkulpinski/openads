@@ -22,7 +22,7 @@ export const campaignRouter = router({
   getById: workspaceProcedure
     .input(idSchema)
     .query(async ({ ctx: { db }, input: { ...where } }) => {
-      return await db.campaign.findUniqueOrThrow({
+      return await db.campaign.findUnique({
         where,
         include: { zone: true },
       })
