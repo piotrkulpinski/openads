@@ -1,6 +1,6 @@
 import { Provider as Analytics } from "@openads/events/client"
 import { TooltipProvider } from "@openads/ui/tooltip"
-import { TanstackDevtools } from "@tanstack/react-devtools"
+import { TanStackDevtools } from "@tanstack/react-devtools"
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
@@ -40,7 +40,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       <Toaster />
       <CossistantChat />
 
-      <TanstackDevtools
+      <TanStackDevtools
         config={{ position: "bottom-left" }}
         plugins={[
           { name: "Tanstack Query", render: <ReactQueryDevtoolsPanel /> },
