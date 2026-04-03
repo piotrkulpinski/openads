@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Link, useRouter } from "@tanstack/react-router"
+import { useSupport } from "@cossistant/react"
 import {
   BookOpenIcon,
   BugIcon,
@@ -25,6 +26,7 @@ import { trpc } from "~/lib/trpc"
 export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
   const router = useRouter()
   const workspace = useWorkspace()
+  const { open: openSupport } = useSupport()
 
   const { data: user, isFetching } = trpc.user.me.useQuery()
 
@@ -81,11 +83,9 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
           </a>
         </DropdownMenuItem>
 
-        <DropdownMenuItem asChild>
-          <a href="#" target="_blank" rel="noopener">
-            <LifeBuoyIcon />
-            Support
-          </a>
+        <DropdownMenuItem onSelect={() => openSupport()}>
+          <LifeBuoyIcon />
+          Support
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />

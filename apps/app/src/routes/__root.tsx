@@ -4,6 +4,7 @@ import { TanstackDevtools } from "@tanstack/react-devtools"
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools"
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router"
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools"
+import { CossistantChat } from "~/components/cossistant-chat"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
 import { env } from "~/env"
@@ -37,6 +38,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
       <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
       <Toaster />
+      <CossistantChat />
 
       <TanstackDevtools
         config={{ position: "bottom-left" }}
