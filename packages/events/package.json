@@ -1,9 +1,9 @@
 {
   "name": "@openads/events",
   "version": "1.0.0",
-  "main": "src/index.ts",
   "private": true,
   "sideEffects": false,
+  "main": "src/index.ts",
   "exports": {
     "./server": "./src/server.ts",
     "./client": "./src/client.tsx",
@@ -11,8 +11,8 @@
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "lint": "biome check .",
-    "format": "biome --write .",
+    "lint": "oxlint",
+    "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
