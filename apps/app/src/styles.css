@@ -1,14 +1,15 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
+@import "@cossistant/react/support.css";
 
 @source "../../../packages/ui/src/components";
 
 @theme {
   --system-font:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.141 0.005 285.823);
@@ -49,14 +50,10 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
-  --animate-slide-down-and-fade: slide-down-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-left-and-fade: slide-left-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-up-and-fade: slide-up-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-slide-right-and-fade: slide-right-and-fade 0.4s
-    cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-down-and-fade: slide-down-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-left-and-fade: slide-left-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-up-and-fade: slide-up-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-right-and-fade: slide-right-and-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 
   @keyframes accordion-down {
     from {
@@ -169,7 +166,7 @@
   }
 
   * {
-    @apply break-words;
+    @apply wrap-break-word;
   }
 
   body {
@@ -217,11 +214,7 @@
       transparent 62.5%,
       transparent 100%
     );
-    background-color: color-mix(
-      in oklch,
-      var(--color-foreground),
-      transparent 90%
-    );
+    background-color: color-mix(in oklch, var(--color-foreground), transparent 90%);
     background-size: 0.25rem 0.25rem;
   }
 }

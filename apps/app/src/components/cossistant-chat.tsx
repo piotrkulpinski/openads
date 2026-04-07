@@ -1,6 +1,4 @@
-import { IdentifySupportVisitor, Support, SupportProvider } from "@cossistant/react"
-import "@cossistant/react/support.css"
-import { env } from "~/env"
+import { IdentifySupportVisitor, Support } from "@cossistant/react"
 import { trpc } from "~/lib/trpc"
 
 export function CossistantChat() {
@@ -9,7 +7,7 @@ export function CossistantChat() {
   })
 
   return (
-    <SupportProvider publicKey={env.VITE_COSSISTANT_PUBLIC_KEY}>
+    <>
       {user && (
         <IdentifySupportVisitor
           externalId={user.id}
@@ -19,7 +17,7 @@ export function CossistantChat() {
         />
       )}
 
-      <Support />
-    </SupportProvider>
+      <Support side="bottom" align="end" />
+    </>
   )
 }
