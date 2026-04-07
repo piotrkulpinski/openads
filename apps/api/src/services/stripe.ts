@@ -1,4 +1,9 @@
-import { createPaymentIntent as createPaymentIntentCore, createStripeClient } from "@openads/stripe"
+import {
+  type CreatePaymentIntentProps,
+  createPaymentIntent as createPaymentIntentCore,
+  createStripeClient,
+} from "@openads/stripe"
+import Stripe from "stripe"
 import { env } from "~/env"
 
 export const stripe = createStripeClient({
@@ -11,13 +16,10 @@ const stripeConfig = {
   STRIPE_PLATFORM_FEE_PERCENT: env.STRIPE_PLATFORM_FEE_PERCENT,
 }
 
-export type CreatePaymentIntentProps = {
-  amount: number
-  workspaceId: string
-  campaignId: string
-  stripeConnectId: string
-}
+export type { CreatePaymentIntentProps }
 
-export async function createPaymentIntent(props: CreatePaymentIntentProps) {
+export async function createPaymentIntent(
+  props: CreatePaymentIntentProps,
+): Promise<Stripe.PaymentIntent> {
   return createPaymentIntentCore(stripe, stripeConfig, props)
 }
