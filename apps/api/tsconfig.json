@@ -5,7 +5,6 @@
     "composite": true,
     "incremental": true,
     "outDir": "./dist",
-    "baseUrl": ".",
     "paths": { "~/*": ["./src/*"] }
   }
 }
