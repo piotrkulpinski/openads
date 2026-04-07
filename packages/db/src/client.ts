@@ -12,10 +12,4 @@ export type {
   Zone,
 } from "@prisma/client"
 
-export {
-  FieldType,
-  Prisma,
-  PrismaClient,
-  WorkspaceMemberRole,
-  WorkspacePlan,
-} from "@prisma/client"
+export { FieldType, Prisma, PrismaClient, WorkspaceMemberRole, WorkspacePlan } from "@prisma/client"

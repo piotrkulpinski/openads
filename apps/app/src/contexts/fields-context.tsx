@@ -71,12 +71,13 @@ export const FieldsProvider = ({ zone, ...props }: FieldsProviderProps) => {
 
   // Update field
   const onUpdateField = (field: Partial<FieldSchema>) => {
-    selectedField &&
+    if (selectedField) {
       updateFieldMutation.mutate({
         ...field,
         id: selectedField.id,
         zoneId: zone.id,
       })
+    }
   }
 
   // Remove field

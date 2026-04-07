@@ -76,7 +76,7 @@ export const CampaignForm = ({
 
   const onSuccess = async (data: RouterOutputs["campaign"]["create"]) => {
     // If we have a nextUrl, navigate to it
-    nextUrl && navigate(nextUrl)
+    if (nextUrl) navigate(nextUrl)
 
     // Show a success toast
     toast.success(`Campaign ${isEditing ? "updated" : "created"} successfully`)
@@ -269,8 +269,8 @@ export const CampaignForm = ({
           mode="range"
           selected={{ from: startsAt, to: endsAt }}
           onSelect={selected => {
-            selected?.from && form.setValue("startsAt", selected.from)
-            selected?.to && form.setValue("endsAt", selected.to)
+            if (selected?.from) form.setValue("startsAt", selected.from)
+            if (selected?.to) form.setValue("endsAt", selected.to)
           }}
           defaultMonth={startsAt || new Date()}
           className="border rounded-lg p-4"

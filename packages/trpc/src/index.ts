@@ -7,7 +7,7 @@ import type { StripeClient } from "@openads/stripe"
 import { initTRPC, TRPCError } from "@trpc/server"
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch"
 import superjson from "superjson"
-import { ZodError, z } from "zod"
+import { z, ZodError } from "zod"
 
 /**
  * Context type that the API will provide
@@ -50,7 +50,7 @@ const t = initTRPC.context<Context>().create({
       // Unique constraint
       if (cause.code === "P2002") {
         if (cause.meta?.target) {
-          const name = (cause.meta?.target as string[]).at(-1)
+          const name = (cause.meta.target as string[]).at(-1)
 
           if (name) {
             dataError.fieldErrors[name] = [

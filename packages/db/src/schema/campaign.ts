@@ -9,12 +9,9 @@ export const campaignBaseSchema = z.object({
   zoneId: z.string().nonempty("Zone is required"),
 })
 
-export const campaignSchema = campaignBaseSchema.refine(
-  data => data.endsAt >= data.startsAt,
-  {
-    message: "End date cannot be earlier than start date.",
-    path: ["endsAt"],
-  },
-)
+export const campaignSchema = campaignBaseSchema.refine(data => data.endsAt >= data.startsAt, {
+  message: "End date cannot be earlier than start date.",
+  path: ["endsAt"],
+})
 
 export type CampaignSchema = z.infer<typeof campaignSchema>

@@ -62,7 +62,7 @@ export const ZoneForm = ({
 
   const onSuccess = async (data: RouterOutputs["zone"]["create"]) => {
     // If we have a nextUrl, navigate to it
-    nextUrl && navigate(nextUrl)
+    if (nextUrl) navigate(nextUrl)
 
     // Show a success toast
     toast.success(`Zone ${isEditing ? "updated" : "created"} successfully`)

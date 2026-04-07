@@ -1,3 +1,4 @@
+import "./styles.css"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { LoaderIcon } from "lucide-react"
@@ -8,7 +9,6 @@ import { ErrorRoute } from "~/components/errors/error"
 import { NotFoundRoute } from "~/components/errors/not-found"
 import { queryClient, trpc, trpcClient, trpcUtils } from "~/lib/trpc"
 import { routeTree } from "~/routeTree.gen"
-import "./styles.css"
 
 // Create a new router instance
 export const router = createRouter({
