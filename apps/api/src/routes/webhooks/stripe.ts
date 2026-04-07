@@ -1,5 +1,4 @@
 import { db } from "@openads/db"
-import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { env } from "~/env"
 import { stripe } from "../../services/stripe"
@@ -9,7 +8,7 @@ export async function POST(req: Request) {
   const signature = req.headers.get("stripe-signature")
 
   if (!signature) {
-    return new NextResponse("No signature", { status: 400 })
+    return new Response("No signature", { status: 400 })
   }
 
   let event: Stripe.Event
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
-    return new NextResponse(`Invalid signature: ${err}`, { status: 400 })
+    return new Response(`Invalid signature: ${err}`, { status: 400 })
   }
 
   try {
@@ -51,10 +50,10 @@ export async function POST(req: Request) {
       }
     }
 
-    return new NextResponse("OK", { status: 200 })
+    return new Response("OK", { status: 200 })
   } catch (error) {
     console.error("Webhook error:", error)
-    return new NextResponse("Webhook handler failed", { status: 500 })
+    return new Response("Webhook handler failed", { status: 500 })
   }
 }
 
