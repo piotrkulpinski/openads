@@ -1,4 +1,4 @@
-import { campaignSchema, idSchema } from "@openads/db/schema"
+import { campaignBaseSchema, campaignSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
 import { publicProcedure, router, workspaceProcedure, zoneProcedure } from "../index"
 
@@ -39,7 +39,7 @@ export const campaignRouter = router({
     }),
 
   update: workspaceProcedure
-    .input(campaignSchema.partial().extend(idSchema.shape))
+    .input(campaignBaseSchema.partial().extend(idSchema.shape))
     .mutation(async ({ ctx: { db }, input: { id, workspaceId, ...data } }) => {
       return await db.campaign.update({
         where: { id, workspaceId },
