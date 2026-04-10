@@ -1,0 +1,79 @@
+---
+import DirStarterLogo from "~/assets/dirstarter.svg"
+import EuroAlternativeLogo from "~/assets/euroalternative.svg"
+import OpenAlternativeLogo from "~/assets/openalternative.svg"
+import Badge from "~/components/Badge.astro"
+import Container from "~/components/Container.astro"
+import Orb from "~/components/Orb.astro"
+import WaitlistForm from "~/components/WaitlistForm.astro"
+
+const logos = [
+  { href: "https://openalternative.co", Logo: OpenAlternativeLogo },
+  { href: "https://euroalternative.co", Logo: EuroAlternativeLogo },
+  { href: "https://dirstarter.com", Logo: DirStarterLogo },
+]
+---
+
+<section class="relative border-b border-border/40 py-12 sm:pb-16 md:pb-24 lg:pb-32">
+  <Orb class="absolute -top-1/2 left-1/2 -translate-x-1/2 -z-1" />
+  <div
+    class="absolute inset-x-0 bottom-0 h-32 bg-linear-to-b from-transparent to-background -z-1 pointer-events-none"
+  />
+
+  <Container class="flex flex-col items-center gap-5 text-center">
+    <Badge class="animate-fade-up -mb-4" style="animation-delay: 0s">
+      Waitlist is now open!
+    </Badge>
+
+    <h1
+      class="max-w-[22ch] text-5xl/[1.05] font-semibold tracking-tight text-balance animate-fade-up sm:text-6xl/[1.05]"
+      style="animation-delay: 80ms"
+    >
+      Sell ad space on your website. Without the ad&nbsp;network.
+    </h1>
+
+    <p
+      class="max-w-xl text-lg/relaxed text-foreground/55 text-pretty animate-fade-up"
+      style="animation-delay: 160ms"
+    >
+      Define your ad zones, set your prices, embed a widget — and let
+      advertisers purchase directly. No middlemen. No rev-share surprises.
+    </p>
+
+    <div
+      id="waitlist"
+      class="w-full max-w-md pt-2 scroll-mt-24 animate-fade-up"
+      style="animation-delay: 240ms"
+    >
+      <WaitlistForm />
+
+      <p class="mt-3 text-xs text-foreground/40 text-center">
+        We respect your privacy. No spam, ever.
+      </p>
+    </div>
+  </Container>
+
+  <Container
+    class="flex flex-col items-center text-center gap-6 translate-y-12 md:translate-y-16 lg:translate-y-24"
+    data-reveal
+  >
+    <p class="text-xs font-medium text-foreground/35 uppercase tracking-widest">
+      Trusted by leading content websites
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-5">
+      {
+        logos.map(({ href, Logo }) => (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener"
+            class="opacity-50 hover:opacity-100 transition-opacity"
+          >
+            <Logo class="h-5 w-auto sm:h-6" />
+          </a>
+        ))
+      }
+    </div>
+  </Container>
+</section>

@@ -6,21 +6,23 @@ type Props = HTMLAttributes<"div">
 const { class: className, ...props } = Astro.props
 ---
 
-<div class:list={["w-4xl aspect-[1.5/1]", className]} {...props}>
+<div
+  class:list={[
+    "w-150 h-100 md:w-225 md:h-150 pointer-events-none",
+    className,
+  ]}
+  {...props}
+>
   <div
-    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] aspect-square rounded-[500px] overflow-visible blur-3xl"
+    class="absolute inset-0 rounded-full bg-[#10b981]/12 blur-[100px]"
   >
-    <div
-      class="absolute inset-0 rounded-full overflow-hidden will-change-transform bg-conic from-[#10b981] via-[#22d3ee] to-[#10b981]"
-    >
-    </div>
   </div>
   <div
-    class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[300px] w-[300px] aspect-square rounded-[500px] overflow-visible blur-2xl mix-blend-overlay"
+    class="absolute inset-[15%] rounded-full bg-[#34d399]/10 blur-[60px]"
   >
-    <div
-      class="absolute inset-0 rounded-full overflow-hidden will-change-transform bg-conic from-[#ccfbf1] via-[#15803d] to-[#4d7c0f]"
-    >
-    </div>
+  </div>
+  <div
+    class="absolute inset-[35%] rounded-full bg-[#6ee7b7]/8 blur-2xl"
+  >
   </div>
 </div>

@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from "astro/types"
+
+interface Props extends HTMLAttributes<"div"> {
+  subtitle?: string
+}
+
+const { subtitle, class: className, ...props } = Astro.props
+---
+
+<div
+  class:list={["text-center mb-14 md:mb-20", className]}
+  data-reveal
+  {...props}
+>
+  <h2 class="text-3xl/tight font-semibold tracking-tight text-balance md:text-4xl/tight">
+    <slot />
+  </h2>
+
+  {subtitle && (
+    <p class="mt-3 text-foreground/50 text-base/relaxed text-pretty max-w-xl mx-auto md:text-lg/relaxed">
+      {subtitle}
+    </p>
+  )}
+</div>

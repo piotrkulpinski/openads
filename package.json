@@ -16,7 +16,7 @@
     "db:studio": "bun run --cwd packages/db db:studio",
     "db:push": "bun run --cwd packages/db db:push",
     "db:reset": "bun run --cwd packages/db db:reset",
-    "postinstall": "bun run db:generate"
+    "postinstall": "bun run db:generate || true"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
@@ -25,7 +25,7 @@
     "lefthook": "^2.1.5",
     "oxfmt": "^0.44.0",
     "oxlint": "^1.59.0",
-    "turbo": "^2.9.3",
+    "turbo": "^2.9.6",
     "typescript": "^6.0.2"
   },
   "engines": {
