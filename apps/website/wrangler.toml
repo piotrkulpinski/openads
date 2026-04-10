@@ -5,3 +5,7 @@ compatibility_flags = ["nodejs_compat"]
 
 [observability]
 enabled = true
+
+[vars]
+PLAUSIBLE_DOMAIN = "openads.co"
+PLAUSIBLE_URL = "https://p.kulp.in"
