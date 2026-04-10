@@ -117,11 +117,11 @@
 a,
 button,
 label[for],
-[href] [class*="group-hover"] {
-  @apply transition;
+[href] [class*="group-hover"],
+[type]:not([disabled]) [class*="group-hover"] {
   @apply ease-out;
-  @apply duration-100;
-  @apply cursor-pointer;
+  @apply duration-250;
+  @apply not-disabled:cursor-pointer;
 }
 
 /* Scroll-triggered reveal */
