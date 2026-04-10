@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && rm -f dist/server/wrangler.json",
+    "build": "astro build && rm -rf dist/server/wrangler.json .wrangler/deploy",
     "preview": "astro preview",
     "astro": "astro"
   },
