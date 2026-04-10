@@ -4,4 +4,10 @@ import { defineConfig } from "prisma/config"
 
 export default defineConfig({
   schema: path.join("prisma"),
+  migrations: {
+    path: path.join("prisma", "migrations"),
+  },
+  datasource: {
+    url: process.env.DATABASE_URL!,
+  },
 })

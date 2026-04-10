@@ -36,6 +36,9 @@ yarn-error.log*
 .DS_Store
 *.pem
 
+# Generated
+packages/db/src/generated
+
 # AI
 .claude
 .context

@@ -1,4 +1,4 @@
-import { isMimeTypeMatch } from "@primoui/utils"
+import { isMimeTypeMatch } from "@dirstack/utils"
 import { z } from "zod"
 
 export const reservedSlugs = [

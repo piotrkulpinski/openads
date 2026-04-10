@@ -1,4 +1,4 @@
-import { addProtocol } from "@primoui/utils"
+import { addProtocol } from "@dirstack/utils"
 import { z } from "zod"
 import { isAllowedSlug, slugSchema, urlSchema } from "./shared"
 

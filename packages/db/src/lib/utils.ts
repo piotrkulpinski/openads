@@ -1,4 +1,4 @@
-import { isKeyInObject } from "@primoui/utils"
+import { isKeyInObject } from "@dirstack/utils"
 import { customAlphabet } from "nanoid"
 
 /**

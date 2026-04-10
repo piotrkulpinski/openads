@@ -1,4 +1,4 @@
-import { slugify } from "@primoui/utils"
+import { slugify } from "@dirstack/utils"
 import { z } from "zod"
 import { authProcedure, router, workspaceProcedure } from "../index"
 

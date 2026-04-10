@@ -10,6 +10,6 @@ export type {
   Workspace,
   WorkspaceMember,
   Zone,
-} from "@prisma/client"
+} from "./generated/prisma/browser"
 
-export { FieldType, Prisma, PrismaClient, WorkspaceMemberRole, WorkspacePlan } from "@prisma/client"
+export { FieldType, Prisma, WorkspaceMemberRole, WorkspacePlan } from "./generated/prisma/browser"

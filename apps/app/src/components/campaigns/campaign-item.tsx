@@ -1,6 +1,6 @@
+import { formatDateRange } from "@dirstack/utils"
 import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
-import { formatDateRange } from "@primoui/utils"
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 import type { RouterOutputs } from "~/lib/trpc"

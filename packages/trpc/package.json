@@ -7,13 +7,13 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
+    "@dirstack/utils": "^1.6.2",
     "@openads/auth": "*",
     "@openads/db": "*",
     "@openads/redis": "*",
     "@openads/s3": "*",
     "@openads/stripe": "*",
     "@openads/utils": "*",
-    "@primoui/utils": "^1.4.3",
     "@t3-oss/env-core": "^0.13.11",
     "@trpc/server": "^11.16.0",
     "superjson": "^2.2.6",

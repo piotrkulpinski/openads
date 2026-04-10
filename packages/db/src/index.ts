@@ -1,8 +1,10 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
+import { PrismaClient } from "./generated/prisma/client"
 import { customIdExtension, modelFilterExtension } from "./lib/extensions"
 
 const prismaClientSingleton = () => {
-  return new PrismaClient().$extends(customIdExtension).$extends(modelFilterExtension)
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+  return new PrismaClient({ adapter }).$extends(customIdExtension).$extends(modelFilterExtension)
 }
 
 declare const globalThis: {

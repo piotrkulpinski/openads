@@ -1,4 +1,5 @@
-import { Prisma, WorkspaceMemberRole } from "../client"
+import { Prisma } from "../generated/prisma/client"
+import { WorkspaceMemberRole } from "../generated/prisma/enums"
 import { generateId } from "./utils"
 
 type RecordData = Record<string, any>

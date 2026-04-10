@@ -6,6 +6,7 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@dirstack/utils": "^1.6.2",
     "@hono/trpc-server": "^0.4.2",
     "@hono/zod-validator": "^0.7.6",
     "@openads/auth": "*",
@@ -15,7 +16,6 @@
     "@openads/stripe": "*",
     "@openads/trpc": "*",
     "@openads/utils": "*",
-    "@primoui/utils": "^1.4.3",
     "@t3-oss/env-core": "^0.13.11",
     "@trpc/server": "^11.16.0",
     "hono": "^4.12.10",

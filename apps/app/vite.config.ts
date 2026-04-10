@@ -1,4 +1,4 @@
-import { removeProtocol } from "@primoui/utils"
+import { removeProtocol } from "@dirstack/utils"
 import tailwindcss from "@tailwindcss/vite"
 import tanstackRouter from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"

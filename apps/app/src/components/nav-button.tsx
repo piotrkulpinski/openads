@@ -1,8 +1,8 @@
+import { getInitials } from "@dirstack/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
-import { getInitials } from "@primoui/utils"
 import type { ComponentProps } from "react"
 
 type NavButtonProps = ComponentProps<typeof Button> & {

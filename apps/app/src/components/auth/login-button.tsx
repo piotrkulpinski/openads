@@ -1,5 +1,5 @@
+import { ucFirst } from "@dirstack/utils"
 import { Button, type ButtonProps } from "@openads/ui/button"
-import { ucFirst } from "@primoui/utils"
 import { LoaderIcon } from "lucide-react"
 import { siteConfig } from "~/config/site"
 import { authClient } from "~/lib/auth"
