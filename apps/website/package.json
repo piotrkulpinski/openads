@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && rm -rf dist/server/wrangler.json .wrangler/deploy",
+    "build": "astro build && node -e \"const f='dist/server/wrangler.json';const c=JSON.parse(require('fs').readFileSync(f));delete c.assets;delete c.triggers;delete c.images;c.kv_namespaces=c.kv_namespaces?.filter(n=>n.id);require('fs').writeFileSync(f,JSON.stringify(c))\"",
     "preview": "astro preview",
     "astro": "astro"
   },
