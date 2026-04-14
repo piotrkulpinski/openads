@@ -1,3 +1,4 @@
+import { cx } from "@openads/ui/cva"
 import type { ReactNode } from "react"
 import { H2 } from "~/components/heading"
 
@@ -7,9 +8,9 @@ interface SectionHeadingProps {
   className?: string
 }
 
-export function SectionHeading({ children, subtitle, className = "" }: SectionHeadingProps) {
+export function SectionHeading({ children, subtitle, className }: SectionHeadingProps) {
   return (
-    <div className={`text-left sm:text-center mb-10 md:mb-20 ${className}`} data-reveal>
+    <div className={cx("text-left sm:text-center mb-10 md:mb-20", className)} data-reveal>
       <H2>{children}</H2>
 
       {subtitle && (
