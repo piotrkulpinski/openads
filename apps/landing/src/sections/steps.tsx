@@ -1,4 +1,5 @@
 import { Container } from "~/components/container"
+import { H3 } from "~/components/heading"
 import { SectionHeading } from "~/components/section-heading"
 
 const steps = [
@@ -22,7 +23,7 @@ const steps = [
 
 export function Steps() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-12 md:py-28">
       <Container>
         <SectionHeading subtitle="One embed snippet. Five minutes. That's all it takes to start selling ad space on your site.">
           From setup to revenue in four&nbsp;steps
@@ -39,7 +40,7 @@ export function Steps() {
               <span className="block text-4xl/none font-semibold text-foreground/8 tabular-nums select-none">
                 0{i + 1}
               </span>
-              <h3 className="text-xl/snug font-semibold tracking-tight mt-4 mb-3">{step.title}</h3>
+              <H3 className="mt-4 mb-3">{step.title}</H3>
               <p className="text-foreground/50 text-[0.9375rem]/relaxed text-pretty">
                 {step.description}
               </p>

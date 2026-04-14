@@ -1,4 +1,5 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
+import { PropsWithChildren } from "react"
 import appCss from "~/styles.css?url"
 
 export const Route = createRootRoute({
@@ -24,13 +25,14 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: PropsWithChildren) {
   return (
-    <html lang="en">
+    <html lang="en" id="waitlist">
       <head>
         <HeadContent />
       </head>
-      <body className="flex flex-col min-h-dvh bg-background text-foreground font-sans antialiased">
+
+      <body className="flex flex-col w-full min-h-dvh bg-background text-foreground font-sans antialiased">
         {children}
         <Scripts />
       </body>

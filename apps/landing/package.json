@@ -10,6 +10,7 @@
     "deploy": "bun run build && wrangler deploy"
   },
   "dependencies": {
+    "@openads/ui": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",

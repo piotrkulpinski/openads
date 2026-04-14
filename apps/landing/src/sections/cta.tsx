@@ -1,19 +1,21 @@
+import { H2 } from "~/components/heading"
 import { Orb } from "~/components/orb"
 
 export function CTA() {
   return (
-    <section className="relative overflow-clip py-20 md:py-28">
+    <section className="relative overflow-clip py-12 md:py-28">
       <div
-        className="relative max-w-3xl mx-auto px-6 flex flex-col items-center text-center gap-6 md:px-8"
+        className="relative max-w-3xl mx-auto px-6 flex flex-col gap-5 items-start text-left sm:items-center sm:text-center md:px-8"
         data-reveal
       >
-        <h2 className="text-3xl/tight font-semibold tracking-tight text-balance md:text-4xl/tight">
-          Your traffic. Your prices. Your&nbsp;advertisers.
-        </h2>
+        <div className="flex flex-col items-start text-left sm:items-center sm:text-center gap-5">
+          <H2>Your traffic. Your prices. Your&nbsp;advertisers.</H2>
 
-        <p className="max-w-md text-base/relaxed text-foreground/55 text-pretty">
-          Join the waitlist and be the first to know when we launch.
-        </p>
+          <p className="max-w-xl text-lg/relaxed text-foreground/55 text-pretty">
+            Sell ad space directly, set your own prices, and keep 100% of what you earn. Join the
+            waitlist to know when we launch.
+          </p>
+        </div>
 
         <a
           href="#waitlist"

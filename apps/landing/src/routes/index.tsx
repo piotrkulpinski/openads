@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect } from "react"
 import { Footer } from "~/components/footer"
-import { Header } from "~/components/header"
 import { CTA } from "~/sections/cta"
 import { Features } from "~/sections/features"
 import { Hero } from "~/sections/hero"
@@ -30,7 +29,6 @@ function HomePage() {
 
   return (
     <>
-      <Header />
       <Hero />
       <Features />
       <Steps />

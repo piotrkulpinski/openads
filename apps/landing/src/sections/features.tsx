@@ -1,4 +1,5 @@
 import { Container } from "~/components/container"
+import { H3 } from "~/components/heading"
 import { SectionHeading } from "~/components/section-heading"
 
 const features = [
@@ -21,7 +22,7 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-12 md:py-28">
       <Container>
         <SectionHeading subtitle="No ad networks, no rev-share surprises. Define your zones, set your prices, and let advertisers purchase directly.">
           Direct ad sales, simplified
@@ -35,7 +36,7 @@ export function Features() {
               data-reveal
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <h3 className="text-xl/snug font-semibold tracking-tight mb-3">{feature.title}</h3>
+              <H3 className="mb-3">{feature.title}</H3>
               <p className="text-foreground/50 text-[0.9375rem]/relaxed text-pretty">
                 {feature.description}
               </p>
