@@ -21,6 +21,13 @@ export const Route = createRootRoute({
       { rel: "icon", href: "/favicon.png", media: "(prefers-color-scheme: light)" },
       { rel: "icon", href: "/favicon-dark.png", media: "(prefers-color-scheme: dark)" },
     ],
+    scripts: [
+      {
+        defer: true,
+        "data-domain": "openads.co",
+        src: "https://p.kulp.in/js/script.js",
+      },
+    ],
   }),
   shellComponent: RootDocument,
 })
