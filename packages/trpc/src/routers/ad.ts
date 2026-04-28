@@ -10,6 +10,7 @@ import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscriptio
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { adProcedure, publicProcedure, router, workspaceProcedure } from "../index"
+import { findServingAd } from "../lib/ad-serving"
 
 const createFromCheckoutInput = z.object({
   sessionId: z.string().min(1),
@@ -169,8 +170,61 @@ export const adRouter = router({
       return updated
     }),
 
-  // Public surface used by the advertiser checkout success page.
+  // Public surface — embed serving and advertiser checkout success.
   public: router({
+    getForPlacement: publicProcedure
+      .input(
+        z.object({
+          workspaceId: z.string(),
+          zoneId: z.string(),
+          excludeId: z.string().optional(),
+        }),
+      )
+      .query(async ({ ctx: { db }, input }) => {
+        return await findServingAd({
+          db,
+          workspaceId: input.workspaceId,
+          zoneId: input.zoneId,
+          excludeId: input.excludeId,
+        })
+      }),
+
+    recordImpression: publicProcedure
+      .input(z.object({ adId: z.string() }))
+      .mutation(async ({ ctx: { db }, input: { adId } }) => {
+        const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
+        if (!ad) return { success: false }
+
+        const today = new Date()
+        today.setUTCHours(0, 0, 0, 0)
+
+        await db.adStat.upsert({
+          where: { adId_date: { adId, date: today } },
+          create: { adId, date: today, impressions: 1, clicks: 0 },
+          update: { impressions: { increment: 1 } },
+        })
+
+        return { success: true }
+      }),
+
+    recordClick: publicProcedure
+      .input(z.object({ adId: z.string() }))
+      .mutation(async ({ ctx: { db }, input: { adId } }) => {
+        const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
+        if (!ad) return { success: false }
+
+        const today = new Date()
+        today.setUTCHours(0, 0, 0, 0)
+
+        await db.adStat.upsert({
+          where: { adId_date: { adId, date: today } },
+          create: { adId, date: today, impressions: 0, clicks: 1 },
+          update: { clicks: { increment: 1 } },
+        })
+
+        return { success: true }
+      }),
+
     getCheckoutInfo: publicProcedure
       .input(z.object({ sessionId: z.string().min(1) }))
       .query(async ({ ctx: { db, stripe }, input: { sessionId } }) => {
