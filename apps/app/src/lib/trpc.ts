@@ -1,6 +1,6 @@
 import type { AppRouter, RouterInputs, RouterOutputs } from "@openads/trpc/router"
 import { QueryCache, QueryClient } from "@tanstack/react-query"
-import { createTRPCClient, httpBatchStreamLink } from "@trpc/client"
+import { createTRPCClient, httpBatchStreamLink, TRPCClientError } from "@trpc/client"
 import { createTRPCQueryUtils, createTRPCReact } from "@trpc/react-query"
 import { toast } from "sonner"
 import superjson from "superjson"
@@ -18,7 +18,12 @@ export const queryClient = new QueryClient({
   },
 
   queryCache: new QueryCache({
-    onError: () => toast.error("Something went wrong. Please try again later."),
+    onError: error => {
+      // Unauthenticated state can be expected on public routes like /login.
+      if (error instanceof TRPCClientError && error.data?.code === "UNAUTHORIZED") return
+
+      toast.error("Something went wrong. Please try again later.")
+    },
   }),
 })
 
