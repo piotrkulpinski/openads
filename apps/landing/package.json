@@ -10,15 +10,17 @@
     "deploy": "bun run build && wrangler deploy"
   },
   "dependencies": {
+    "@openads/emails": "workspace:*",
     "@openads/ui": "workspace:*",
+    "@t3-oss/env-core": "^0.13.11",
     "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/router-plugin": "^1.167.28",
-    "autosendjs": "^1.0.3",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "tailwindcss": "^4.2.4"
+    "tailwindcss": "^4.2.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.33.2",

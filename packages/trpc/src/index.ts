@@ -1,5 +1,6 @@
 import type { Session } from "@openads/auth/server"
 import { Prisma, type db } from "@openads/db"
+import type { EmailClient } from "@openads/emails"
 import type { RedisClient } from "@openads/redis"
 import type { S3BucketClient } from "@openads/s3"
 import type { StripeClient } from "@openads/stripe"
@@ -14,6 +15,7 @@ import { z, ZodError } from "zod"
 export interface Context extends FetchCreateContextFnOptions, Record<string, unknown> {
   auth: Session | null
   db: typeof db
+  emails: EmailClient
   redis: RedisClient
   stripe: StripeClient
   s3: S3BucketClient

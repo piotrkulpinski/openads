@@ -1,0 +1,8 @@
+{
+  "extends": "@openads/tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

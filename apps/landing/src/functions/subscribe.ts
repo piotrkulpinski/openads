@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start"
-import { Autosend } from "autosendjs"
+import { emails, waitlistListId } from "~/lib/emails"
 
 export const subscribe = createServerFn({ method: "POST" })
   .inputValidator((data: { email: string }) => {
@@ -12,17 +12,9 @@ export const subscribe = createServerFn({ method: "POST" })
     return { email }
   })
   .handler(async ({ data }) => {
-    const apiKey = process.env.AUTOSEND_API_KEY
-    const listId = process.env.AUTOSEND_WAITLIST_LIST_ID
-
-    if (!apiKey || !listId) {
-      throw new Error("Waitlist is not configured yet. Please try again later.")
-    }
-
-    const autosend = new Autosend(apiKey, { maxRetries: 3 })
-    const result = await autosend.contacts.upsert({
+    const result = await emails.upsertContact({
       email: data.email,
-      listIds: [listId],
+      listIds: [waitlistListId],
     })
 
     if (!result.success) {

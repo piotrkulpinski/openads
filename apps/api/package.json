@@ -11,6 +11,7 @@
     "@hono/zod-validator": "^0.7.6",
     "@openads/auth": "*",
     "@openads/db": "*",
+    "@openads/emails": "*",
     "@openads/redis": "*",
     "@openads/s3": "*",
     "@openads/stripe": "*",

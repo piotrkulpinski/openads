@@ -10,6 +10,7 @@
     "@dirstack/utils": "^1.6.2",
     "@openads/auth": "*",
     "@openads/db": "*",
+    "@openads/emails": "*",
     "@openads/redis": "*",
     "@openads/s3": "*",
     "@openads/stripe": "*",

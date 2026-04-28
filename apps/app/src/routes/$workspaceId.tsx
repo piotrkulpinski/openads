@@ -27,7 +27,7 @@ function WorkspaceLayoutPending() {
       <main className="flex-1 min-w-xl p-4 sm:px-6 lg:px-10 lg:py-6">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
           <Skeleton className="h-7 max-w-40" />
-          <Skeleton className="h-[32rem]" />
+          <Skeleton className="h-128" />
         </div>
       </main>
     </div>
