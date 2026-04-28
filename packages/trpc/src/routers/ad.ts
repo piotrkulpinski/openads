@@ -59,6 +59,31 @@ export const adRouter = router({
 
   getById: adProcedure.query(({ ctx: { ad } }) => ad),
 
+  // Per-ad daily stats over a date range, defaulting to the past 30 days.
+  getStats: adProcedure
+    .input(z.object({ days: z.number().int().min(1).max(180).default(30) }))
+    .query(async ({ ctx: { ad, db }, input: { days } }) => {
+      const since = new Date()
+      since.setUTCHours(0, 0, 0, 0)
+      since.setUTCDate(since.getUTCDate() - (days - 1))
+
+      const rows = await db.adStat.findMany({
+        where: { adId: ad.id, date: { gte: since } },
+        orderBy: { date: "asc" },
+        select: { date: true, impressions: true, clicks: true },
+      })
+
+      const totals = rows.reduce(
+        (acc, r) => ({
+          impressions: acc.impressions + r.impressions,
+          clicks: acc.clicks + r.clicks,
+        }),
+        { impressions: 0, clicks: 0 },
+      )
+
+      return { rows, totals, days }
+    }),
+
   approve: adProcedure
     .input(optionalNoteInput)
     .mutation(async ({ ctx: { ad, db, emails, workspace } }) => {

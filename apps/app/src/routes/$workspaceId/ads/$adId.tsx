@@ -6,6 +6,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router"
 import { CheckIcon, MessageSquareIcon, XIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
+import { AdStats } from "~/components/ads/ad-stats"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H4, H5 } from "~/components/ui/heading"
@@ -69,6 +70,8 @@ function AdReviewPage() {
           <Badge>{ad.status}</Badge>
         </HeaderActions>
       </Header>
+
+      <AdStats workspaceId={workspaceId} adId={adId} />
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card>
