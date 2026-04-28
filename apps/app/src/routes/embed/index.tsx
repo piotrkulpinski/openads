@@ -7,7 +7,7 @@ const defaultValues = {
   theme: "auto",
 } as const
 
-export const Route = createFileRoute("/embed")({
+export const Route = createFileRoute("/embed/")({
   validateSearch: z.object({
     workspaceId: z.string().default(defaultValues.workspaceId),
     zoneId: z.string().default(defaultValues.zoneId),
