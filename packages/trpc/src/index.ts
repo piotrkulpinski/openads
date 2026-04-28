@@ -122,3 +122,24 @@ export const zoneProcedure = authProcedure
       ctx: { zone },
     })
   })
+
+// zoneProcedure that additionally requires the workspace to have Stripe Connect onboarded.
+// Loads the workspace and exposes it on the ctx for downstream Stripe API calls.
+export const connectEnabledZoneProcedure = zoneProcedure.use(
+  async ({ ctx: { db, zone }, next }) => {
+    const workspace = await db.workspace.findUnique({
+      where: { id: zone.workspaceId },
+    })
+
+    if (!workspace?.stripeConnectEnabled || !workspace.stripeConnectId) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "Connect your Stripe account before creating packages.",
+      })
+    }
+
+    return next({
+      ctx: { workspace },
+    })
+  },
+)
