@@ -6,7 +6,6 @@ import {
   Code2Icon,
   LayoutDashboardIcon,
   MegaphoneIcon,
-  PackageIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
@@ -30,11 +29,6 @@ const navs: NavMainItem[][] = [
       title: "Ad Zones",
       to: "/zones",
       prefix: <AppWindowIcon />,
-    },
-    {
-      title: "Packages",
-      to: "/packages",
-      prefix: <PackageIcon />,
     },
     {
       title: "Ads",
