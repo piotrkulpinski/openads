@@ -1,17 +1,11 @@
-enum WorkspacePlan {
-  Free
-  Pro
-}
-
 model Workspace {
-  id         String        @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
-  slug       String        @unique
+  slug       String   @unique
   websiteUrl String
-  faviconUrl String        @default("")
-  plan       WorkspacePlan @default(Free)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
+  faviconUrl String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   // Stripe Connect fields
   stripeConnectId      String? @unique // Stripe Connect account ID
@@ -20,11 +14,11 @@ model Workspace {
   stripeConnectData    Json? // Additional Stripe account data
 
   // Relations
-  members     WorkspaceMember[]
-  defaultFor  User[]
-  zones       Zone[]
-  campaigns   Campaign[]
-  advertisers Advertiser[]
+  members       WorkspaceMember[]
+  defaultFor    User[]
+  zones         Zone[]
+  advertisers   Advertiser[]
+  subscriptions Subscription[]
 
   // Indexes
   @@unique([name, slug])

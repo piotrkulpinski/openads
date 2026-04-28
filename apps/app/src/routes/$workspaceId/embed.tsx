@@ -1,33 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { EmbedCodeGenerator } from "~/components/embed/embed-code-generator"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 
 export const Route = createFileRoute("/$workspaceId/embed")({
-  loader: async ({ context: { trpc, workspace } }) => {
-    const zones = await trpc.zone.getAll.fetch({
-      workspaceId: workspace.id,
-    })
-
-    return { zones }
-  },
-
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { zones } = Route.useLoaderData()
-
   return (
     <>
       <Header>
         <HeaderTitle>Embed Code Generator</HeaderTitle>
 
         <HeaderDescription size="md">
-          Customize how your ad zones widget will appear on your website.
+          Coming back in M5 alongside the new ad serving pipeline.
         </HeaderDescription>
       </Header>
-
-      <EmbedCodeGenerator zones={zones} />
     </>
   )
 }

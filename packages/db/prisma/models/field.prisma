@@ -31,13 +31,13 @@ model Meta {
   value Json
 
   // Relations
-  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  campaignId String
-  field      Field    @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  fieldId    String
+  ad      Ad     @relation(fields: [adId], references: [id], onDelete: Cascade)
+  adId    String
+  field   Field  @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  fieldId String
 
   // Indexes
-  @@unique([campaignId, fieldId])
-  @@index([campaignId])
+  @@unique([adId, fieldId])
+  @@index([adId])
   @@index([fieldId])
 }

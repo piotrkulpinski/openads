@@ -21,33 +21,13 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
-      // Handle Connect account updates
+      // Connect account onboarding status updates
       case "account.updated": {
         const account = event.data.object as Stripe.Account
         await handleConnectAccountUpdate(account)
         break
       }
-
-      // Handle successful payments
-      case "payment_intent.succeeded": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
-        await handlePaymentSuccess(paymentIntent)
-        break
-      }
-
-      // Handle failed payments
-      case "payment_intent.payment_failed": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
-        await handlePaymentFailure(paymentIntent)
-        break
-      }
-
-      // Handle transfers to connected accounts
-      case "transfer.created": {
-        const transfer = event.data.object as Stripe.Transfer
-        await handleTransferCreated(transfer)
-        break
-      }
+      // Subscription lifecycle events are wired in M3 alongside the advertiser checkout flow.
     }
 
     return new Response("OK", { status: 200 })
@@ -71,55 +51,5 @@ async function handleConnectAccountUpdate(account: Stripe.Account) {
       stripeConnectEnabled: account.charges_enabled,
       stripeConnectData: account as any,
     },
-  })
-}
-
-async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: paymentIntent.id },
-  })
-
-  if (!campaign) return
-
-  // Calculate fees
-  const stripeFee = Math.round(paymentIntent.application_fee_amount || 0)
-  const platformFee = Math.round((campaign.amount * 10) / 100) // 10% platform fee
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: {
-      status: "paid",
-      stripeFee,
-      platformFee,
-    },
-  })
-}
-
-async function handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: paymentIntent.id },
-  })
-
-  if (!campaign) return
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: {
-      status: "failed",
-    },
-  })
-}
-
-async function handleTransferCreated(transfer: Stripe.Transfer) {
-  // Find campaign by payment intent ID from metadata
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: transfer.metadata?.payment_intent },
-  })
-
-  if (!campaign) return
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: { stripeTransferId: transfer.id },
   })
 }

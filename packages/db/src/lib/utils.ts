@@ -18,9 +18,11 @@ export const generateId = (prefix?: string, length = 21) => {
     Workspace: "ws",
     Advertiser: "adv",
     Zone: "zne",
-    Campaign: "cmp",
     Field: "fld",
+    Package: "pkg",
     Subscription: "sub",
+    Ad: "ad",
+    AdStat: "ads",
   }
 
   if (prefix && isKeyInObject(prefix, prefixes)) {

@@ -12,10 +12,9 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  accounts     Account[]
-  sessions     Session[]
-  subscription Subscription?
-  workspaces   WorkspaceMember[]
+  accounts   Account[]
+  sessions   Session[]
+  workspaces WorkspaceMember[]
 
   defaultWorkspaceId String? // id of the user's default workspace
   defaultWorkspace   Workspace? @relation(fields: [defaultWorkspaceId], references: [id])

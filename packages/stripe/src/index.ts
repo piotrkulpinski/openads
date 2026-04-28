@@ -7,36 +7,11 @@ export interface StripeConfig {
 
 export function createStripeClient(config: StripeConfig) {
   return new Stripe(config.STRIPE_SECRET_KEY, {
-    apiVersion: "2026-03-25.dahlia",
+    apiVersion: "2026-04-22.dahlia",
   })
 }
 
 export type StripeClient = ReturnType<typeof createStripeClient>
-
-export interface CreatePaymentIntentProps {
-  amount: number
-  workspaceId: string
-  campaignId: string
-  stripeConnectId: string
-}
-
-export async function createPaymentIntent(
-  stripe: StripeClient,
-  config: StripeConfig,
-  props: CreatePaymentIntentProps,
-) {
-  const { amount, workspaceId, campaignId, stripeConnectId } = props
-  const applicationFeeAmount = Math.round((amount * config.STRIPE_PLATFORM_FEE_PERCENT) / 100)
-
-  return stripe.paymentIntents.create({
-    amount,
-    currency: "usd",
-    payment_method_types: ["card"],
-    application_fee_amount: applicationFeeAmount,
-    transfer_data: { destination: stripeConnectId },
-    metadata: { workspaceId, campaignId },
-  })
-}
 
 // Re-export Stripe types for convenience
 export * from "stripe"
