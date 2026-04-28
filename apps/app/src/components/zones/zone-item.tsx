@@ -26,7 +26,6 @@ const ZoneItem = ({ zone, className, ...props }: ZoneItemProps) => {
       // Show a success toast
       toast.success("Zone deleted successfully")
 
-      // Invalidate the campaigns cache
       utils.zone.getAll.invalidate({ workspaceId })
     },
 

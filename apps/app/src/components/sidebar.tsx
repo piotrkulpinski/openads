@@ -6,6 +6,7 @@ import {
   Code2Icon,
   LayoutDashboardIcon,
   MegaphoneIcon,
+  PackageIcon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
@@ -31,8 +32,13 @@ const navs: NavMainItem[][] = [
       prefix: <AppWindowIcon />,
     },
     {
-      title: "Campaigns",
-      to: "/campaigns",
+      title: "Packages",
+      to: "/packages",
+      prefix: <PackageIcon />,
+    },
+    {
+      title: "Ads",
+      to: "/ads",
       prefix: <MegaphoneIcon />,
     },
     {

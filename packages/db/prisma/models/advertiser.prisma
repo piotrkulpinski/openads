@@ -6,9 +6,9 @@ model Advertiser {
   updatedAt DateTime @updatedAt
 
   // Relations
-  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId String
-  campaigns   Campaign[]
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId   String
+  subscriptions Subscription[]
 
   // Indexes
   @@index([workspaceId])

@@ -36,8 +36,8 @@ export const DeleteForm = (props: ComponentProps<"div">) => {
           <HeaderTitle size="h4">Delete Workspace</HeaderTitle>
 
           <HeaderDescription>
-            The will permanently delete the current workspace, including its ad zones and campaigns.
-            This action cannot be undone - please proceed with caution.
+            This will permanently delete the current workspace, including its ad zones, packages,
+            and active subscriptions. This action cannot be undone — please proceed with caution.
           </HeaderDescription>
         </Header>
       </Card.Panel>

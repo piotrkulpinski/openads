@@ -164,27 +164,6 @@ export const ZoneForm = ({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field: { onChange, ...field } }) => (
-            <FormItem className="col-span-full">
-              <FormLabel>Price</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="100"
-                  min={0}
-                  onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
-                  {...field}
-                />
-              </FormControl>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <DialogFooter className="mt-2 col-span-full">
           <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Zone</FormButton>
           {children}

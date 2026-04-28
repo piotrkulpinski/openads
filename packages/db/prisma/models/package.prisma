@@ -1,0 +1,23 @@
+model Package {
+  id              String   @id @default(cuid())
+  name            String
+  description     String   @default("")
+  weight          Float    @default(1.0)
+  priceMonthly    Int // Amount in cents
+  currency        String   @default("usd")
+  stripeProductId String?  @unique
+  stripePriceId   String?  @unique
+  isActive        Boolean  @default(true)
+  order           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  zone          Zone           @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zoneId        String
+  subscriptions Subscription[]
+
+  // Indexes
+  @@index([zoneId, isActive, order])
+  @@index([zoneId])
+}

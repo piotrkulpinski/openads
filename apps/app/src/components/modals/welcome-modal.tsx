@@ -42,7 +42,7 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
           <DialogDescription asChild>
             <HeaderDescription className="max-w-md">
               Thanks for signing up – your account is ready to go! You now have a central, organized
-              place to manage all your ad zones and campaigns.
+              place to manage your ad zones, packages, and advertisers.
             </HeaderDescription>
           </DialogDescription>
 
