@@ -21,7 +21,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   s3: S3BucketClient
   env: {
     APP_URL: string
-    // Add other env vars as needed
+    STRIPE_PLATFORM_FEE_PERCENT: number
   }
 }
 
