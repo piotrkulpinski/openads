@@ -1,10 +1,15 @@
-import { WorkspaceMemberRole } from "@openads/db/client"
-import { renderAdPendingReview } from "@openads/emails"
+import { AdStatus, WorkspaceMemberRole } from "@openads/db/client"
+import {
+  renderAdApproved,
+  renderAdChangesRequested,
+  renderAdPendingReview,
+  renderAdRejected,
+} from "@openads/emails"
 import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscription"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
-import { publicProcedure, router } from "../index"
+import { adProcedure, publicProcedure, router, workspaceProcedure } from "../index"
 
 const createFromCheckoutInput = z.object({
   sessionId: z.string().min(1),
@@ -18,7 +23,152 @@ const createFromCheckoutInput = z.object({
     .default([]),
 })
 
+const reviewNoteInput = z.object({ note: z.string().trim().min(1).max(500) })
+const optionalNoteInput = z.object({ note: z.string().trim().max(500).optional() })
+
 export const adRouter = router({
+  // Workspace dashboard surface.
+  getAll: workspaceProcedure
+    .input(
+      z.object({
+        status: z.enum(AdStatus).optional(),
+        zoneId: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx: { db, workspace }, input: { status, zoneId } }) => {
+      return await db.ad.findMany({
+        where: {
+          subscription: {
+            workspaceId: workspace.id,
+            ...(zoneId ? { package: { zoneId } } : {}),
+          },
+          ...(status ? { status } : {}),
+        },
+        orderBy: { createdAt: "desc" },
+        include: {
+          subscription: {
+            include: {
+              advertiser: true,
+              package: { include: { zone: true } },
+            },
+          },
+        },
+      })
+    }),
+
+  getById: adProcedure.query(({ ctx: { ad } }) => ad),
+
+  approve: adProcedure
+    .input(optionalNoteInput)
+    .mutation(async ({ ctx: { ad, db, emails, workspace } }) => {
+      const updated = await db.ad.update({
+        where: { id: ad.id },
+        data: {
+          status: AdStatus.Approved,
+          approvedAt: new Date(),
+          rejectedAt: null,
+          rejectionNote: null,
+        },
+      })
+
+      const advertiserEmail = ad.subscription.advertiser.email
+      if (advertiserEmail) {
+        const { html, text } = await renderAdApproved({
+          workspaceName: workspace.name,
+          adName: ad.name,
+          zoneName: ad.subscription.package.zone.name,
+        })
+
+        await emails.send({
+          to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
+          subject: `Your ad on ${workspace.name} is now live`,
+          html,
+          text,
+        })
+      }
+
+      return updated
+    }),
+
+  reject: adProcedure
+    .input(reviewNoteInput)
+    .mutation(async ({ ctx: { ad, db, emails, stripe, workspace }, input: { note } }) => {
+      const updated = await db.ad.update({
+        where: { id: ad.id },
+        data: {
+          status: AdStatus.Rejected,
+          rejectedAt: new Date(),
+          approvedAt: null,
+          rejectionNote: note,
+        },
+      })
+
+      // Cancel the underlying Stripe subscription so the advertiser stops being billed.
+      try {
+        await stripe.subscriptions.cancel(ad.subscription.stripeSubscriptionId)
+      } catch (err) {
+        console.warn(
+          `[ad.reject] failed to cancel stripe subscription ${ad.subscription.stripeSubscriptionId}:`,
+          err,
+        )
+      }
+
+      const advertiserEmail = ad.subscription.advertiser.email
+      if (advertiserEmail) {
+        const { html, text } = await renderAdRejected({
+          workspaceName: workspace.name,
+          adName: ad.name,
+          zoneName: ad.subscription.package.zone.name,
+          rejectionNote: note,
+        })
+
+        await emails.send({
+          to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
+          subject: `Your ad on ${workspace.name} was not approved`,
+          html,
+          text,
+        })
+      }
+
+      return updated
+    }),
+
+  requestChanges: adProcedure
+    .input(reviewNoteInput)
+    .mutation(async ({ ctx: { ad, db, emails, env, workspace }, input: { note } }) => {
+      const updated = await db.ad.update({
+        where: { id: ad.id },
+        data: {
+          status: AdStatus.Pending,
+          approvedAt: null,
+          rejectedAt: null,
+          rejectionNote: note,
+        },
+      })
+
+      const advertiserEmail = ad.subscription.advertiser.email
+      if (advertiserEmail) {
+        const { html, text } = await renderAdChangesRequested({
+          workspaceName: workspace.name,
+          adName: ad.name,
+          zoneName: ad.subscription.package.zone.name,
+          changesNote: note,
+          // sessionId isn't tracked on the Ad row — point advertisers at the billing portal
+          // for now. v2 can store a session token to support direct creative resubmission.
+          resubmitUrl: `${env.APP_URL}/advertise/cancelled`,
+        })
+
+        await emails.send({
+          to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
+          subject: `Changes requested on your ad`,
+          html,
+          text,
+        })
+      }
+
+      return updated
+    }),
+
   // Public surface used by the advertiser checkout success page.
   public: router({
     getCheckoutInfo: publicProcedure
