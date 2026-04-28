@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start"
+import { Autosend } from "autosendjs"
 
 export const subscribe = createServerFn({ method: "POST" })
   .inputValidator((data: { email: string }) => {
@@ -11,22 +12,23 @@ export const subscribe = createServerFn({ method: "POST" })
     return { email }
   })
   .handler(async ({ data }) => {
-    const token = process.env.MAILERLITE_API_TOKEN
+    const apiKey = process.env.AUTOSEND_API_KEY
+    const listId = process.env.AUTOSEND_WAITLIST_LIST_ID
 
-    if (!token) {
+    if (!apiKey || !listId) {
       throw new Error("Waitlist is not configured yet. Please try again later.")
     }
 
-    const response = await fetch("https://connect.mailerlite.com/api/subscribers", {
-      method: "POST",
-      body: JSON.stringify({ email: data.email }),
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${token}`,
-      },
+    const autosend = new Autosend(apiKey, { maxRetries: 3 })
+    const result = await autosend.contacts.upsert({
+      email: data.email,
+      listIds: [listId],
     })
 
-    if (!response.ok) {
+    if (!result.success) {
+      if (import.meta.env.DEV) {
+        console.error("[waitlist] AutoSend error", result.error)
+      }
       throw new Error("Something went wrong. Please try again.")
     }
 

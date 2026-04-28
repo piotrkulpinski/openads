@@ -22,6 +22,7 @@
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@dirstack/kodeks": "^1.1.2",
+    "autosendjs": "^1.0.3",
     "lefthook": "^2.1.6",
     "oxfmt": "^0.44.0",
     "oxlint": "^1.60.0",
