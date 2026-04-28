@@ -1,9 +1,12 @@
 import { OpenPanel, type TrackProperties } from "@openpanel/nextjs"
-import { waitUntil } from "@vercel/functions"
 
 type Props = {
   userId?: string
   fullName?: string | null
+}
+
+const runInBackground = (promise: Promise<unknown> | undefined) => {
+  promise?.catch(error => console.error("Analytics task failed:", error))
 }
 
 export const setupAnalytics = async (options?: Props) => {
@@ -17,15 +20,13 @@ export const setupAnalytics = async (options?: Props) => {
   if (userId && fullName) {
     const [firstName, lastName] = fullName.split(" ")
 
-    const identifyPromise = client.identify({
-      profileId: userId,
-      firstName,
-      lastName,
-    })
-
-    if (identifyPromise) {
-      waitUntil(identifyPromise)
-    }
+    runInBackground(
+      client.identify({
+        profileId: userId,
+        firstName,
+        lastName,
+      }),
+    )
   }
 
   return {
@@ -37,7 +38,7 @@ export const setupAnalytics = async (options?: Props) => {
 
       const { event, ...rest } = options
 
-      waitUntil(client.track(event, rest))
+      runInBackground(client.track(event, rest))
     },
   }
 }
