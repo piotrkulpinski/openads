@@ -1,6 +1,5 @@
 import type { Session } from "@openads/auth/server"
-import type { db } from "@openads/db"
-import { Prisma } from "@openads/db/client"
+import { Prisma, type db } from "@openads/db"
 import type { RedisClient } from "@openads/redis"
 import type { S3BucketClient } from "@openads/s3"
 import type { StripeClient } from "@openads/stripe"

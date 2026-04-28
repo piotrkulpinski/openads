@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg"
-import { PrismaClient } from "./generated/prisma/client"
+import { Prisma, PrismaClient } from "./generated/prisma/client"
 import { customIdExtension, modelFilterExtension } from "./lib/extensions"
 
 const prismaClientSingleton = () => {
@@ -13,6 +13,6 @@ declare const globalThis: {
 
 const db = globalThis.prismaGlobal ?? prismaClientSingleton()
 
-export { db }
+export { db, Prisma }
 
 if (process.env.NODE_ENV === "development") globalThis.prismaGlobal = db
