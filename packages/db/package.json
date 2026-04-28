@@ -16,18 +16,18 @@
   },
   "dependencies": {
     "@dirstack/utils": "^1.6.2",
-    "@prisma/adapter-pg": "^7.7.0",
-    "@prisma/client": "^7.7.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@t3-oss/env-core": "^0.13.11",
-    "dotenv": "^17.4.0",
-    "nanoid": "^5.1.7",
+    "dotenv": "^17.4.2",
+    "nanoid": "^5.1.9",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
-    "@types/node": "^24.12.2",
-    "prisma": "^7.7.0",
-    "typescript": "^5.9.3"
+    "@types/node": "^25.6.0",
+    "prisma": "^7.8.0",
+    "typescript": "^6.0.3"
   },
   "trustedDependencies": [
     "@prisma/client",

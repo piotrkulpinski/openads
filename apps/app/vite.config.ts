@@ -3,7 +3,6 @@ import tailwindcss from "@tailwindcss/vite"
 import tanstackRouter from "@tanstack/router-plugin/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, loadEnv } from "vite"
-import tsconfigPaths from "vite-tsconfig-paths"
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd())
@@ -14,8 +13,11 @@ export default defineConfig(({ mode }) => {
       allowedHosts: env.VITE_BASE_URL ? [removeProtocol(env.VITE_BASE_URL)] : [],
     },
 
+    resolve: {
+      tsconfigPaths: true,
+    },
+
     plugins: [
-      tsconfigPaths(),
       tailwindcss(),
       tanstackRouter({ target: "react", quoteStyle: "double", autoCodeSplitting: true }),
       react(),

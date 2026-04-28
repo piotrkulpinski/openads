@@ -1,4 +1,4 @@
-import { OpenPanel, type PostEventPayload } from "@openpanel/nextjs"
+import { OpenPanel, type TrackProperties } from "@openpanel/nextjs"
 import { waitUntil } from "@vercel/functions"
 
 type Props = {
@@ -17,17 +17,19 @@ export const setupAnalytics = async (options?: Props) => {
   if (userId && fullName) {
     const [firstName, lastName] = fullName.split(" ")
 
-    waitUntil(
-      client.identify({
-        profileId: userId,
-        firstName,
-        lastName,
-      }),
-    )
+    const identifyPromise = client.identify({
+      profileId: userId,
+      firstName,
+      lastName,
+    })
+
+    if (identifyPromise) {
+      waitUntil(identifyPromise)
+    }
   }
 
   return {
-    track: (options: { event: string } & PostEventPayload["properties"]) => {
+    track: (options: { event: string } & TrackProperties) => {
       if (process.env.NODE_ENV !== "production") {
         console.log("Track", options)
         return

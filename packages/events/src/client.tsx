@@ -1,8 +1,9 @@
-import { OpenPanelComponent, type PostEventPayload, useOpenPanel } from "@openpanel/nextjs"
+import { OpenPanelComponent, type TrackProperties, useOpenPanel } from "@openpanel/nextjs"
+import type { ReactElement } from "react"
 
 const isProd = process.env.NODE_ENV === "production"
 
-const Provider = ({ clientId }: { clientId: string }) => (
+const Provider = ({ clientId }: { clientId: string }): ReactElement => (
   <OpenPanelComponent
     clientId={clientId}
     trackAttributes={true}
@@ -11,7 +12,7 @@ const Provider = ({ clientId }: { clientId: string }) => (
   />
 )
 
-const track = (options: { event: string } & PostEventPayload["properties"]) => {
+const track = (options: { event: string } & TrackProperties) => {
   const { track: openTrack } = useOpenPanel()
 
   if (!isProd) {

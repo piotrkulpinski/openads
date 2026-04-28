@@ -18,8 +18,8 @@
     "@openads/utils": "*",
     "@t3-oss/env-core": "^0.13.11",
     "@trpc/server": "^11.16.0",
-    "hono": "^4.12.10",
-    "stripe": "^22.0.0",
+    "hono": "^4.12.15",
+    "stripe": "^22.1.0",
     "superjson": "^2.2.6",
     "zod": "^4.3.6"
   },

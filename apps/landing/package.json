@@ -11,25 +11,24 @@
   },
   "dependencies": {
     "@openads/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "^4.2.4",
     "@tanstack/react-router": "latest",
     "@tanstack/react-start": "latest",
-    "@tanstack/router-plugin": "^1.132.0",
+    "@tanstack/router-plugin": "^1.167.28",
     "autosendjs": "^1.0.3",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "tailwindcss": "^4.1.18"
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.0.0",
+    "@cloudflare/vite-plugin": "^1.33.2",
     "@openads/tsconfig": "workspace:*",
-    "@tailwindcss/typography": "^0.5.16",
-    "@types/react": "^19.2.0",
-    "@types/react-dom": "^19.2.0",
-    "@vitejs/plugin-react": "^5.1.4",
-    "typescript": "^5.7.2",
-    "vite": "^7.3.1",
-    "vite-tsconfig-paths": "^5.1.4",
-    "wrangler": "^4.81.1"
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10",
+    "wrangler": "^4.85.0"
   }
 }
