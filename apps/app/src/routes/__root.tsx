@@ -2,7 +2,6 @@ import { SupportProvider } from "@cossistant/react"
 import { Provider as Analytics } from "@openads/events/client"
 import { TooltipProvider } from "@openads/ui/tooltip"
 import { createRootRouteWithContext, Outlet, redirect } from "@tanstack/react-router"
-import { CossistantChat } from "~/components/cossistant-chat"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
 import { env } from "~/env"
@@ -20,7 +19,6 @@ function RootComponent() {
 
         <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
         <Toaster />
-        <CossistantChat />
       </TooltipProvider>
     </SupportProvider>
   )
