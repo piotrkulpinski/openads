@@ -8,7 +8,7 @@
     "./templates/*": "./src/templates/*.tsx"
   },
   "scripts": {
-    "dev": "email dev",
+    "dev": "email dev --dir src/templates",
     "lint": "oxlint",
     "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit"
