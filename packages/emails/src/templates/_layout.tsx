@@ -1,3 +1,4 @@
+/** @jsxImportSource react */
 import type { ReactNode } from "react"
 import { Body, Container, Head, Html, Preview, Tailwind } from "react-email"
 

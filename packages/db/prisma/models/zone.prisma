@@ -3,15 +3,14 @@ model Zone {
   name        String
   description String   @default("")
   previewUrl  String   @default("")
-  price       Int      @default(0)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  workspace   Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
-  campaigns   Campaign[]
+  packages    Package[]
   fields      Field[]
 
   // Indexes

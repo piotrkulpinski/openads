@@ -31,8 +31,8 @@ const navs: NavMainItem[][] = [
       prefix: <AppWindowIcon />,
     },
     {
-      title: "Campaigns",
-      to: "/campaigns",
+      title: "Ads",
+      to: "/ads",
       prefix: <MegaphoneIcon />,
     },
     {

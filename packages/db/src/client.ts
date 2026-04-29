@@ -1,8 +1,10 @@
 export type {
   Account,
-  Campaign,
+  Ad,
+  AdStat,
   Field,
   Meta,
+  Package,
   Session,
   Subscription,
   User,
@@ -12,4 +14,10 @@ export type {
   Zone,
 } from "./generated/prisma/browser"
 
-export { FieldType, Prisma, WorkspaceMemberRole, WorkspacePlan } from "./generated/prisma/browser"
+export {
+  AdStatus,
+  FieldType,
+  Prisma,
+  SubscriptionStatus,
+  WorkspaceMemberRole,
+} from "./generated/prisma/browser"

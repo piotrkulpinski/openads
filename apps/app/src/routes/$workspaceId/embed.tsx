@@ -1,33 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { EmbedCodeGenerator } from "~/components/embed/embed-code-generator"
+import { EmbedSnippet } from "~/components/embed/embed-snippet"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 
 export const Route = createFileRoute("/$workspaceId/embed")({
-  loader: async ({ context: { trpc, workspace } }) => {
-    const zones = await trpc.zone.getAll.fetch({
-      workspaceId: workspace.id,
-    })
-
+  loader: async ({ context: { trpc }, params: { workspaceId } }) => {
+    const zones = await trpc.zone.getAll.fetch({ workspaceId })
     return { zones }
   },
 
-  component: RouteComponent,
+  component: EmbedPage,
 })
 
-function RouteComponent() {
+function EmbedPage() {
+  const { workspaceId } = Route.useParams()
   const { zones } = Route.useLoaderData()
 
   return (
     <>
       <Header>
-        <HeaderTitle>Embed Code Generator</HeaderTitle>
-
+        <HeaderTitle>Embed</HeaderTitle>
         <HeaderDescription size="md">
-          Customize how your ad zones widget will appear on your website.
+          Drop these snippets onto your site to display ads or sell new packages.
         </HeaderDescription>
       </Header>
 
-      <EmbedCodeGenerator zones={zones} />
+      <EmbedSnippet workspaceId={workspaceId} zones={zones} />
     </>
   )
 }

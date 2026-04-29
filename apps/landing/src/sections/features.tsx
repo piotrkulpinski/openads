@@ -4,19 +4,19 @@ import { SectionHeading } from "~/components/section-heading"
 
 const features = [
   {
-    title: "Your zones, your prices",
+    title: "Your zones, your packages",
     description:
-      "Create ad zones that match your layout — sidebars, banners, sponsored listings. Set pricing and let advertisers fill in the rest.",
+      "Create ad zones that match your layout — sidebars, banners, sponsored listings. Define tiered subscription packages and let advertisers pick their level.",
   },
   {
-    title: "Self-service campaigns",
+    title: "Self-service subscriptions",
     description:
-      "Advertisers pick a zone, choose their dates, and pay. No back-and-forth emails. No invoicing headaches. Revenue on autopilot.",
+      "Advertisers pick a package and subscribe. No back-and-forth emails, no invoicing — recurring revenue on autopilot.",
   },
   {
-    title: "Instant Stripe payouts",
+    title: "Stripe payouts on rails",
     description:
-      "Payments go straight from advertiser to your Stripe account. No 30-day net terms. You set the price, you get the price.",
+      "Payments route from advertiser to your Stripe Connect account every month. You set the price, you keep the price.",
   },
 ]
 
@@ -24,7 +24,7 @@ export function Features() {
   return (
     <section className="py-12 md:py-28">
       <Container>
-        <SectionHeading subtitle="No ad networks, no rev-share surprises. Define your zones, set your prices, and let advertisers purchase directly.">
+        <SectionHeading subtitle="No ad networks, no rev-share surprises. Define your zones, package up your inventory, and let advertisers subscribe directly.">
           Direct ad sales, simplified
         </SectionHeading>
 

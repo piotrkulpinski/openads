@@ -1,0 +1,52 @@
+enum AdStatus {
+  Pending
+  Approved
+  Rejected
+}
+
+model Ad {
+  id             String    @id @default(cuid())
+  status         AdStatus  @default(Pending)
+  weight         Float // Cached from package at create time
+
+  // Standard creative
+  name           String
+  description    String    @default("")
+  websiteUrl     String
+  faviconUrl     String    @default("")
+  bannerUrl      String    @default("")
+  buttonLabel    String    @default("")
+
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  rejectionNote  String?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // Relations
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId String       @unique
+  meta           Meta[]
+  stats          AdStat[]
+
+  // Indexes
+  @@index([status])
+  @@index([subscriptionId])
+}
+
+model AdStat {
+  id          String   @id @default(cuid())
+  date        DateTime @db.Date
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+
+  // Relations
+  ad   Ad     @relation(fields: [adId], references: [id], onDelete: Cascade)
+  adId String
+
+  // Indexes
+  @@unique([adId, date])
+  @@index([adId])
+  @@index([date])
+}

@@ -21,7 +21,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   s3: S3BucketClient
   env: {
     APP_URL: string
-    // Add other env vars as needed
+    STRIPE_PLATFORM_FEE_PERCENT: number
   }
 }
 
@@ -121,4 +121,49 @@ export const zoneProcedure = authProcedure
     return next({
       ctx: { zone },
     })
+  })
+
+// zoneProcedure that additionally requires the workspace to have Stripe Connect onboarded.
+// Loads the workspace and exposes it on the ctx for downstream Stripe API calls.
+export const connectEnabledZoneProcedure = zoneProcedure.use(
+  async ({ ctx: { db, zone }, next }) => {
+    const workspace = await db.workspace.findUnique({
+      where: { id: zone.workspaceId },
+    })
+
+    if (!workspace?.stripeConnectEnabled || !workspace.stripeConnectId) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "Connect your Stripe account before creating packages.",
+      })
+    }
+
+    return next({
+      ctx: { workspace },
+    })
+  },
+)
+
+// procedure that resolves an Ad scoped to a workspace the user belongs to.
+export const adProcedure = workspaceProcedure
+  .input(z.object({ adId: z.string() }))
+  .use(async ({ ctx: { db, workspace }, input: { adId }, next }) => {
+    const ad = await db.ad.findFirst({
+      where: { id: adId, subscription: { workspaceId: workspace.id } },
+      include: {
+        subscription: {
+          include: {
+            advertiser: true,
+            package: { include: { zone: true } },
+          },
+        },
+        meta: true,
+      },
+    })
+
+    if (!ad) {
+      throw new TRPCError({ code: "NOT_FOUND" })
+    }
+
+    return next({ ctx: { ad } })
   })
