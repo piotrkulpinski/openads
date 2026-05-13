@@ -4,6 +4,7 @@ import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { StripeIcon } from "~/components/icons/stripe"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
+import { logger } from "~/lib/logger"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type StripeConnectButtonsProps = ComponentProps<"div"> & {
@@ -28,7 +29,7 @@ export const StripeConnectButtons = ({
     },
 
     onError: error => {
-      console.error(error)
+      logger.error("stripe.connect.create failed", { err: error, workspaceId: workspace.id })
       toast.error("Failed to connect with Stripe")
     },
   })
@@ -40,7 +41,7 @@ export const StripeConnectButtons = ({
     },
 
     onError: error => {
-      console.error(error)
+      logger.error("stripe.connect.delete failed", { err: error, workspaceId: workspace.id })
       toast.error("Failed to disconnect with Stripe")
     },
   })

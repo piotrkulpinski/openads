@@ -6,7 +6,9 @@ import { createContext } from "~/context"
 import { env } from "~/env"
 import { corsMiddleware } from "~/middleware/cors"
 import { onError } from "~/middleware/on-error"
+import { logRoute } from "~/routes/log"
 import { auth } from "~/services/auth"
+import { logger } from "~/services/logger"
 import { loggerMiddleware } from "./middleware/logger"
 
 const app = new Hono({
@@ -25,12 +27,17 @@ app.use("/trpc/*", trpcServer({ router: appRouter, createContext }))
 // Auth
 app.on(["POST", "GET"], "/api/auth/**", c => auth.handler(c.req.raw))
 
+// Browser log ingestion
+app.route("/log", logRoute)
+
 // Error Handling
 app.onError(onError)
 
 if (env.NODE_ENV === "development") {
   showRoutes(app, { verbose: true, colorize: true })
 }
+
+logger.info("api booted", { port: env.PORT, env: env.NODE_ENV })
 
 const server = {
   port: env.PORT,

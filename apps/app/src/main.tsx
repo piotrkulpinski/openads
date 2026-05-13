@@ -7,6 +7,7 @@ import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { ErrorRoute } from "~/components/errors/error"
 import { NotFoundRoute } from "~/components/errors/not-found"
+import { logger } from "~/lib/logger"
 import { queryClient, trpc, trpcClient, trpcUtils } from "~/lib/trpc"
 import { routeTree } from "~/routeTree.gen"
 
@@ -43,7 +44,14 @@ window.addEventListener("vite:preloadError", () => {
 // Render the app
 const rootElement = document.getElementById("app")
 if (rootElement && !rootElement.innerHTML) {
-  createRoot(rootElement).render(
+  createRoot(rootElement, {
+    onCaughtError: (error, info) =>
+      logger.error("react caught error", { err: error, componentStack: info.componentStack }),
+    onUncaughtError: (error, info) =>
+      logger.error("react uncaught error", { err: error, componentStack: info.componentStack }),
+    onRecoverableError: (error, info) =>
+      logger.warn("react recoverable error", { err: error, componentStack: info.componentStack }),
+  }).render(
     <StrictMode>
       <RouterProvider router={router} />
     </StrictMode>,

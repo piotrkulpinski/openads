@@ -9,6 +9,7 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query"
 import type { ReactNode } from "react"
+import { logger } from "~/lib/logger"
 
 type ErrorResult<TData, TError> =
   | QueryObserverLoadingErrorResult<TData, TError>
@@ -72,7 +73,7 @@ export const createQueryCell = <TError>(queryCellOpts: CreateQueryCellOptions<TE
     }
 
     if (query.status === "error") {
-      console.error(query.error)
+      logger.error("query cell error", { err: query.error })
       return opts.error?.(query) ?? queryCellOpts.error(query)
     }
 

@@ -21,6 +21,7 @@
     "@openads/auth": "*",
     "@openads/db": "*",
     "@openads/events": "*",
+    "@openads/logger": "*",
     "@openads/trpc": "*",
     "@openads/ui": "*",
     "@openads/utils": "*",
