@@ -1,11 +1,17 @@
 import { Button } from "@openads/ui/button"
 import type { ErrorRouteComponent } from "@tanstack/react-router"
 import { CircleXIcon } from "lucide-react"
+import { useEffect } from "react"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { env } from "~/env"
+import { logger } from "~/lib/logger"
 
 export const ErrorRoute: ErrorRouteComponent = ({ error, reset }) => {
+  useEffect(() => {
+    logger.error("router error boundary", { err: error })
+  }, [error])
+
   return (
     <>
       <Header>

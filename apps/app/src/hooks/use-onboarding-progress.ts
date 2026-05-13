@@ -2,6 +2,7 @@ import type { OnboardingStep } from "@openads/utils"
 import { useNavigate } from "@tanstack/react-router"
 import { useCallback } from "react"
 import { toast } from "sonner"
+import { logger } from "~/lib/logger"
 import { trpc } from "~/lib/trpc"
 
 export function useOnboardingProgress() {
@@ -10,8 +11,8 @@ export function useOnboardingProgress() {
 
   const { mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
     onError: ({ data }) => {
+      logger.error("onboarding.setProgress failed", { data })
       toast.error("Failed to update onboarding progress. Please try again.")
-      console.error("Failed to update onboarding progress", data)
     },
   })
 

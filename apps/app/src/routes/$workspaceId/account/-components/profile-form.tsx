@@ -16,6 +16,7 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { fileToDataUrl } from "~/lib/helpers"
+import { logger } from "~/lib/logger"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 
@@ -50,7 +51,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
   const uploadImage = trpc.storage.uploadUserImage.useMutation({
     onError: error => {
-      console.error(error)
+      logger.error("storage.uploadUserImage failed", { err: error })
       toast.error("Failed to upload image")
     },
   })
@@ -79,7 +80,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
         isRemoved: false,
       })
     } catch (error) {
-      console.error(error)
+      logger.error("failed to read avatar file", { err: error })
       toast.error("Unable to read the selected file")
     }
   }
@@ -132,7 +133,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
       // Invalidate the route
       await router.invalidate()
     } catch (error) {
-      console.error(error)
+      logger.error("profile update failed", { err: error })
     }
   }
 

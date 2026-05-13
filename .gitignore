@@ -42,3 +42,7 @@ packages/db/src/generated
 # AI
 .claude
 .context
+
+# Logs
+logs
+*.log

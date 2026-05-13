@@ -12,6 +12,7 @@
     "@openads/auth": "*",
     "@openads/db": "*",
     "@openads/emails": "*",
+    "@openads/logger": "*",
     "@openads/redis": "*",
     "@openads/s3": "*",
     "@openads/stripe": "*",
