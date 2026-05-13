@@ -10,6 +10,14 @@ export const fieldRouter = router({
     })
   }),
 
+  getById: workspaceProcedure
+    .input(idSchema)
+    .query(async ({ ctx: { db }, input: { id, workspaceId } }) => {
+      return await db.field.findFirst({
+        where: { id, workspaceId },
+      })
+    }),
+
   create: workspaceProcedure
     .input(fieldSchema)
     .mutation(async ({ ctx: { db }, input: { ...data } }) => {
