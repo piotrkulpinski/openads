@@ -8,7 +8,6 @@ import { OnboardingStep } from "~/components/onboarding/step"
 import { QueryCell } from "~/components/query-cell"
 import { StripeConnectButtons } from "~/components/stripe/stripe-connect-buttons"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
-import { ZoneForm } from "~/components/zones/zone-form"
 import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 import { trpc } from "~/lib/trpc"
@@ -61,26 +60,7 @@ function OnboardingStepPage() {
           title="Create your workspace"
           description="For example, you can use the name of your company or department."
         >
-          <CreateWorkspaceForm onSuccess={({ id }) => continueTo("zone", id)} />
-        </OnboardingStep>
-      )
-
-    case "zone":
-      return (
-        <OnboardingStep
-          title="Create your first ad zone"
-          description="A single ad unit that you can use to display ads on your website. Don't worry, you can always edit it later."
-        >
-          <QueryCell
-            query={query}
-            pending={() => <LoaderIcon className="mx-auto animate-spin" />}
-            empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
-            success={({ data }) => (
-              <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("stripe", workspaceId)}>
-                <OnboardingLaterButton step="stripe" slug={workspaceId} />
-              </ZoneForm>
-            )}
-          />
+          <CreateWorkspaceForm onSuccess={({ id }) => continueTo("stripe", id)} />
         </OnboardingStep>
       )
 
@@ -88,7 +68,7 @@ function OnboardingStepPage() {
       return (
         <OnboardingStep
           title="Connect your Stripe account"
-          description="Connect your Stripe account to start receiving payments for your ad zones."
+          description="Connect Stripe so advertisers can subscribe to your packages and funds route to you."
         >
           <QueryCell
             query={query}
@@ -106,23 +86,5 @@ function OnboardingStepPage() {
           />
         </OnboardingStep>
       )
-
-    // case "plan":
-    //   return (
-    //     <OnboardingStep title="Choose your plan" description="Find a plan that fits your needs.">
-    //       <QueryCell
-    //         query={query}
-    //         pending={() => <LoaderIcon className="mx-auto animate-spin" />}
-    //         empty={() => <p className="text-red-500">There was an error loading the workspace.</p>}
-    //         success={({ data }) => (
-    //           <ZoneForm workspaceId={data?.id} onSuccess={() => continueTo("plan", { id })}>
-    //             <OnboardingLaterButton step="completed" id={workspaceId}>
-    //               I'll pick a plan later
-    //             </OnboardingLaterButton>
-    //           </ZoneForm>
-    //         )}
-    //       />
-    //     </OnboardingStep>
-    //   )
   }
 }

@@ -1,37 +1,41 @@
 import { fieldSchema, idSchema } from "@openads/db/schema"
 import { z } from "zod"
-import { router, zoneProcedure } from "../index"
+import { router, workspaceProcedure } from "../index"
 
 export const fieldRouter = router({
-  getAll: zoneProcedure.query(async ({ ctx: { db }, input: { zoneId } }) => {
+  getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { workspaceId } }) => {
     return await db.field.findMany({
-      where: { zoneId },
+      where: { workspaceId },
       orderBy: { order: "asc" },
     })
   }),
 
-  create: zoneProcedure.input(fieldSchema).mutation(async ({ ctx: { db }, input: { ...data } }) => {
-    return await db.field.create({
-      data,
-    })
-  }),
-
-  update: zoneProcedure
-    .input(fieldSchema.partial().extend(idSchema.shape))
-    .mutation(async ({ ctx: { db }, input: { id, zoneId, ...data } }) => {
-      return await db.field.update({
-        where: { id, zoneId },
+  create: workspaceProcedure
+    .input(fieldSchema)
+    .mutation(async ({ ctx: { db }, input: { ...data } }) => {
+      return await db.field.create({
         data,
       })
     }),
 
-  delete: zoneProcedure.input(idSchema).mutation(async ({ ctx: { db }, input: { ...where } }) => {
-    return await db.field.delete({
-      where,
-    })
-  }),
+  update: workspaceProcedure
+    .input(fieldSchema.partial().extend(idSchema.shape))
+    .mutation(async ({ ctx: { db }, input: { id, workspaceId, ...data } }) => {
+      return await db.field.update({
+        where: { id, workspaceId },
+        data,
+      })
+    }),
 
-  reorder: zoneProcedure
+  delete: workspaceProcedure
+    .input(idSchema)
+    .mutation(async ({ ctx: { db }, input: { ...where } }) => {
+      return await db.field.delete({
+        where,
+      })
+    }),
+
+  reorder: workspaceProcedure
     .input(
       z.object({
         fields: z.array(
@@ -42,11 +46,11 @@ export const fieldRouter = router({
         ),
       }),
     )
-    .mutation(async ({ ctx: { db, zone }, input: { fields } }) => {
+    .mutation(async ({ ctx: { db, workspace }, input: { fields } }) => {
       await Promise.all(
         fields.map(({ id, order }) =>
           db.field.update({
-            where: { id, zoneId: zone.id },
+            where: { id, workspaceId: workspace.id },
             data: { order },
           }),
         ),

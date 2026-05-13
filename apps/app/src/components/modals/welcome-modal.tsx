@@ -41,8 +41,9 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
 
           <DialogDescription asChild>
             <HeaderDescription className="max-w-md">
-              Thanks for signing up – your account is ready to go! You now have a central, organized
-              place to manage all your ad zones and campaigns.
+              Thanks for signing up – your account is ready to go! Set up your packages and custom
+              fields, then drop the embed widget on your site to start taking advertiser
+              subscriptions.
             </HeaderDescription>
           </DialogDescription>
 

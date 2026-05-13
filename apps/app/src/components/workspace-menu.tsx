@@ -56,7 +56,7 @@ export const WorkspaceMenu = () => {
       <DropdownMenuTrigger asChild>
         <NavButton
           title={activeWorkspace.name}
-          subtitle={`${activeWorkspace.plan} Plan`}
+          subtitle={activeWorkspace.slug}
           avatar={getWorkspaceFaviconUrl(activeWorkspace)}
           suffix={<ChevronDownIcon />}
         />
