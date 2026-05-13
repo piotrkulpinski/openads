@@ -17,6 +17,11 @@ export function WaitlistForm() {
 
     try {
       const result = await subscribe({ data: { email } })
+
+      if (!result?.message) {
+        throw new Error("Something went wrong. Please try again.")
+      }
+
       setStatus("success")
       setMessage(result.message)
       form.reset()
