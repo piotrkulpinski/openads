@@ -1,3 +1,4 @@
+/** @jsxImportSource react */
 import { Button, Heading, Hr, Link, Section, Text } from "react-email"
 import { Layout } from "./_layout"
 
