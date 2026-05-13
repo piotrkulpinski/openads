@@ -1,11 +1,11 @@
-import { idSchema, packageSchema } from "@openads/db/schema"
+import { idSchema, tierSchema } from "@openads/db/schema"
 import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
-  archivePackageProduct,
   archivePrice,
+  archiveTierProduct,
   createMonthlyPrice,
-  createPackageProduct,
-  updatePackageProduct,
+  createTierProduct,
+  updateTierProduct,
 } from "@openads/stripe/products"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
@@ -16,10 +16,10 @@ import {
   workspaceProcedure,
 } from "../index"
 
-export const packageRouter = router({
+export const tierRouter = router({
   // Read paths don't require Connect (publishers can browse what they have).
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { workspaceId } }) => {
-    return await db.package.findMany({
+    return await db.tier.findMany({
       where: { workspaceId },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     })
@@ -28,21 +28,21 @@ export const packageRouter = router({
   getById: workspaceProcedure
     .input(idSchema)
     .query(async ({ ctx: { db }, input: { id, workspaceId } }) => {
-      return await db.package.findFirst({
+      return await db.tier.findFirst({
         where: { id, workspaceId },
       })
     }),
 
   create: connectEnabledWorkspaceProcedure
-    .input(packageSchema)
+    .input(tierSchema)
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
         input: { name, description, weight, priceMonthly, currency, isActive, order },
       }) => {
-        // Create the Package row first so we can stamp its id onto the Stripe Product metadata —
-        // webhooks downstream rely on `packageId` for routing.
-        const created = await db.package.create({
+        // Create the Tier row first so we can stamp its id onto the Stripe Product metadata —
+        // webhooks downstream rely on `tierId` for routing.
+        const created = await db.tier.create({
           data: {
             name,
             description: description ?? "",
@@ -55,12 +55,12 @@ export const packageRouter = router({
           },
         })
 
-        const product = await createPackageProduct(stripe, {
+        const product = await createTierProduct(stripe, {
           name,
           description,
           metadata: {
             workspaceId: workspace.id,
-            packageId: created.id,
+            tierId: created.id,
             weight: String(weight),
           },
         })
@@ -71,12 +71,12 @@ export const packageRouter = router({
           currency,
           metadata: {
             workspaceId: workspace.id,
-            packageId: created.id,
+            tierId: created.id,
             weight: String(weight),
           },
         })
 
-        return await db.package.update({
+        return await db.tier.update({
           where: { id: created.id },
           data: { stripeProductId: product.id, stripePriceId: price.id },
         })
@@ -84,13 +84,13 @@ export const packageRouter = router({
     ),
 
   update: connectEnabledWorkspaceProcedure
-    .input(packageSchema.partial().extend(idSchema.shape))
+    .input(tierSchema.partial().extend(idSchema.shape))
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
         input: { id, name, description, weight, priceMonthly, currency, isActive, order },
       }) => {
-        const existing = await db.package.findFirst({
+        const existing = await db.tier.findFirst({
           where: { id, workspaceId: workspace.id },
         })
 
@@ -107,13 +107,13 @@ export const packageRouter = router({
             (isActive !== undefined && isActive !== existing.isActive)
 
           if (productChanged) {
-            await updatePackageProduct(stripe, existing.stripeProductId, {
+            await updateTierProduct(stripe, existing.stripeProductId, {
               name,
               description,
               active: isActive,
               metadata: {
                 workspaceId: workspace.id,
-                packageId: existing.id,
+                tierId: existing.id,
                 weight: String(weight ?? existing.weight),
               },
             })
@@ -136,14 +136,14 @@ export const packageRouter = router({
             currency: currency ?? existing.currency,
             metadata: {
               workspaceId: workspace.id,
-              packageId: existing.id,
+              tierId: existing.id,
               weight: String(weight ?? existing.weight),
             },
           })
           nextStripePriceId = newPrice.id
         }
 
-        return await db.package.update({
+        return await db.tier.update({
           where: { id },
           data: {
             name,
@@ -164,7 +164,7 @@ export const packageRouter = router({
   delete: connectEnabledWorkspaceProcedure
     .input(idSchema)
     .mutation(async ({ ctx: { db, stripe, workspace }, input: { id } }) => {
-      const existing = await db.package.findFirst({
+      const existing = await db.tier.findFirst({
         where: { id, workspaceId: workspace.id },
       })
 
@@ -173,21 +173,21 @@ export const packageRouter = router({
       }
 
       if (existing.stripeProductId) {
-        await archivePackageProduct(stripe, existing.stripeProductId)
+        await archiveTierProduct(stripe, existing.stripeProductId)
       }
 
-      return await db.package.update({
+      return await db.tier.update({
         where: { id },
         data: { isActive: false },
       })
     }),
 
-  // Public surface: consumed by the embeddable package selector (`/embed`).
+  // Public surface: consumed by the embeddable tier selector (`/embed`).
   public: router({
     listForWorkspace: publicProcedure
       .input(z.object({ workspaceId: z.string() }))
       .query(async ({ ctx: { db }, input: { workspaceId } }) => {
-        return await db.package.findMany({
+        return await db.tier.findMany({
           where: { workspaceId, isActive: true },
           orderBy: [{ order: "asc" }, { createdAt: "desc" }],
           select: {
@@ -205,21 +205,21 @@ export const packageRouter = router({
     createCheckout: publicProcedure
       .input(
         z.object({
-          packageId: z.string(),
+          tierId: z.string(),
           email: z.email(),
         }),
       )
-      .mutation(async ({ ctx: { db, stripe, env }, input: { packageId, email } }) => {
-        const adPackage = await db.package.findFirst({
-          where: { id: packageId, isActive: true },
+      .mutation(async ({ ctx: { db, stripe, env }, input: { tierId, email } }) => {
+        const tier = await db.tier.findFirst({
+          where: { id: tierId, isActive: true },
           include: { workspace: true },
         })
 
-        if (!adPackage || !adPackage.stripePriceId) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Package not available." })
+        if (!tier || !tier.stripePriceId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Tier not available." })
         }
 
-        const { workspace } = adPackage
+        const { workspace } = tier
 
         if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
           throw new TRPCError({
@@ -229,7 +229,7 @@ export const packageRouter = router({
         }
 
         const session = await createSubscriptionCheckoutSession(stripe, {
-          priceId: adPackage.stripePriceId,
+          priceId: tier.stripePriceId,
           customerEmail: email,
           successUrl: `${env.APP_URL}/advertise/success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${env.APP_URL}/advertise/cancelled`,
@@ -237,7 +237,7 @@ export const packageRouter = router({
           destinationAccountId: workspace.stripeConnectId,
           metadata: {
             workspaceId: workspace.id,
-            packageId: adPackage.id,
+            tierId: tier.id,
           },
         })
 

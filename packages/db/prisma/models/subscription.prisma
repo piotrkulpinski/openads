@@ -23,8 +23,8 @@ model Subscription {
   // Relations
   workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId  String
-  package      Package    @relation(fields: [packageId], references: [id])
-  packageId    String
+  tier         Tier       @relation(fields: [tierId], references: [id])
+  tierId       String
   advertiser   Advertiser @relation(fields: [advertiserId], references: [id])
   advertiserId String
   ad           Ad?
@@ -32,6 +32,6 @@ model Subscription {
   // Indexes
   @@index([workspaceId, status])
   @@index([workspaceId])
-  @@index([packageId])
+  @@index([tierId])
   @@index([advertiserId])
 }

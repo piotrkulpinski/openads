@@ -92,7 +92,7 @@ function AdReviewPage() {
                   </a>
                 </Field>
                 <Field label="Weight">{ad.weight}</Field>
-                <Field label="Package">{ad.subscription.package.name}</Field>
+                <Field label="Tier">{ad.subscription.tier.name}</Field>
                 <Field label="Advertiser">
                   {ad.subscription.advertiser.email ?? ad.subscription.advertiser.name}
                 </Field>

@@ -1,19 +1,19 @@
 import type Stripe from "stripe"
 import type { StripeClient } from "./index"
 
-export interface PackageMetadata extends Record<string, string> {
+export interface TierMetadata extends Record<string, string> {
   workspaceId: string
-  packageId: string
+  tierId: string
   weight: string
 }
 
 export interface ProductCreateProps {
   name: string
   description?: string
-  metadata: PackageMetadata
+  metadata: TierMetadata
 }
 
-export async function createPackageProduct(
+export async function createTierProduct(
   stripe: StripeClient,
   props: ProductCreateProps,
 ): Promise<Stripe.Product> {
@@ -28,10 +28,10 @@ export interface ProductUpdateProps {
   name?: string
   description?: string
   active?: boolean
-  metadata?: Partial<PackageMetadata>
+  metadata?: Partial<TierMetadata>
 }
 
-export async function updatePackageProduct(
+export async function updateTierProduct(
   stripe: StripeClient,
   productId: string,
   props: ProductUpdateProps,
@@ -44,7 +44,7 @@ export async function updatePackageProduct(
   })
 }
 
-export async function archivePackageProduct(
+export async function archiveTierProduct(
   stripe: StripeClient,
   productId: string,
 ): Promise<Stripe.Product> {
@@ -55,7 +55,7 @@ export interface PriceCreateProps {
   productId: string
   unitAmount: number
   currency: string
-  metadata?: PackageMetadata
+  metadata?: TierMetadata
 }
 
 export async function createMonthlyPrice(

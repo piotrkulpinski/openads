@@ -1,4 +1,4 @@
-import { type PackageSchema, packageSchema } from "@openads/db/schema"
+import { type TierSchema, tierSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
@@ -18,41 +18,41 @@ import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
 import type { router } from "~/main"
 
-type PackageFormProps = HTMLAttributes<HTMLFormElement> & {
+type TierFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
-  adPackage?: RouterOutputs["package"]["getAll"][number]
+  tier?: RouterOutputs["tier"]["getAll"][number]
   nextUrl?: NavigateOptions<typeof router>
-  onSuccess?: (data: RouterOutputs["package"]["create"]) => void
+  onSuccess?: (data: RouterOutputs["tier"]["create"]) => void
 }
 
-export const PackageForm = ({
+export const TierForm = ({
   children,
   className,
   workspaceId,
-  adPackage,
+  tier,
   nextUrl,
   onSuccess: onSuccessCallback,
   ...props
-}: PackageFormProps) => {
+}: TierFormProps) => {
   const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
-  const isEditing = !!adPackage?.id
+  const isEditing = !!tier?.id
 
-  const form = useZodForm(packageSchema, {
+  const form = useZodForm(tierSchema, {
     defaultValues: {
-      ...init(packageSchema),
-      ...adPackage,
+      ...init(tierSchema),
+      ...tier,
     },
   })
 
-  const onSuccess = async (data: RouterOutputs["package"]["create"]) => {
+  const onSuccess = async (data: RouterOutputs["tier"]["create"]) => {
     if (nextUrl) navigate(nextUrl)
 
-    toast.success(`Package ${isEditing ? "updated" : "created"} successfully`)
+    toast.success(`Tier ${isEditing ? "updated" : "created"} successfully`)
 
-    await utils.package.getAll.invalidate({ workspaceId })
-    if (adPackage?.id) await utils.package.getById.invalidate({ id: adPackage.id, workspaceId })
+    await utils.tier.getAll.invalidate({ workspaceId })
+    if (tier?.id) await utils.tier.getById.invalidate({ id: tier.id, workspaceId })
 
     form.reset({}, { keepValues: true })
     onSuccessCallback?.(data)
@@ -62,15 +62,15 @@ export const PackageForm = ({
     handleError({ error, form })
   }
 
-  const createPackage = trpc.package.create.useMutation({ onSuccess, onError })
-  const updatePackage = trpc.package.update.useMutation({ onSuccess, onError })
-  const isPending = createPackage.isPending || updatePackage.isPending
+  const createTier = trpc.tier.create.useMutation({ onSuccess, onError })
+  const updateTier = trpc.tier.update.useMutation({ onSuccess, onError })
+  const isPending = createTier.isPending || updateTier.isPending
 
-  const onSubmit = (data: PackageSchema) => {
+  const onSubmit = (data: TierSchema) => {
     if (isEditing) {
-      return updatePackage.mutate({ ...data, id: adPackage.id, workspaceId })
+      return updateTier.mutate({ ...data, id: tier.id, workspaceId })
     }
-    return createPackage.mutate({ ...data, workspaceId })
+    return createTier.mutate({ ...data, workspaceId })
   }
 
   return (
@@ -206,7 +206,7 @@ export const PackageForm = ({
         />
 
         <DialogFooter className="col-span-full mt-2">
-          <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Package</FormButton>
+          <FormButton isPending={isPending}>{isEditing ? "Update" : "Create"} Tier</FormButton>
           {children}
         </DialogFooter>
       </form>

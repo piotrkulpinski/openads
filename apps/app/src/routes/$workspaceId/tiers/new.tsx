@@ -1,19 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router"
-import { PackageForm } from "~/components/packages/package-form"
+import { TierForm } from "~/components/tiers/tier-form"
 import { H3 } from "~/components/ui/heading"
 
-export const Route = createFileRoute("/$workspaceId/packages/new")({
-  component: PackagesNewPage,
+export const Route = createFileRoute("/$workspaceId/tiers/new")({
+  component: TiersNewPage,
 })
 
-function PackagesNewPage() {
+function TiersNewPage() {
   const { workspaceId } = Route.useParams()
 
   return (
     <>
-      <H3>New Package</H3>
+      <H3>New Tier</H3>
 
-      <PackageForm
+      <TierForm
         workspaceId={workspaceId}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"

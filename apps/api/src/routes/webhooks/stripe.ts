@@ -73,7 +73,7 @@ async function handleConnectAccountUpdate(account: Stripe.Account) {
 async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
   const meta = readSubscriptionMetadata(stripeSubscription.metadata)
 
-  // Without the workspace/package metadata we can't link the subscription — surface
+  // Without the workspace/tier metadata we can't link the subscription — surface
   // a warning and skip. The AdForm submission path will create the row when it has
   // the data via the checkout session.
   if (!meta) {
@@ -111,7 +111,7 @@ async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
       currentPeriodStart: toDate(stripeSubscription.items.data[0]?.current_period_start),
       currentPeriodEnd: toDate(stripeSubscription.items.data[0]?.current_period_end),
       workspaceId: meta.workspaceId,
-      packageId: meta.packageId,
+      tierId: meta.tierId,
       advertiserId: advertiser.id,
     },
     update: {

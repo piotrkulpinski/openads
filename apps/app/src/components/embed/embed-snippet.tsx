@@ -50,11 +50,11 @@ export function EmbedSnippet({ workspaceId }: EmbedSnippetProps) {
     <Card>
       <Card.Section>
         <Header gap="sm" className="mb-4">
-          <HeaderTitle size="h4">Package selector</HeaderTitle>
+          <HeaderTitle size="h4">Tier selector</HeaderTitle>
           <HeaderDescription size="sm">
             Drop this iframe onto your site so visitors can subscribe to one of your advertising
-            packages. Payment runs through Stripe; once paid, the advertiser fills in the creative
-            and the ad enters the review queue.
+            tiers. Payment runs through Stripe; once paid, the advertiser fills in the creative and
+            the ad enters the review queue.
           </HeaderDescription>
         </Header>
 

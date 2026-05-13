@@ -6,7 +6,7 @@ export interface AdPendingReviewProps {
   workspaceName: string
   advertiserName: string
   advertiserEmail: string
-  packageName: string
+  tierName: string
   reviewUrl: string
 }
 
@@ -14,7 +14,7 @@ export function AdPendingReview({
   workspaceName,
   advertiserName,
   advertiserEmail,
-  packageName,
+  tierName,
   reviewUrl,
 }: AdPendingReviewProps) {
   return (
@@ -23,7 +23,7 @@ export function AdPendingReview({
 
       <Text className="text-base text-neutral-700">
         <strong>{advertiserName}</strong> ({advertiserEmail}) just subscribed to the{" "}
-        <strong>{packageName}</strong> package on <strong>{workspaceName}</strong>.
+        <strong>{tierName}</strong> tier on <strong>{workspaceName}</strong>.
       </Text>
 
       <Text className="text-base text-neutral-700">

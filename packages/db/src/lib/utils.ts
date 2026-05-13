@@ -11,18 +11,18 @@ export const generateId = (prefix?: string, length = 21) => {
   const alphabet = "0123456789abcdefghijkmnopqrstuvwxyz"
   const nanoid = customAlphabet(alphabet, length)
   const prefixes = {
-    User: "usr",
+    User: "user",
     Account: "acc",
     Session: "ses",
     Verification: "ver",
     Workspace: "ws",
     Advertiser: "adv",
     Field: "fld",
-    Package: "pkg",
+    Tier: "tier",
     Subscription: "sub",
     Ad: "ad",
-    AdStat: "ast",
-    Meta: "mta",
+    AdStat: "stat",
+    Meta: "meta",
   }
 
   if (prefix && isKeyInObject(prefix, prefixes)) {

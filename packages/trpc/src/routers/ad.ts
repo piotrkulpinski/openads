@@ -44,7 +44,7 @@ export const adRouter = router({
           subscription: {
             include: {
               advertiser: true,
-              package: true,
+              tier: true,
             },
           },
         },
@@ -254,19 +254,19 @@ export const adRouter = router({
 
         const metadata = session.metadata
         const workspaceId = metadata?.workspaceId
-        const packageId = metadata?.packageId
+        const tierId = metadata?.tierId
 
-        if (!workspaceId || !packageId) {
+        if (!workspaceId || !tierId) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
         }
 
-        const [workspace, adPackage, fields, existingAd] = await Promise.all([
+        const [workspace, tier, fields, existingAd] = await Promise.all([
           db.workspace.findUnique({
             where: { id: workspaceId },
             select: { id: true, name: true, slug: true, faviconUrl: true },
           }),
-          db.package.findUnique({
-            where: { id: packageId },
+          db.tier.findUnique({
+            where: { id: tierId },
             select: { id: true, name: true, weight: true, priceMonthly: true, currency: true },
           }),
           db.field.findMany({
@@ -282,13 +282,13 @@ export const adRouter = router({
           })(),
         ])
 
-        if (!workspace || !adPackage) {
+        if (!workspace || !tier) {
           throw new TRPCError({ code: "NOT_FOUND" })
         }
 
         return {
           workspace,
-          package: adPackage,
+          tier,
           fields,
           customerEmail: session.customer_email ?? null,
           existingAd,
@@ -321,19 +321,19 @@ export const adRouter = router({
           const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription)
           const metadata = stripeSubscription.metadata ?? session.metadata
           const workspaceId = metadata?.workspaceId
-          const packageId = metadata?.packageId
+          const tierId = metadata?.tierId
           const customerEmail = session.customer_email
 
-          if (!workspaceId || !packageId || !customerEmail) {
+          if (!workspaceId || !tierId || !customerEmail) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
           }
 
-          const adPackage = await db.package.findUnique({
-            where: { id: packageId },
+          const tier = await db.tier.findUnique({
+            where: { id: tierId },
             select: { id: true, name: true, weight: true, workspaceId: true },
           })
 
-          if (!adPackage || adPackage.workspaceId !== workspaceId) {
+          if (!tier || tier.workspaceId !== workspaceId) {
             throw new TRPCError({ code: "NOT_FOUND" })
           }
 
@@ -367,7 +367,7 @@ export const adRouter = router({
               currentPeriodStart: toDate(stripeSubscription.items.data[0]?.current_period_start),
               currentPeriodEnd: toDate(stripeSubscription.items.data[0]?.current_period_end),
               workspaceId,
-              packageId,
+              tierId,
               advertiserId: advertiser.id,
             },
             update: {
@@ -384,7 +384,7 @@ export const adRouter = router({
             create: {
               subscriptionId: subscription.id,
               status: "Pending",
-              weight: adPackage.weight,
+              weight: tier.weight,
               name,
               websiteUrl,
             },
@@ -447,7 +447,7 @@ export const adRouter = router({
               workspaceName: workspace.name,
               advertiserName: advertiser.name,
               advertiserEmail: customerEmail,
-              packageName: adPackage.name,
+              tierName: tier.name,
               reviewUrl: `${env.APP_URL}/${workspace.id}/ads/${ad.id}`,
             })
 

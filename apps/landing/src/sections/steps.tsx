@@ -4,8 +4,8 @@ import { SectionHeading } from "~/components/section-heading"
 
 const steps = [
   {
-    title: "Define your packages",
-    description: "Set monthly prices and weights for each ad tier you want to sell.",
+    title: "Define your tiers",
+    description: "Set monthly prices and weights for each tier you want to sell.",
   },
   {
     title: "Customize fields",

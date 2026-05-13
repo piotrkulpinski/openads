@@ -35,7 +35,7 @@ export const AdRow = ({ workspaceId, ad, className, ...props }: AdRowProps) => {
         </Stack>
         <p className="text-muted-foreground text-sm">
           {ad.subscription.advertiser.email ?? ad.subscription.advertiser.name} ·{" "}
-          {ad.subscription.package.name}
+          {ad.subscription.tier.name}
         </p>
         <span className="absolute inset-0" />
       </Link>

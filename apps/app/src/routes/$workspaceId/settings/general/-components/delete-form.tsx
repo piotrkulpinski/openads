@@ -36,7 +36,7 @@ export const DeleteForm = (props: ComponentProps<"div">) => {
           <HeaderTitle size="h4">Delete Workspace</HeaderTitle>
 
           <HeaderDescription>
-            This will permanently delete the current workspace, including its packages, fields, and
+            This will permanently delete the current workspace, including its tiers, fields, and
             ads. This action cannot be undone — please proceed with caution.
           </HeaderDescription>
         </Header>

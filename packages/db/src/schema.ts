@@ -1,6 +1,6 @@
 export * from "./schema/ad"
 export * from "./schema/field"
-export * from "./schema/package"
 export * from "./schema/shared"
+export * from "./schema/tier"
 export * from "./schema/user"
 export * from "./schema/workspace"

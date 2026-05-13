@@ -15,7 +15,7 @@ function EmbedPage() {
         <HeaderTitle>Embed</HeaderTitle>
         <HeaderDescription size="md">
           Drop this snippet onto your site so visitors can subscribe to one of your advertising
-          packages.
+          tiers.
         </HeaderDescription>
       </Header>
 
