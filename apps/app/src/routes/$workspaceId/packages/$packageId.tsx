@@ -4,13 +4,13 @@ import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspaceId/packages/$packageId")({
   loader: async ({ context: { trpc }, params: { workspaceId, packageId } }) => {
-    const pkg = await trpc.package.getById.fetch({ id: packageId, workspaceId })
+    const adPackage = await trpc.package.getById.fetch({ id: packageId, workspaceId })
 
-    if (!pkg) {
+    if (!adPackage) {
       throw notFound()
     }
 
-    return { pkg }
+    return { adPackage }
   },
 
   component: PackagesEditPage,
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/$workspaceId/packages/$packageId")({
 
 function PackagesEditPage() {
   const { workspaceId } = Route.useParams()
-  const { pkg } = Route.useLoaderData()
+  const { adPackage } = Route.useLoaderData()
 
   return (
     <>
@@ -26,7 +26,7 @@ function PackagesEditPage() {
 
       <PackageForm
         workspaceId={workspaceId}
-        pkg={pkg}
+        adPackage={adPackage}
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"
       />

@@ -51,8 +51,8 @@ function PackagesIndexPage() {
         )}
         success={({ data }) => (
           <div className="flex flex-col divide-y rounded-lg border">
-            {data.map(pkg => (
-              <PackageItem key={pkg.id} workspaceId={workspaceId} pkg={pkg} />
+            {data.map(adPackage => (
+              <PackageItem key={adPackage.id} workspaceId={workspaceId} adPackage={adPackage} />
             ))}
           </div>
         )}

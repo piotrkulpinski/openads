@@ -20,7 +20,7 @@ import type { router } from "~/main"
 
 type PackageFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
-  pkg?: RouterOutputs["package"]["getAll"][number]
+  adPackage?: RouterOutputs["package"]["getAll"][number]
   nextUrl?: NavigateOptions<typeof router>
   onSuccess?: (data: RouterOutputs["package"]["create"]) => void
 }
@@ -29,7 +29,7 @@ export const PackageForm = ({
   children,
   className,
   workspaceId,
-  pkg,
+  adPackage,
   nextUrl,
   onSuccess: onSuccessCallback,
   ...props
@@ -37,12 +37,12 @@ export const PackageForm = ({
   const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
-  const isEditing = !!pkg?.id
+  const isEditing = !!adPackage?.id
 
   const form = useZodForm(packageSchema, {
     defaultValues: {
       ...init(packageSchema),
-      ...pkg,
+      ...adPackage,
     },
   })
 
@@ -52,7 +52,7 @@ export const PackageForm = ({
     toast.success(`Package ${isEditing ? "updated" : "created"} successfully`)
 
     await utils.package.getAll.invalidate({ workspaceId })
-    if (pkg?.id) await utils.package.getById.invalidate({ id: pkg.id, workspaceId })
+    if (adPackage?.id) await utils.package.getById.invalidate({ id: adPackage.id, workspaceId })
 
     form.reset({}, { keepValues: true })
     onSuccessCallback?.(data)
@@ -68,7 +68,7 @@ export const PackageForm = ({
 
   const onSubmit = (data: PackageSchema) => {
     if (isEditing) {
-      return updatePackage.mutate({ ...data, id: pkg.id, workspaceId })
+      return updatePackage.mutate({ ...data, id: adPackage.id, workspaceId })
     }
     return createPackage.mutate({ ...data, workspaceId })
   }

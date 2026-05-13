@@ -210,16 +210,16 @@ export const packageRouter = router({
         }),
       )
       .mutation(async ({ ctx: { db, stripe, env }, input: { packageId, email } }) => {
-        const pkg = await db.package.findFirst({
+        const adPackage = await db.package.findFirst({
           where: { id: packageId, isActive: true },
           include: { workspace: true },
         })
 
-        if (!pkg || !pkg.stripePriceId) {
+        if (!adPackage || !adPackage.stripePriceId) {
           throw new TRPCError({ code: "NOT_FOUND", message: "Package not available." })
         }
 
-        const { workspace } = pkg
+        const { workspace } = adPackage
 
         if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
           throw new TRPCError({
@@ -229,7 +229,7 @@ export const packageRouter = router({
         }
 
         const session = await createSubscriptionCheckoutSession(stripe, {
-          priceId: pkg.stripePriceId,
+          priceId: adPackage.stripePriceId,
           customerEmail: email,
           successUrl: `${env.APP_URL}/advertise/success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${env.APP_URL}/advertise/cancelled`,
@@ -237,7 +237,7 @@ export const packageRouter = router({
           destinationAccountId: workspace.stripeConnectId,
           metadata: {
             workspaceId: workspace.id,
-            packageId: pkg.id,
+            packageId: adPackage.id,
           },
         })
 
