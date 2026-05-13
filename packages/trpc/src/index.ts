@@ -21,7 +21,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   s3: S3BucketClient
   env: {
     APP_URL: string
-    // Add other env vars as needed
+    STRIPE_PLATFORM_FEE_PERCENT: number
   }
 }
 
@@ -106,19 +106,19 @@ export const workspaceProcedure = authProcedure
     })
   })
 
-// procedure that checks if a user has access to a specific zone
-export const zoneProcedure = authProcedure
-  .input(z.object({ zoneId: z.string() }))
-  .use(async ({ ctx: { db, user }, input: { zoneId }, next }) => {
-    const zone = await db.zone.findFirst({
-      where: { AND: [{ id: zoneId }, db.zone.belongsTo(user.id)] },
-    })
-
-    if (!zone) {
-      throw new TRPCError({ code: "FORBIDDEN" })
+// workspaceProcedure that additionally requires the workspace to have Stripe Connect onboarded.
+// Re-exposes the workspace on ctx so call sites can pass `stripeConnectId` directly into Stripe calls.
+export const connectEnabledWorkspaceProcedure = workspaceProcedure.use(
+  async ({ ctx: { workspace }, next }) => {
+    if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: "Connect your Stripe account before creating packages.",
+      })
     }
 
     return next({
-      ctx: { zone },
+      ctx: { workspace },
     })
-  })
+  },
+)

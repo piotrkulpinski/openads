@@ -4,12 +4,12 @@ import { SectionHeading } from "~/components/section-heading"
 
 const steps = [
   {
-    title: "Create your zones",
-    description: "Define where ads appear on your site and what they cost.",
+    title: "Define your packages",
+    description: "Set monthly prices and weights for each ad tier you want to sell.",
   },
   {
     title: "Customize fields",
-    description: "Choose what info advertisers need to provide for each zone.",
+    description: "Choose what creative info advertisers submit for review.",
   },
   {
     title: "Embed the widget",
@@ -17,7 +17,7 @@ const steps = [
   },
   {
     title: "Get paid",
-    description: "Advertisers purchase campaigns. Money hits your Stripe instantly.",
+    description: "Advertisers subscribe. Money hits your Stripe instantly.",
   },
 ]
 

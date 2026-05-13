@@ -1,17 +1,37 @@
+enum SubscriptionStatus {
+  Trialing
+  Active
+  PastDue
+  Canceled
+  Unpaid
+  Incomplete
+  IncompleteExpired
+  Paused
+}
+
 model Subscription {
-  id                String    @id @unique
-  planId            String    @unique
-  priceId           String
-  periodStart       DateTime?
-  periodEnd         DateTime?
-  cancelAtPeriodEnd Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                   String             @id @default(cuid())
+  stripeSubscriptionId String             @unique
+  stripeCustomerId     String?
+  status               SubscriptionStatus
+  cancelAtPeriodEnd    Boolean            @default(false)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
 
   // Relations
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @unique
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId  String
+  package      Package    @relation(fields: [packageId], references: [id])
+  packageId    String
+  advertiser   Advertiser @relation(fields: [advertiserId], references: [id])
+  advertiserId String
+  ad           Ad?
 
   // Indexes
-  @@index([userId])
+  @@index([workspaceId, status])
+  @@index([workspaceId])
+  @@index([packageId])
+  @@index([advertiserId])
 }

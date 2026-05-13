@@ -1,6 +1,7 @@
 import { db } from "@openads/db"
 import type Stripe from "stripe"
 import { env } from "~/env"
+import { logger } from "~/services/logger"
 import { stripe } from "../../services/stripe"
 
 export async function POST(req: Request) {
@@ -21,38 +22,22 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
-      // Handle Connect account updates
+      // Stripe Connect account state changes — flip stripeConnectEnabled when charges go live.
       case "account.updated": {
-        const account = event.data.object as Stripe.Account
-        await handleConnectAccountUpdate(account)
+        await handleConnectAccountUpdate(event.data.object as Stripe.Account)
         break
       }
 
-      // Handle successful payments
-      case "payment_intent.succeeded": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
-        await handlePaymentSuccess(paymentIntent)
+      // Subscription lifecycle events are scaffolded here; handlers land in D3.
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
         break
-      }
-
-      // Handle failed payments
-      case "payment_intent.payment_failed": {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent
-        await handlePaymentFailure(paymentIntent)
-        break
-      }
-
-      // Handle transfers to connected accounts
-      case "transfer.created": {
-        const transfer = event.data.object as Stripe.Transfer
-        await handleTransferCreated(transfer)
-        break
-      }
     }
 
     return new Response("OK", { status: 200 })
-  } catch (error) {
-    console.error("Webhook error:", error)
+  } catch (err) {
+    logger.error("stripe webhook handler failed", { err, type: event.type })
     return new Response("Webhook handler failed", { status: 500 })
   }
 }
@@ -71,55 +56,5 @@ async function handleConnectAccountUpdate(account: Stripe.Account) {
       stripeConnectEnabled: account.charges_enabled,
       stripeConnectData: account as any,
     },
-  })
-}
-
-async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: paymentIntent.id },
-  })
-
-  if (!campaign) return
-
-  // Calculate fees
-  const stripeFee = Math.round(paymentIntent.application_fee_amount || 0)
-  const platformFee = Math.round((campaign.amount * 10) / 100) // 10% platform fee
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: {
-      status: "paid",
-      stripeFee,
-      platformFee,
-    },
-  })
-}
-
-async function handlePaymentFailure(paymentIntent: Stripe.PaymentIntent) {
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: paymentIntent.id },
-  })
-
-  if (!campaign) return
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: {
-      status: "failed",
-    },
-  })
-}
-
-async function handleTransferCreated(transfer: Stripe.Transfer) {
-  // Find campaign by payment intent ID from metadata
-  const campaign = await db.campaign.findFirst({
-    where: { stripePaymentIntentId: transfer.metadata?.payment_intent },
-  })
-
-  if (!campaign) return
-
-  await db.campaign.update({
-    where: { id: campaign.id },
-    data: { stripeTransferId: transfer.id },
   })
 }

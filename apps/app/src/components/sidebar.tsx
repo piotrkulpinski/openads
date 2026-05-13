@@ -2,10 +2,11 @@ import { cx } from "@openads/ui/cva"
 import { Separator } from "@openads/ui/separator"
 import { Skeleton } from "@openads/ui/skeleton"
 import {
-  AppWindowIcon,
   Code2Icon,
   LayoutDashboardIcon,
   MegaphoneIcon,
+  PackageIcon,
+  Rows3Icon,
   SettingsIcon,
   UsersIcon,
 } from "lucide-react"
@@ -26,13 +27,18 @@ const navs: NavMainItem[][] = [
       activeOptions: { exact: true },
     },
     {
-      title: "Ad Zones",
-      to: "/zones",
-      prefix: <AppWindowIcon />,
+      title: "Packages",
+      to: "/packages",
+      prefix: <PackageIcon />,
     },
     {
-      title: "Campaigns",
-      to: "/campaigns",
+      title: "Fields",
+      to: "/fields",
+      prefix: <Rows3Icon />,
+    },
+    {
+      title: "Ads",
+      to: "/ads",
       prefix: <MegaphoneIcon />,
     },
     {

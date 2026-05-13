@@ -8,12 +8,12 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        title: "Automate ad zone management, increase revenue and make advertisers happy – OpenAds",
+        title: "Self-serve subscription advertising for publishers – OpenAds",
       },
       {
         name: "description",
         content:
-          "The simplest way to sell ads directly on your site. Define zones, set prices, embed a widget, and get paid via Stripe.",
+          "The simplest way to sell advertising on your site. Define packages, embed a widget, approve creatives, and get paid via Stripe.",
       },
     ],
     links: [

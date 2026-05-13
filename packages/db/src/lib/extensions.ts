@@ -33,11 +33,5 @@ export const modelFilterExtension = Prisma.defineExtension({
         return { members: { some: { userId, role: { in: allowedRoles } } } }
       },
     },
-
-    zone: {
-      belongsTo: (userId: string) => {
-        return { workspace: { members: { some: { userId, role: { in: allowedRoles } } } } }
-      },
-    },
   },
 })
