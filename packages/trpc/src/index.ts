@@ -122,3 +122,27 @@ export const connectEnabledWorkspaceProcedure = workspaceProcedure.use(
     })
   },
 )
+
+// procedure that resolves an Ad scoped to a workspace the user belongs to.
+export const adProcedure = workspaceProcedure
+  .input(z.object({ adId: z.string() }))
+  .use(async ({ ctx: { db, workspace }, input: { adId }, next }) => {
+    const ad = await db.ad.findFirst({
+      where: { id: adId, subscription: { workspaceId: workspace.id } },
+      include: {
+        subscription: {
+          include: {
+            advertiser: true,
+            package: true,
+          },
+        },
+        meta: true,
+      },
+    })
+
+    if (!ad) {
+      throw new TRPCError({ code: "NOT_FOUND" })
+    }
+
+    return next({ ctx: { ad } })
+  })
