@@ -3,7 +3,7 @@ import { Input } from "@openads/ui/input"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
-import { CheckIcon, PackageIcon } from "lucide-react"
+import { CheckIcon, LayersIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/embed")({
     middlewares: [stripSearchParams(defaultValues)],
   },
 
-  component: PackageSelector,
+  component: TierSelector,
 })
 
 const formatPrice = (cents: number, currency: string) =>
@@ -35,23 +35,23 @@ const formatPrice = (cents: number, currency: string) =>
     currency: currency.toUpperCase(),
   }).format(cents / 100)
 
-function PackageSelector() {
+function TierSelector() {
   const { workspaceId } = Route.useSearch()
   const [email, setEmail] = useState("")
-  const [pendingPackageId, setPendingPackageId] = useState<string | null>(null)
+  const [pendingTierId, setPendingTierId] = useState<string | null>(null)
 
-  const packagesQuery = trpc.package.public.listForWorkspace.useQuery(
+  const tiersQuery = trpc.tier.public.listForWorkspace.useQuery(
     { workspaceId },
     { enabled: !!workspaceId },
   )
 
-  const checkout = trpc.package.public.createCheckout.useMutation({
+  const checkout = trpc.tier.public.createCheckout.useMutation({
     onSuccess: ({ url }) => {
       window.location.href = url
     },
     onError: error => {
       toast.error(error.message)
-      setPendingPackageId(null)
+      setPendingTierId(null)
     },
   })
 
@@ -65,13 +65,13 @@ function PackageSelector() {
     )
   }
 
-  const handleSubscribe = (packageId: string) => {
+  const handleSubscribe = (tierId: string) => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Enter a valid email to continue.")
       return
     }
-    setPendingPackageId(packageId)
-    checkout.mutate({ packageId, email })
+    setPendingTierId(tierId)
+    checkout.mutate({ tierId, email })
   }
 
   return (
@@ -79,7 +79,7 @@ function PackageSelector() {
       <div className="mb-8 grid gap-3 text-center">
         <h1 className="font-semibold text-2xl">Advertise on this site</h1>
         <p className="text-muted-foreground text-sm">
-          Pick a package below — payment runs through Stripe and your ad goes live after a quick
+          Pick a tier below — payment runs through Stripe and your ad goes live after a quick
           review.
         </p>
       </div>
@@ -94,37 +94,37 @@ function PackageSelector() {
       />
 
       <QueryCell
-        query={packagesQuery}
+        query={tiersQuery}
         pending={() =>
           [...Array(3)].map((_, i) => <Skeleton key={i} className="mb-3 h-24 rounded-lg" />)
         }
-        error={() => <p className="text-center text-red-500 text-sm">Could not load packages.</p>}
+        error={() => <p className="text-center text-red-500 text-sm">Could not load tiers.</p>}
         empty={() => (
           <div className="grid place-items-center gap-2 rounded-lg border border-dashed p-12 text-center text-muted-foreground text-sm">
-            <PackageIcon />
-            <p>No packages available yet.</p>
+            <LayersIcon />
+            <p>No tiers available yet.</p>
           </div>
         )}
         success={({ data }) => (
           <div className="flex flex-col gap-3">
-            {data.map(adPackage => (
+            {data.map(tier => (
               <div
-                key={adPackage.id}
+                key={tier.id}
                 className="flex items-center justify-between rounded-lg border p-4"
               >
                 <div>
-                  <h2 className="font-medium">{adPackage.name}</h2>
-                  {adPackage.description && (
-                    <p className="mt-1 text-muted-foreground text-sm">{adPackage.description}</p>
+                  <h2 className="font-medium">{tier.name}</h2>
+                  {tier.description && (
+                    <p className="mt-1 text-muted-foreground text-sm">{tier.description}</p>
                   )}
                   <p className="mt-2 font-medium text-sm">
-                    {formatPrice(adPackage.priceMonthly, adPackage.currency)}/month
+                    {formatPrice(tier.priceMonthly, tier.currency)}/month
                   </p>
                 </div>
 
                 <Button
-                  onClick={() => handleSubscribe(adPackage.id)}
-                  isPending={pendingPackageId === adPackage.id && checkout.isPending}
+                  onClick={() => handleSubscribe(tier.id)}
+                  isPending={pendingTierId === tier.id && checkout.isPending}
                   prefix={<CheckIcon />}
                 >
                   Subscribe

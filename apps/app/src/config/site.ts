@@ -5,7 +5,7 @@ export const siteConfig = {
   name: "OpenAds",
   tagline: "Self-serve subscription advertising for publishers.",
   description:
-    "OpenAds lets publishers sell advertising packages directly, with built-in Stripe billing and an approval workflow.",
+    "OpenAds lets publishers sell advertising tiers directly, with built-in Stripe billing and an approval workflow.",
 
   // Command
   commandShortcuts: [{ key: "k", metaKey: true }] as const,

@@ -2,9 +2,9 @@
 
 ## What OpenAds is
 
-OpenAds is a **self-serve subscription advertising platform for content publishers**. Publishers configure ad packages and custom creative fields in the OpenAds dashboard; advertisers find the publisher's site, click a "Subscribe to advertise" widget, pay through Stripe, fill in a creative form, and wait for approval. Once approved, their ad is available via the OpenAds API for the publisher to render on their own site however they want.
+OpenAds is a **self-serve subscription advertising platform for content publishers**. Publishers configure ad tiers and custom creative fields in the OpenAds dashboard; advertisers find the publisher's site, click a "Subscribe to advertise" widget, pay through Stripe, fill in a creative form, and wait for approval. Once approved, their ad is available via the OpenAds API for the publisher to render on their own site however they want.
 
-**OpenAds does not render ads.** It owns: subscription billing (Stripe Connect with destination charges), advertiser onboarding, the approval queue, the weighted-rotation selection algorithm, impression/click tracking, and the embeddable package selector. Publishers render ads themselves using a future SDK (which is **out of scope** at v1 — see deferred list below). The only embeddable surface OpenAds ships today is `/embed` (the package selector iframe for advertiser acquisition).
+**OpenAds does not render ads.** It owns: subscription billing (Stripe Connect with destination charges), advertiser onboarding, the approval queue, the weighted-rotation selection algorithm, impression/click tracking, and the embeddable tier selector. Publishers render ads themselves using a future SDK (which is **out of scope** at v1 — see deferred list below). The only embeddable surface OpenAds ships today is `/embed` (the tier selector iframe for advertiser acquisition).
 
 The model is based on OpenAlternative's existing setup ($5k+ MRR), generalized to multi-tenant SaaS.
 
@@ -35,14 +35,14 @@ Monorepo, Bun + Turbo. Three apps and twelve packages.
 
 These were locked in across the strategic-pivot conversations and reflect the *current* product shape. Don't deviate without checking the plan file first.
 
-### 1. Subscription packages, not time-based bookings
+### 1. Subscription tiers, not time-based bookings
 Earlier the product had time-based campaign bookings (a `Campaign` model with `startsAt`/`endsAt`). That model is **deleted**. The replacement is recurring monthly subscriptions:
-- **Why**: Time-based meant chasing renewals, inventory gaps, conflicting bookings, mispricing high-traffic windows. Subscriptions give predictable MRR, no manual ops, and packages are fungible across publishers — prerequisite for a future ad network.
+- **Why**: Time-based meant chasing renewals, inventory gaps, conflicting bookings, mispricing high-traffic windows. Subscriptions give predictable MRR, no manual ops, and tiers are fungible across publishers — prerequisite for a future ad network.
 - **Proof**: OpenAlternative runs this model successfully ($5k MRR, ~1mo–1yr+ retention per advertiser).
 
-### 2. Packages are workspace-global, not zone-scoped
-There is no `Zone` model. Earlier iterations tied Packages to Zones; that was simplified.
-- **Why**: Publishers think in "what package am I selling?" not "what zone am I selling in?" Mirrors OpenAlternative. Easier to standardize across the network later (`Silver`/`Gold`/`Platinum` weight bands become portable).
+### 2. Tiers are workspace-global, not zone-scoped
+There is no `Zone` model. Earlier iterations tied Tiers to Zones; that was simplified.
+- **Why**: Publishers think in "what tier am I selling?" not "what zone am I selling in?" Mirrors OpenAlternative. Easier to standardize across the network later (`Silver`/`Gold`/`Platinum` weight bands become portable).
 - **Where placement lives**: Entirely on the publisher's side. They call the (future) SDK with `weight >= 2.5` for premium positions, anything for regular cards. OpenAds doesn't have a placement concept.
 
 ### 3. Custom fields are the creative model
@@ -60,19 +60,19 @@ Subscriptions live on the **platform** Stripe account; funds transfer to the pub
 An ad serves only if **both** `Ad.status = Approved` AND `Subscription.status ∈ (Active, Trialing)`.
 - **Why**: A paid subscription with violating creative shouldn't serve. An admin-approved creative shouldn't serve if payment lapses. Two concerns, two flags.
 
-### 6. Package deletion is soft, not hard
-`package.delete` archives the Stripe Product and flips `isActive = false`. Live subscriptions stay billable.
-- **Why**: Hard-deleting a Package would orphan in-flight subscriptions. Publishers should be able to retire a tier without breaking existing advertisers.
+### 6. Tier deletion is soft, not hard
+`tier.delete` archives the Stripe Product and flips `isActive = false`. Live subscriptions stay billable.
+- **Why**: Hard-deleting a Tier would orphan in-flight subscriptions. Publishers should be able to retire a tier without breaking existing advertisers.
 
-### 7. Only one embeddable iframe: `/embed` (the package selector)
-- **Why**: Publishers render ads themselves. We don't want to maintain a rendering iframe in parallel with the future SDK. The package selector stays because it's a self-contained "Subscribe to advertise" widget that publishers can drop on any page.
+### 7. Only one embeddable iframe: `/embed` (the tier selector)
+- **Why**: Publishers render ads themselves. We don't want to maintain a rendering iframe in parallel with the future SDK. The tier selector stays because it's a self-contained "Subscribe to advertise" widget that publishers can drop on any page.
 
 ### 8. House ads are out of scope
 When there are no eligible approved ads, the API returns an empty list. The publisher's renderer handles the empty state.
 - **Why**: Keeps OpenAds focused on the marketplace side. Publishers who want self-promotion can serve their own thing from their own code.
 
 ### 9. Workspace-defined pricing, no platform-imposed tiers
-Publishers create as many Packages as they like, with any weight and any price.
+Publishers create as many Tiers as they like, with any weight and any price.
 - **Why**: Each publisher's audience is different. Forcing Silver/Gold/Platinum at the platform level would be premature. Network standardization can come later via an opt-in mapping.
 
 ### 10. Monthly billing only at v1
@@ -91,7 +91,7 @@ The following are explicit deferrals. Don't build them without confirming a scop
 - **Per-workspace branded sender domains** — single shared sender via `AUTOSEND_FROM_EMAIL`.
 - **Yearly / weekly billing intervals** — monthly-only.
 - **SaaS plan gating** (Free/Pro for the publisher SaaS) — `Workspace.plan` was dropped; re-add when SaaS billing is a real concern.
-- **Cross-workspace ad network** — packages stay workspace-defined; standardization is a future opt-in.
+- **Cross-workspace ad network** — tiers stay workspace-defined; standardization is a future opt-in.
 
 ## Build / test commands
 
@@ -159,5 +159,5 @@ These all bit during earlier iterations; they will bite the next agent the same 
 
 ## Reference docs
 
-- **Strategic + implementation plan**: `/Users/piotrkulpinski/.claude/plans/that-s-all-great-i-composed-cupcake.md`. Contains Parts A (strategic direction), B (emails infrastructure, shipped), C (zone-scoped package model — superseded, kept for reference), and **Part D (the current API-first / globally-scoped model — execute this)**. Part D includes a full hand-off table mapping every commit on the closed `feat/package-based-ads` branch to its disposition (port / heavy rewrite / stays deleted).
+- **Strategic + implementation plan**: `/Users/piotrkulpinski/.claude/plans/that-s-all-great-i-composed-cupcake.md`. Contains Parts A (strategic direction), B (emails infrastructure, shipped), C (zone-scoped tier model — superseded, kept for reference), and **Part D (the current API-first / globally-scoped model — execute this)**. Part D includes a full hand-off table mapping every commit on the closed `feat/package-based-ads` branch (its name is a historical artifact — the model has since been renamed to Tier) to its disposition (port / heavy rewrite / stays deleted).
 - **Closed PR for reference**: `feat/package-based-ads` (PR #5) — closed because the design pivoted. Surviving algorithms (Stripe checkout, webhooks, approval flow, weighted rotation, fairness boost, stats endpoint) are documented for cherry-pick / port in Part D's port table.

@@ -113,7 +113,7 @@ export const connectEnabledWorkspaceProcedure = workspaceProcedure.use(
     if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: "Connect your Stripe account before creating packages.",
+        message: "Connect your Stripe account before creating tiers.",
       })
     }
 
@@ -133,7 +133,7 @@ export const adProcedure = workspaceProcedure
         subscription: {
           include: {
             advertiser: true,
-            package: true,
+            tier: true,
           },
         },
         meta: true,

@@ -13,7 +13,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "The simplest way to sell advertising on your site. Define packages, embed a widget, approve creatives, and get paid via Stripe.",
+          "The simplest way to sell advertising on your site. Define tiers, embed a widget, approve creatives, and get paid via Stripe.",
       },
     ],
     links: [

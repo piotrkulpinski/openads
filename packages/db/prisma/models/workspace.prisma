@@ -17,7 +17,7 @@ model Workspace {
   members       WorkspaceMember[]
   defaultFor    User[]
   advertisers   Advertiser[]
-  packages      Package[]
+  tiers         Tier[]
   fields        Field[]
   subscriptions Subscription[]
 

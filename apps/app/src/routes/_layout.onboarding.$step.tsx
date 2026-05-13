@@ -68,7 +68,7 @@ function OnboardingStepPage() {
       return (
         <OnboardingStep
           title="Connect your Stripe account"
-          description="Connect Stripe so advertisers can subscribe to your packages and funds route to you."
+          description="Connect Stripe so advertisers can subscribe to your tiers and funds route to you."
         >
           <QueryCell
             query={query}

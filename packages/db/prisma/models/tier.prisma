@@ -1,4 +1,4 @@
-model Package {
+model Tier {
   id              String   @id @default(cuid())
   name            String
   description     String   @default("")

@@ -41,7 +41,7 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
 
           <DialogDescription asChild>
             <HeaderDescription className="max-w-md">
-              Thanks for signing up – your account is ready to go! Set up your packages and custom
+              Thanks for signing up – your account is ready to go! Set up your tiers and custom
               fields, then drop the embed widget on your site to start taking advertiser
               subscriptions.
             </HeaderDescription>

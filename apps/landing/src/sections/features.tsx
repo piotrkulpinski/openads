@@ -4,14 +4,14 @@ import { SectionHeading } from "~/components/section-heading"
 
 const features = [
   {
-    title: "Your packages, your prices",
+    title: "Your tiers, your prices",
     description:
       "Create the tiers you want to sell — banner, sidebar, sponsored card. Set weights and monthly prices, then let advertisers subscribe.",
   },
   {
     title: "Self-service subscriptions",
     description:
-      "Advertisers pick a package, pay through Stripe, and submit creative for review. No invoicing, no chasing — recurring revenue on autopilot.",
+      "Advertisers pick a tier, pay through Stripe, and submit creative for review. No invoicing, no chasing — recurring revenue on autopilot.",
   },
   {
     title: "Instant Stripe payouts",
@@ -24,7 +24,7 @@ export function Features() {
   return (
     <section className="py-12 md:py-28">
       <Container>
-        <SectionHeading subtitle="No ad networks, no rev-share surprises. Define your packages, set your prices, and let advertisers subscribe directly.">
+        <SectionHeading subtitle="No ad networks, no rev-share surprises. Define your tiers, set your prices, and let advertisers subscribe directly.">
           Direct ad sales, simplified
         </SectionHeading>
 

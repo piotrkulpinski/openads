@@ -4,10 +4,10 @@ import { adRouter } from "./routers/ad"
 import { authRouter } from "./routers/auth"
 import { fieldRouter } from "./routers/field"
 import { onboardingRouter } from "./routers/onboarding"
-import { packageRouter } from "./routers/package"
 import { storageRouter } from "./routers/storage"
 import { stripeRouter } from "./routers/stripe"
 import { subscriptionRouter } from "./routers/subscription"
+import { tierRouter } from "./routers/tier"
 import { userRouter } from "./routers/user"
 import { workspaceRouter } from "./routers/workspace"
 
@@ -19,7 +19,7 @@ export const appRouter = router({
   onboarding: onboardingRouter,
   workspace: workspaceRouter,
   field: fieldRouter,
-  package: packageRouter,
+  tier: tierRouter,
   ad: adRouter,
   subscription: subscriptionRouter,
 })

@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const packageSchema = z.object({
+export const tierSchema = z.object({
   name: z.string().trim().min(2, { message: "Name is too short" }),
   description: z.string().trim().optional(),
   weight: z.number().positive(),
@@ -10,4 +10,4 @@ export const packageSchema = z.object({
   order: z.number().int().nonnegative().default(0),
 })
 
-export type PackageSchema = z.infer<typeof packageSchema>
+export type TierSchema = z.infer<typeof tierSchema>

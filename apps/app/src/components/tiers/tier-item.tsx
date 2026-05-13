@@ -16,9 +16,9 @@ import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
-type PackageItemProps = ComponentProps<"div"> & {
+type TierItemProps = ComponentProps<"div"> & {
   workspaceId: string
-  adPackage: RouterOutputs["package"]["getAll"][number]
+  tier: RouterOutputs["tier"]["getAll"][number]
 }
 
 const formatPrice = (cents: number, currency: string) => {
@@ -28,13 +28,13 @@ const formatPrice = (cents: number, currency: string) => {
   }).format(cents / 100)
 }
 
-const PackageItem = ({ workspaceId, adPackage, className, ...props }: PackageItemProps) => {
+const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => {
   const utils = trpc.useUtils()
 
-  const { mutate, isPending } = trpc.package.delete.useMutation({
+  const { mutate, isPending } = trpc.tier.delete.useMutation({
     onSuccess: () => {
-      toast.success("Package archived")
-      utils.package.getAll.invalidate({ workspaceId })
+      toast.success("Tier archived")
+      utils.tier.getAll.invalidate({ workspaceId })
     },
     onError: ({ message }) => {
       toast.error(message)
@@ -50,16 +50,16 @@ const PackageItem = ({ workspaceId, adPackage, className, ...props }: PackageIte
       {...props}
     >
       <Link
-        to="/$workspaceId/packages/$packageId"
-        params={{ workspaceId, packageId: adPackage.id }}
+        to="/$workspaceId/tiers/$tierId"
+        params={{ workspaceId, tierId: tier.id }}
         className="flex-1"
       >
         <Stack size="sm">
-          <H5 className="truncate">{adPackage.name}</H5>
-          {!adPackage.isActive && <Badge variant="secondary">Archived</Badge>}
+          <H5 className="truncate">{tier.name}</H5>
+          {!tier.isActive && <Badge variant="secondary">Archived</Badge>}
         </Stack>
         <p className="text-sm text-muted-foreground">
-          {formatPrice(adPackage.priceMonthly, adPackage.currency)}/mo · weight {adPackage.weight}
+          {formatPrice(tier.priceMonthly, tier.currency)}/mo · weight {tier.weight}
         </p>
         <span className="absolute inset-0" />
       </Link>
@@ -76,9 +76,9 @@ const PackageItem = ({ workspaceId, adPackage, className, ...props }: PackageIte
 
         <DropdownMenuContent align="end">
           <ConfirmModal
-            key={adPackage.id}
+            key={tier.id}
             isPending={isPending}
-            onConfirm={() => mutate({ id: adPackage.id, workspaceId })}
+            onConfirm={() => mutate({ id: tier.id, workspaceId })}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Trash2 />
@@ -91,4 +91,4 @@ const PackageItem = ({ workspaceId, adPackage, className, ...props }: PackageIte
   )
 }
 
-export { PackageItem }
+export { TierItem }

@@ -3,9 +3,9 @@ import { Separator } from "@openads/ui/separator"
 import { Skeleton } from "@openads/ui/skeleton"
 import {
   Code2Icon,
+  LayersIcon,
   LayoutDashboardIcon,
   MegaphoneIcon,
-  PackageIcon,
   Rows3Icon,
   SettingsIcon,
   UsersIcon,
@@ -27,9 +27,9 @@ const navs: NavMainItem[][] = [
       activeOptions: { exact: true },
     },
     {
-      title: "Packages",
-      to: "/packages",
-      prefix: <PackageIcon />,
+      title: "Tiers",
+      to: "/tiers",
+      prefix: <LayersIcon />,
     },
     {
       title: "Fields",
