@@ -260,7 +260,7 @@ export const adRouter = router({
           throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
         }
 
-        const [workspace, pkg, fields, existingAd] = await Promise.all([
+        const [workspace, adPackage, fields, existingAd] = await Promise.all([
           db.workspace.findUnique({
             where: { id: workspaceId },
             select: { id: true, name: true, slug: true, faviconUrl: true },
@@ -282,13 +282,13 @@ export const adRouter = router({
           })(),
         ])
 
-        if (!workspace || !pkg) {
+        if (!workspace || !adPackage) {
           throw new TRPCError({ code: "NOT_FOUND" })
         }
 
         return {
           workspace,
-          package: pkg,
+          package: adPackage,
           fields,
           customerEmail: session.customer_email ?? null,
           existingAd,
@@ -328,12 +328,12 @@ export const adRouter = router({
             throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
           }
 
-          const pkg = await db.package.findUnique({
+          const adPackage = await db.package.findUnique({
             where: { id: packageId },
             select: { id: true, name: true, weight: true, workspaceId: true },
           })
 
-          if (!pkg || pkg.workspaceId !== workspaceId) {
+          if (!adPackage || adPackage.workspaceId !== workspaceId) {
             throw new TRPCError({ code: "NOT_FOUND" })
           }
 
@@ -384,7 +384,7 @@ export const adRouter = router({
             create: {
               subscriptionId: subscription.id,
               status: "Pending",
-              weight: pkg.weight,
+              weight: adPackage.weight,
               name,
               websiteUrl,
             },
@@ -447,7 +447,7 @@ export const adRouter = router({
               workspaceName: workspace.name,
               advertiserName: advertiser.name,
               advertiserEmail: customerEmail,
-              packageName: pkg.name,
+              packageName: adPackage.name,
               reviewUrl: `${env.APP_URL}/${workspace.id}/ads/${ad.id}`,
             })
 

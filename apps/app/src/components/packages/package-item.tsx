@@ -18,7 +18,7 @@ import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 type PackageItemProps = ComponentProps<"div"> & {
   workspaceId: string
-  pkg: RouterOutputs["package"]["getAll"][number]
+  adPackage: RouterOutputs["package"]["getAll"][number]
 }
 
 const formatPrice = (cents: number, currency: string) => {
@@ -28,7 +28,7 @@ const formatPrice = (cents: number, currency: string) => {
   }).format(cents / 100)
 }
 
-const PackageItem = ({ workspaceId, pkg, className, ...props }: PackageItemProps) => {
+const PackageItem = ({ workspaceId, adPackage, className, ...props }: PackageItemProps) => {
   const utils = trpc.useUtils()
 
   const { mutate, isPending } = trpc.package.delete.useMutation({
@@ -51,15 +51,15 @@ const PackageItem = ({ workspaceId, pkg, className, ...props }: PackageItemProps
     >
       <Link
         to="/$workspaceId/packages/$packageId"
-        params={{ workspaceId, packageId: pkg.id }}
+        params={{ workspaceId, packageId: adPackage.id }}
         className="flex-1"
       >
         <Stack size="sm">
-          <H5 className="truncate">{pkg.name}</H5>
-          {!pkg.isActive && <Badge variant="secondary">Archived</Badge>}
+          <H5 className="truncate">{adPackage.name}</H5>
+          {!adPackage.isActive && <Badge variant="secondary">Archived</Badge>}
         </Stack>
         <p className="text-sm text-muted-foreground">
-          {formatPrice(pkg.priceMonthly, pkg.currency)}/mo · weight {pkg.weight}
+          {formatPrice(adPackage.priceMonthly, adPackage.currency)}/mo · weight {adPackage.weight}
         </p>
         <span className="absolute inset-0" />
       </Link>
@@ -76,9 +76,9 @@ const PackageItem = ({ workspaceId, pkg, className, ...props }: PackageItemProps
 
         <DropdownMenuContent align="end">
           <ConfirmModal
-            key={pkg.id}
+            key={adPackage.id}
             isPending={isPending}
-            onConfirm={() => mutate({ id: pkg.id, workspaceId })}
+            onConfirm={() => mutate({ id: adPackage.id, workspaceId })}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
               <Trash2 />

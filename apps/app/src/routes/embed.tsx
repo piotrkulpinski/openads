@@ -107,21 +107,24 @@ function PackageSelector() {
         )}
         success={({ data }) => (
           <div className="flex flex-col gap-3">
-            {data.map(pkg => (
-              <div key={pkg.id} className="flex items-center justify-between rounded-lg border p-4">
+            {data.map(adPackage => (
+              <div
+                key={adPackage.id}
+                className="flex items-center justify-between rounded-lg border p-4"
+              >
                 <div>
-                  <h2 className="font-medium">{pkg.name}</h2>
-                  {pkg.description && (
-                    <p className="mt-1 text-muted-foreground text-sm">{pkg.description}</p>
+                  <h2 className="font-medium">{adPackage.name}</h2>
+                  {adPackage.description && (
+                    <p className="mt-1 text-muted-foreground text-sm">{adPackage.description}</p>
                   )}
                   <p className="mt-2 font-medium text-sm">
-                    {formatPrice(pkg.priceMonthly, pkg.currency)}/month
+                    {formatPrice(adPackage.priceMonthly, adPackage.currency)}/month
                   </p>
                 </div>
 
                 <Button
-                  onClick={() => handleSubscribe(pkg.id)}
-                  isPending={pendingPackageId === pkg.id && checkout.isPending}
+                  onClick={() => handleSubscribe(adPackage.id)}
+                  isPending={pendingPackageId === adPackage.id && checkout.isPending}
                   prefix={<CheckIcon />}
                 >
                   Subscribe
