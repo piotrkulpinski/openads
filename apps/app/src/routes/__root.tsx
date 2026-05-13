@@ -26,7 +26,12 @@ function RootComponent() {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   beforeLoad: async ({ context: { trpc }, location: { pathname, searchStr } }) => {
-    if (["/login", "/embed"].includes(pathname)) {
+    if (
+      pathname === "/login" ||
+      pathname === "/embed" ||
+      pathname.startsWith("/embed/") ||
+      pathname.startsWith("/advertise/")
+    ) {
       return
     }
 

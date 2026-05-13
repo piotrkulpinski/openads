@@ -1,4 +1,5 @@
 import { idSchema, packageSchema } from "@openads/db/schema"
+import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
   archivePackageProduct,
   archivePrice,
@@ -7,7 +8,13 @@ import {
   updatePackageProduct,
 } from "@openads/stripe/products"
 import { TRPCError } from "@trpc/server"
-import { connectEnabledWorkspaceProcedure, router, workspaceProcedure } from "../index"
+import { z } from "zod"
+import {
+  connectEnabledWorkspaceProcedure,
+  publicProcedure,
+  router,
+  workspaceProcedure,
+} from "../index"
 
 export const packageRouter = router({
   // Read paths don't require Connect (publishers can browse what they have).
@@ -174,4 +181,74 @@ export const packageRouter = router({
         data: { isActive: false },
       })
     }),
+
+  // Public surface: consumed by the embeddable package selector (`/embed`).
+  public: router({
+    listForWorkspace: publicProcedure
+      .input(z.object({ workspaceId: z.string() }))
+      .query(async ({ ctx: { db }, input: { workspaceId } }) => {
+        return await db.package.findMany({
+          where: { workspaceId, isActive: true },
+          orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            weight: true,
+            priceMonthly: true,
+            currency: true,
+            order: true,
+          },
+        })
+      }),
+
+    createCheckout: publicProcedure
+      .input(
+        z.object({
+          packageId: z.string(),
+          email: z.email(),
+        }),
+      )
+      .mutation(async ({ ctx: { db, stripe, env }, input: { packageId, email } }) => {
+        const pkg = await db.package.findFirst({
+          where: { id: packageId, isActive: true },
+          include: { workspace: true },
+        })
+
+        if (!pkg || !pkg.stripePriceId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Package not available." })
+        }
+
+        const { workspace } = pkg
+
+        if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "This publisher cannot accept payments yet.",
+          })
+        }
+
+        const session = await createSubscriptionCheckoutSession(stripe, {
+          priceId: pkg.stripePriceId,
+          customerEmail: email,
+          successUrl: `${env.APP_URL}/advertise/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${env.APP_URL}/advertise/cancelled`,
+          applicationFeePercent: env.STRIPE_PLATFORM_FEE_PERCENT,
+          destinationAccountId: workspace.stripeConnectId,
+          metadata: {
+            workspaceId: workspace.id,
+            packageId: pkg.id,
+          },
+        })
+
+        if (!session.url) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Stripe did not return a checkout URL.",
+          })
+        }
+
+        return { url: session.url, sessionId: session.id }
+      }),
+  }),
 })
