@@ -1,4 +1,5 @@
 import { BillingInterval } from "@openads/db/client"
+import { tierPriceSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
@@ -9,17 +10,20 @@ import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { FormButton } from "~/components/form-button"
+import { CurrencySelect } from "~/components/tiers/currency-select"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
 import { trpc } from "~/lib/trpc"
 
 // Visible form schema uses whole units; the submit handler converts to cents.
+// Currency is borrowed from the canonical tierPriceSchema so the allow-list stays
+// in one place.
 const tierPriceFormSchema = z.object({
   interval: z.enum(BillingInterval).default(BillingInterval.Month),
   intervalCount: z.number().int().positive().default(1),
   amountWhole: z.number().int().nonnegative(),
-  currency: z.string().trim().toLowerCase().length(3).default("usd"),
+  currency: tierPriceSchema.shape.currency,
 })
 
 type TierPriceFormValues = z.infer<typeof tierPriceFormSchema>
@@ -143,7 +147,7 @@ export const TierPriceForm = ({
             <FormItem>
               <FormLabel className="text-xs">Currency</FormLabel>
               <FormControl>
-                <Input placeholder="usd" autoCapitalize="none" maxLength={3} {...field} />
+                <CurrencySelect value={field.value} onValueChange={field.onChange} />
               </FormControl>
               <FormMessage />
             </FormItem>
