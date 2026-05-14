@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import { slugify } from "@dirstack/utils"
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
@@ -15,11 +16,12 @@ function generateObjectKey(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase() || "png"
   const baseName = slugify(fileName.replace(/\.[^.]+$/, "")) || "file"
 
-  return `${baseName}-${Date.now()}.${extension}`
+  return `${baseName}-${Date.now()}-${randomUUID()}.${extension}`
 }
 
-// Allowed image MIME types for advertiser-submitted Image custom fields.
-const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"])
+// SVG is intentionally excluded — it can execute JS when rendered via <img>
+// from a same-origin asset host.
+const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"])
 
 const MAX_ADVERTISER_UPLOAD_BYTES = 2 * 1024 * 1024 // 2 MB
 const ADVERTISER_UPLOAD_TTL_SECONDS = 60 * 5 // 5 minutes to PUT after issuing the URL
@@ -44,8 +46,8 @@ export const storageRouter = router({
     return await s3.deletePrefix({ prefix: `workspaces/${workspace.id}` })
   }),
 
-  // Public surface: presigned upload for advertisers submitting Image custom-field values
-  // on the post-checkout AdForm. Anonymous (Stripe session is the auth) and rate-limited.
+  // Anonymous endpoint: the Stripe Checkout session is the only auth, so
+  // rate-limit per session to bound abuse from a leaked session id.
   public: router({
     createAdvertiserUpload: publicProcedure
       .input(
@@ -64,7 +66,7 @@ export const storageRouter = router({
           if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
             throw new TRPCError({
               code: "BAD_REQUEST",
-              message: "Unsupported file type. Use PNG, JPEG, WebP, or SVG.",
+              message: "Unsupported file type. Use PNG, JPEG, or WebP.",
             })
           }
 
@@ -90,7 +92,6 @@ export const storageRouter = router({
             throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
           }
 
-          // Lightweight workspace existence check — bail if metadata points at a stale row.
           const workspace = await db.workspace.findUnique({
             where: { id: workspaceId },
             select: { id: true },
@@ -100,7 +101,6 @@ export const storageRouter = router({
             throw new TRPCError({ code: "NOT_FOUND" })
           }
 
-          // Per-session rate limit so a leaked session id can't burn through R2 PUTs.
           const rateKey = `storage:advertiser-upload:${sessionId}`
           const count = await redis.incr(rateKey)
           if (count === 1) {
@@ -115,15 +115,27 @@ export const storageRouter = router({
 
           const objectKey = `workspaces/${workspaceId}/uploads/${sessionId}/${generateObjectKey(fileName)}`
 
-          const uploadUrl = await s3.getSignedUploadUrl({
+          // Presigned POST (not PUT) so the size cap is enforced server-side
+          // at S3 via `content-length-range`.
+          const presigned = await s3.createSignedPost({
             key: objectKey,
-            contentType,
             expiresInSeconds: ADVERTISER_UPLOAD_TTL_SECONDS,
-            cacheControl: "public, max-age=31536000, immutable",
+            contentLengthRange: { max: MAX_ADVERTISER_UPLOAD_BYTES },
+            // S3 requires the form to echo every signed field with the exact
+            // value, so these are returned to the client alongside `conditions`.
+            fields: {
+              "Content-Type": contentType,
+              "Cache-Control": "public, max-age=31536000, immutable",
+            },
+            conditions: [
+              ["eq", "$Content-Type", contentType],
+              ["eq", "$Cache-Control", "public, max-age=31536000, immutable"],
+            ],
           })
 
           return {
-            uploadUrl,
+            uploadUrl: presigned.url,
+            fields: presigned.fields,
             publicUrl: s3.getPublicUrl({ key: objectKey }),
             key: objectKey,
           }

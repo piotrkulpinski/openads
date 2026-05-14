@@ -1,6 +1,7 @@
 import type { Session } from "@openads/auth/server"
 import { Prisma, type db } from "@openads/db"
 import type { EmailClient } from "@openads/emails"
+import type { Logger } from "@openads/logger"
 import type { RedisClient } from "@openads/redis"
 import type { S3BucketClient } from "@openads/s3"
 import type { StripeClient } from "@openads/stripe"
@@ -16,6 +17,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   auth: Session | null
   db: typeof db
   emails: EmailClient
+  logger: Logger
   redis: RedisClient
   stripe: StripeClient
   s3: S3BucketClient

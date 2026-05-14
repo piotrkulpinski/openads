@@ -112,7 +112,7 @@ export const adRouter = router({
 
   reject: adProcedure
     .input(reviewNoteInput)
-    .mutation(async ({ ctx: { ad, db, emails, stripe, workspace }, input: { note } }) => {
+    .mutation(async ({ ctx: { ad, db, emails, logger, stripe, workspace }, input: { note } }) => {
       const updated = await db.ad.update({
         where: { id: ad.id },
         data: {
@@ -129,10 +129,11 @@ export const adRouter = router({
       } catch (err) {
         // Subscription may already be canceled or otherwise inaccessible — leave
         // local state correct and surface the failure in logs only.
-        console.warn(
-          `[ad.reject] failed to cancel stripe subscription ${ad.subscription.stripeSubscriptionId}:`,
+        logger.warn("ad.reject: failed to cancel stripe subscription", {
           err,
-        )
+          stripeSubscriptionId: ad.subscription.stripeSubscriptionId,
+          adId: ad.id,
+        })
       }
 
       const advertiserEmail = ad.subscription.advertiser.email
@@ -304,11 +305,15 @@ export const adRouter = router({
         }
       }),
 
+    // Gated only by the Stripe Checkout session id, which isn't a secret — it
+    // lives in the success-URL query string. The safeguard against malicious
+    // overwrites is that every submission resets `status` to Pending, so a
+    // reviewer still has to approve before the creative serves.
     createFromCheckout: publicProcedure
       .input(createFromCheckoutInput)
       .mutation(
         async ({
-          ctx: { db, emails, s3, stripe, env },
+          ctx: { db, emails, logger, s3, stripe, env },
           input: { sessionId, name, websiteUrl, meta },
         }) => {
           const session = await stripe.checkout.sessions.retrieve(sessionId)
@@ -352,7 +357,6 @@ export const adRouter = router({
 
           const tier = tierPrice.tier
 
-          // Find or create the Advertiser by email within this workspace.
           let advertiser = await db.advertiser.findFirst({
             where: { workspaceId, email: customerEmail },
           })
@@ -367,8 +371,7 @@ export const adRouter = router({
             })
           }
 
-          // Upsert the Subscription DB row from Stripe state (idempotent — the webhook
-          // may have already created it).
+          // Idempotent — the Stripe webhook may have already created this row.
           const subscription = await db.subscription.upsert({
             where: { stripeSubscriptionId: stripeSubscription.id },
             create: {
@@ -394,20 +397,18 @@ export const adRouter = router({
             },
           })
 
-          // Upsert the Ad row keyed by subscriptionId.
           const ad = await db.ad.upsert({
             where: { subscriptionId: subscription.id },
             create: {
               subscriptionId: subscription.id,
               status: "Pending",
-              weight: tier.weight,
               name,
               websiteUrl,
             },
             update: {
               name,
               websiteUrl,
-              // Resetting to Pending on resubmission of creative.
+              // Resubmission re-enters the review queue.
               status: "Pending",
               approvedAt: null,
               rejectedAt: null,
@@ -415,15 +416,21 @@ export const adRouter = router({
             },
           })
 
-          // Auto-fetch favicon (best-effort, non-blocking failure). Stored on the
-          // workspace's S3 prefix; publishers can surface it however they want when
-          // serving the ad.
+          // Best-effort — failure is logged but doesn't block ad creation.
           await fetchAndUploadFavicon(s3, {
             websiteUrl,
             key: `workspaces/${workspaceId}/ads/${ad.id}/favicon.png`,
-          }).catch(() => null)
+          }).catch(err => {
+            logger.warn("ad.createFromCheckout: favicon fetch failed", {
+              err,
+              adId: ad.id,
+              websiteUrl,
+            })
+            return null
+          })
 
-          // Replace meta rows for this ad to mirror the submitted custom-field values.
+          // Transactional replace so concurrent reads never see an ad with zero
+          // meta rows between the delete and the recreate.
           if (meta.length > 0) {
             const validFieldIds = new Set(
               (await db.field.findMany({ where: { workspaceId }, select: { id: true } })).map(
@@ -432,16 +439,20 @@ export const adRouter = router({
             )
             const filtered = meta.filter(m => validFieldIds.has(m.fieldId))
 
-            await db.meta.deleteMany({ where: { adId: ad.id } })
-            if (filtered.length > 0) {
-              await db.meta.createMany({
-                data: filtered.map(m => ({
-                  adId: ad.id,
-                  fieldId: m.fieldId,
-                  value: m.value,
-                })),
-              })
-            }
+            await db.$transaction([
+              db.meta.deleteMany({ where: { adId: ad.id } }),
+              ...(filtered.length > 0
+                ? [
+                    db.meta.createMany({
+                      data: filtered.map(m => ({
+                        adId: ad.id,
+                        fieldId: m.fieldId,
+                        value: m.value,
+                      })),
+                    }),
+                  ]
+                : []),
+            ])
           }
 
           // Notify workspace owners and managers.

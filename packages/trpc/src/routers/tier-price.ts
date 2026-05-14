@@ -5,9 +5,9 @@ import { z } from "zod"
 import { connectEnabledWorkspaceProcedure, router } from "../index"
 
 export const tierPriceRouter = router({
-  // Add a new price (interval / amount / currency combo) to an existing tier.
-  // Stripe Prices are immutable on unit_amount/interval/currency, so price changes
-  // are always archive-and-create — there's no `update`.
+  // Stripe Prices are immutable on unit_amount/interval/currency, so price
+  // changes are always archive-then-create on both sides. A tier holds at most
+  // one active price per (interval, intervalCount, currency) shape.
   create: connectEnabledWorkspaceProcedure
     .input(tierPriceSchema.extend({ tierId: z.string() }))
     .mutation(async ({ ctx: { db, stripe, workspace }, input }) => {
@@ -19,9 +19,8 @@ export const tierPriceRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Tier not found." })
       }
 
-      // Reject if an active price already exists for this shape — the caller must
-      // archive the existing one first. Mirrors Stripe's "archive + create" pattern
-      // on the publisher side.
+      // Amount is intentionally not part of the uniqueness key — that's the
+      // field you change by archive-and-create.
       const conflict = await db.tierPrice.findFirst({
         where: {
           tierId: tier.id,
@@ -36,7 +35,7 @@ export const tierPriceRouter = router({
         throw new TRPCError({
           code: "CONFLICT",
           message:
-            "An active price with this interval and currency already exists. Archive it first.",
+            "An active price already exists for this interval and currency. Archive it before creating a replacement.",
         })
       }
 

@@ -7,9 +7,8 @@ enum AdStatus {
 model Ad {
   id     String   @id @default(cuid())
   status AdStatus @default(Pending)
-  weight Float // Cached from tier at create time
 
-  // Standard creative — fixed fields. Everything else lives in Meta.
+  // Fixed creative fields. Everything else lives in Meta.
   name       String
   websiteUrl String
 
