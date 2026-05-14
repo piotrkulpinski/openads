@@ -1,6 +1,7 @@
 import { idSchema, tierPriceSchema, tierSchema } from "@openads/db/schema"
 import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
+  archivePrice,
   archiveTierProduct,
   createTierPrice,
   createTierProduct,
@@ -76,38 +77,53 @@ export const tierRouter = router({
           },
         })
 
-        // Create the initial price rows + their Stripe Prices, one at a time so each
-        // local row's id can be stamped onto its Stripe Price metadata.
-        for (const price of initialPrices) {
-          const tierPriceRow = await db.tierPrice.create({
-            data: {
-              tierId: tier.id,
+        // One at a time so each local id can be stamped onto its Stripe Price
+        // metadata. Partial failures roll back via the catch below.
+        const createdStripePriceIds: string[] = []
+        try {
+          for (const price of initialPrices) {
+            const tierPriceRow = await db.tierPrice.create({
+              data: {
+                tierId: tier.id,
+                interval: price.interval,
+                intervalCount: price.intervalCount,
+                amount: price.amount,
+                currency: price.currency,
+              },
+            })
+
+            const stripePrice = await createTierPrice(stripe, {
+              productId: product.id,
+              unitAmount: price.amount,
+              currency: price.currency,
               interval: price.interval,
               intervalCount: price.intervalCount,
-              amount: price.amount,
-              currency: price.currency,
-            },
-          })
+              metadata: {
+                workspaceId: workspace.id,
+                tierId: tier.id,
+                tierPriceId: tierPriceRow.id,
+                interval: price.interval,
+                intervalCount: String(price.intervalCount),
+              },
+            })
 
-          const stripePrice = await createTierPrice(stripe, {
-            productId: product.id,
-            unitAmount: price.amount,
-            currency: price.currency,
-            interval: price.interval,
-            intervalCount: price.intervalCount,
-            metadata: {
-              workspaceId: workspace.id,
-              tierId: tier.id,
-              tierPriceId: tierPriceRow.id,
-              interval: price.interval,
-              intervalCount: String(price.intervalCount),
-            },
-          })
+            createdStripePriceIds.push(stripePrice.id)
 
-          await db.tierPrice.update({
-            where: { id: tierPriceRow.id },
-            data: { stripePriceId: stripePrice.id },
-          })
+            await db.tierPrice.update({
+              where: { id: tierPriceRow.id },
+              data: { stripePriceId: stripePrice.id },
+            })
+          }
+        } catch (err) {
+          // Best-effort cleanup. We swallow secondary errors so the user sees the
+          // original failure, not the rollback noise.
+          await Promise.allSettled([
+            ...createdStripePriceIds.map(id => archivePrice(stripe, id)),
+            archiveTierProduct(stripe, product.id),
+          ])
+          await db.tierPrice.deleteMany({ where: { tierId: tier.id } })
+          await db.tier.delete({ where: { id: tier.id } })
+          throw err
         }
 
         // Stamp the Stripe Product id back onto the Tier and return with prices nested.

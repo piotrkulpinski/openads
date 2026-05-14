@@ -76,7 +76,7 @@ Publishers create as many Tiers as they like, with any weight and any price.
 - **Why**: Each publisher's audience is different. Forcing Silver/Gold/Platinum at the platform level would be premature. Network standardization can come later via an opt-in mapping.
 
 ### 10. `TierPrice` rows are immutable
-Each Tier has many `TierPrice`s (one Stripe Product, many Stripe Prices). Adding a new amount, interval, or currency creates a new `TierPrice` + Stripe Price. There's no "edit price" — only "archive + create new". Archiving flips `isActive = false` on the `TierPrice` and archives the Stripe Price.
+Each Tier has many `TierPrice`s (one Stripe Product, many Stripe Prices). A tier can have at most one active price per `(interval, intervalCount, currency)` shape — changing the *amount* for an existing shape means archiving the current price and creating a new one. There's no "edit price" — only "archive + create new". Archiving flips `isActive = false` on the `TierPrice` and archives the Stripe Price.
 - **Why**: Stripe Prices are immutable on `unit_amount` / `interval` / `currency`. Mirroring that on our side gives us an audit trail of price changes and lets old subscribers keep their grandfathered price even after the publisher raises rates. `Subscription` references a specific `TierPrice` via `Subscription.tierPriceId`, so archive ≠ break.
 - **Intervals supported**: `Day` / `Week` / `Month` / `Year` (matches `Stripe.recurring.interval`). `intervalCount` is on the schema with `default(1)` but isn't yet exposed in the form.
 - **Form input**: publishers type integer whole units (`19`); the form multiplies by 100 before submitting. DB and Stripe always see cents.

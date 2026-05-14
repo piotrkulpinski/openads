@@ -12,7 +12,7 @@ type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
   accept?: string
 }
 
-const DEFAULT_ACCEPT = "image/png,image/jpeg,image/webp,image/svg+xml"
+const DEFAULT_ACCEPT = "image/png,image/jpeg,image/webp"
 
 export const ImageUpload = ({
   sessionId,
@@ -45,14 +45,21 @@ export const ImageUpload = ({
         contentLength: file.size,
       })
 
-      const putResponse = await fetch(presigned.uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
+      // Presigned POST: every field from the signature must be in the form,
+      // and the file must come last (S3 requirement).
+      const form = new FormData()
+      for (const [name, value] of Object.entries(presigned.fields)) {
+        form.append(name, value)
+      }
+      form.append("file", file)
+
+      const uploadResponse = await fetch(presigned.uploadUrl, {
+        method: "POST",
+        body: form,
       })
 
-      if (!putResponse.ok) {
-        throw new Error(`Upload failed (${putResponse.status})`)
+      if (!uploadResponse.ok) {
+        throw new Error(`Upload failed (${uploadResponse.status})`)
       }
 
       onChange(presigned.publicUrl)

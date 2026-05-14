@@ -16,8 +16,12 @@ interface FindServingAdProps {
   excludeId?: string
   /** Maximum boost applied to the least-served ad (1.2 = +20%). */
   leastServedBoostMax?: number
-  /** Window in hours for impression-based fairness. */
-  fairnessWindowHours?: number
+  /**
+   * Number of UTC days of impression history to consider when computing
+   * least-served fairness. 1 = today only, 7 = last week, etc. Matches the
+   * day-bucketed granularity of `AdStat`.
+   */
+  fairnessWindowDays?: number
 }
 
 /**
@@ -35,33 +39,46 @@ export async function findServingAd({
   weightGte,
   excludeId,
   leastServedBoostMax = 1.2,
-  fairnessWindowHours = 24,
+  fairnessWindowDays = 1,
 }: FindServingAdProps): Promise<ServingCandidate | null> {
-  const ads = await db.ad.findMany({
+  const rows = await db.ad.findMany({
     where: {
       status: "Approved",
-      ...(weightGte !== undefined ? { weight: { gte: weightGte } } : {}),
       ...(excludeId ? { NOT: { id: excludeId } } : {}),
       subscription: {
         workspaceId,
         status: { in: ["Active", "Trialing"] },
+        // Weight is sourced live from the tier — applying the floor here
+        // means tier weight edits affect placement targeting immediately.
+        ...(weightGte !== undefined ? { tier: { weight: { gte: weightGte } } } : {}),
       },
     },
     select: {
       id: true,
-      weight: true,
       name: true,
       websiteUrl: true,
+      subscription: { select: { tier: { select: { weight: true } } } },
       meta: { select: { fieldId: true, value: true } },
     },
   })
 
+  const ads: ServingCandidate[] = rows.map(r => ({
+    id: r.id,
+    name: r.name,
+    websiteUrl: r.websiteUrl,
+    weight: r.subscription.tier.weight,
+    meta: r.meta,
+  }))
+
   if (ads.length === 0) return null
   if (ads.length === 1) return ads[0] ?? null
 
-  // Aggregate impressions across the fairness window.
-  const since = new Date(Date.now() - fairnessWindowHours * 60 * 60 * 1000)
+  // Aggregate impressions across the last N UTC days. `AdStat.date` is the
+  // UTC midnight of a day bucket; subtracting (N - 1) days from today's
+  // bucket gives the inclusive lower bound.
+  const since = new Date()
   since.setUTCHours(0, 0, 0, 0)
+  since.setUTCDate(since.getUTCDate() - Math.max(0, fairnessWindowDays - 1))
 
   const stats = await db.adStat.groupBy({
     by: ["adId"],
