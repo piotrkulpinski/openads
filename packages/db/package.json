@@ -20,12 +20,12 @@
     "@prisma/client": "^7.8.0",
     "@t3-oss/env-core": "^0.13.11",
     "dotenv": "^17.4.2",
-    "nanoid": "^5.1.9",
-    "zod": "^4.3.6"
+    "nanoid": "^5.1.11",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.8.0",
     "prisma": "^7.8.0",
     "typescript": "^6.0.3"
   },

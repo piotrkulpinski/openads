@@ -19,11 +19,11 @@
     "@openads/trpc": "*",
     "@openads/utils": "*",
     "@t3-oss/env-core": "^0.13.11",
-    "@trpc/server": "^11.16.0",
-    "hono": "^4.12.15",
-    "stripe": "^22.1.0",
+    "@trpc/server": "^11.17.0",
+    "hono": "^4.12.18",
+    "stripe": "^22.1.1",
     "superjson": "^2.2.6",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
