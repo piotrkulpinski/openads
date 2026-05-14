@@ -9,16 +9,16 @@ import { Input } from "@openads/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
-import { Tooltip } from "@openads/ui/tooltip"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
-import { HelpCircleIcon, PlusIcon, TrashIcon } from "lucide-react"
+import { PlusIcon, TrashIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
 import { useFieldArray } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
+import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
@@ -187,11 +187,9 @@ export const TierForm = ({
           name="weight"
           render={({ field: { onChange, ...field } }) => (
             <FormItem>
-              <Stack size="xs">
+              <Stack size="xs" className="w-full">
                 <FormLabel>Weight</FormLabel>
-                <Tooltip tooltip="Controls how often this tier's ads are shown relative to others. A weight-2 tier appears roughly twice as often as a weight-1 tier; weight 0.5 appears half as often. Over each 24h window a fairness boost nudges less-served ads upward so weights aren't strictly winner-takes-all.">
-                  <HelpCircleIcon className="size-4 text-muted-foreground" />
-                </Tooltip>
+                <WeightInfoDialog />
               </Stack>
               <FormControl>
                 <Input
