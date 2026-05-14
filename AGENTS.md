@@ -156,8 +156,3 @@ These all bit during earlier iterations; they will bite the next agent the same 
 - **React Email v6**: imports come from `"react-email"` (single package), **not** `@react-email/components` (v5 legacy). Preview server is `@react-email/ui`, invoked via `email dev --dir src/templates` (the `--dir` flag is required because templates aren't in the default `./emails` folder).
 - **AutoSend** is the email provider (not Resend). Used by `apps/landing` for the waitlist and by `@openads/emails` for all transactional. Env vars: `AUTOSEND_API_KEY`, `AUTOSEND_FROM_EMAIL`, `AUTOSEND_FROM_NAME`, plus `AUTOSEND_WAITLIST_LIST_ID` in landing only.
 - **Public tRPC procedures**: must use `publicProcedure` and tolerate cross-origin requests. CORS is wired in `apps/api/src/index.ts`. No API key auth required for read endpoints (ads are public) or for impression/click tracking.
-
-## Reference docs
-
-- **Strategic + implementation plan**: `/Users/piotrkulpinski/.claude/plans/that-s-all-great-i-composed-cupcake.md`. Contains Parts A (strategic direction), B (emails infrastructure, shipped), C (zone-scoped tier model — superseded, kept for reference), and **Part D (the current API-first / globally-scoped model — execute this)**. Part D includes a full hand-off table mapping every commit on the closed `feat/package-based-ads` branch (its name is a historical artifact — the model has since been renamed to Tier) to its disposition (port / heavy rewrite / stays deleted).
-- **Closed PR for reference**: `feat/package-based-ads` (PR #5) — closed because the design pivoted. Surviving algorithms (Stripe checkout, webhooks, approval flow, weighted rotation, fairness boost, stats endpoint) are documented for cherry-pick / port in Part D's port table.
