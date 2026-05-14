@@ -25,6 +25,8 @@ model Subscription {
   workspaceId  String
   tier         Tier       @relation(fields: [tierId], references: [id])
   tierId       String
+  tierPrice    TierPrice  @relation(fields: [tierPriceId], references: [id])
+  tierPriceId  String
   advertiser   Advertiser @relation(fields: [advertiserId], references: [id])
   advertiserId String
   ad           Ad?
@@ -33,5 +35,6 @@ model Subscription {
   @@index([workspaceId, status])
   @@index([workspaceId])
   @@index([tierId])
+  @@index([tierPriceId])
   @@index([advertiserId])
 }

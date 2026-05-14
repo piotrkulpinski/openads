@@ -19,6 +19,7 @@ export const generateId = (prefix?: string, length = 21) => {
     Advertiser: "adv",
     Field: "fld",
     Tier: "tier",
+    TierPrice: "price",
     Subscription: "sub",
     Ad: "ad",
     AdStat: "stat",

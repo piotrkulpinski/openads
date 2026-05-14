@@ -1,0 +1,28 @@
+enum BillingInterval {
+  Day
+  Week
+  Month
+  Year
+}
+
+model TierPrice {
+  id            String          @id @default(cuid())
+  interval      BillingInterval
+  intervalCount Int             @default(1)
+  amount        Int // Amount in cents
+  currency      String          @default("usd")
+  stripePriceId String?         @unique
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relations
+  tier          Tier           @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  tierId        String
+  subscriptions Subscription[]
+
+  // Indexes
+  @@index([tierId, isActive])
+  @@index([tierId])
+  @@index([stripePriceId])
+}

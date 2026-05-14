@@ -5,7 +5,7 @@ import { SectionHeading } from "~/components/section-heading"
 const steps = [
   {
     title: "Define your tiers",
-    description: "Set monthly prices and weights for each tier you want to sell.",
+    description: "Set prices and weights for each tier — any billing interval Stripe supports.",
   },
   {
     title: "Customize fields",

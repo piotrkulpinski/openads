@@ -112,6 +112,7 @@ async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
       currentPeriodEnd: toDate(stripeSubscription.items.data[0]?.current_period_end),
       workspaceId: meta.workspaceId,
       tierId: meta.tierId,
+      tierPriceId: meta.tierPriceId,
       advertiserId: advertiser.id,
     },
     update: {

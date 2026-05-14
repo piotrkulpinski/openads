@@ -39,15 +39,16 @@ export function mapStripeSubscriptionStatus(
 export interface SubscriptionMetadata {
   workspaceId: string
   tierId: string
+  tierPriceId: string
 }
 
 export function readSubscriptionMetadata(
   metadata: Stripe.Metadata | null | undefined,
 ): SubscriptionMetadata | null {
   if (!metadata) return null
-  const { workspaceId, tierId } = metadata
-  if (!workspaceId || !tierId) return null
-  return { workspaceId, tierId }
+  const { workspaceId, tierId, tierPriceId } = metadata
+  if (!workspaceId || !tierId || !tierPriceId) return null
+  return { workspaceId, tierId, tierPriceId }
 }
 
 export function toDate(timestamp: number | null | undefined): Date | null {
