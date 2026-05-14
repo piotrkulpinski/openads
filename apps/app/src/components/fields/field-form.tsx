@@ -198,10 +198,15 @@ export const FieldForm = ({
           control={form.control}
           name="isRequired"
           render={({ field: { value, onChange, ...field } }) => (
-            <FormItem className="col-span-full flex items-center justify-between gap-4 rounded-md border px-3 py-2">
+            <FormItem direction="row" className="col-span-full w-full">
               <FormLabel>Required</FormLabel>
               <FormControl>
-                <Switch checked={!!value} onCheckedChange={onChange} {...field} />
+                <Switch
+                  checked={!!value}
+                  onCheckedChange={onChange}
+                  className="ml-auto"
+                  {...field}
+                />
               </FormControl>
             </FormItem>
           )}
