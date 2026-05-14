@@ -61,7 +61,7 @@ An ad serves only if **both** `Ad.status = Approved` AND `Subscription.status �
 - **Why**: A paid subscription with violating creative shouldn't serve. An admin-approved creative shouldn't serve if payment lapses. Two concerns, two flags.
 
 ### 6. Tier deletion is soft, not hard
-`tier.delete` archives the Stripe Product and flips `isActive = false`. Live subscriptions stay billable.
+`tier.delete` archives the Stripe Product, flips `Tier.isActive = false`, and archives every active `TierPrice` (Stripe Price + `isActive = false`). Live subscriptions stay billable.
 - **Why**: Hard-deleting a Tier would orphan in-flight subscriptions. Publishers should be able to retire a tier without breaking existing advertisers.
 
 ### 7. Only one embeddable iframe: `/embed` (the tier selector)
@@ -75,8 +75,11 @@ When there are no eligible approved ads, the API returns an empty list. The publ
 Publishers create as many Tiers as they like, with any weight and any price.
 - **Why**: Each publisher's audience is different. Forcing Silver/Gold/Platinum at the platform level would be premature. Network standardization can come later via an opt-in mapping.
 
-### 10. Monthly billing only at v1
-- **Why**: Yearly/weekly multiplies billing-state complexity. Add when publishers actually ask.
+### 10. `TierPrice` rows are immutable
+Each Tier has many `TierPrice`s (one Stripe Product, many Stripe Prices). Adding a new amount, interval, or currency creates a new `TierPrice` + Stripe Price. There's no "edit price" — only "archive + create new". Archiving flips `isActive = false` on the `TierPrice` and archives the Stripe Price.
+- **Why**: Stripe Prices are immutable on `unit_amount` / `interval` / `currency`. Mirroring that on our side gives us an audit trail of price changes and lets old subscribers keep their grandfathered price even after the publisher raises rates. `Subscription` references a specific `TierPrice` via `Subscription.tierPriceId`, so archive ≠ break.
+- **Intervals supported**: `Day` / `Week` / `Month` / `Year` (matches `Stripe.recurring.interval`). `intervalCount` is on the schema with `default(1)` but isn't yet exposed in the form.
+- **Form input**: publishers type integer whole units (`19`); the form multiplies by 100 before submitting. DB and Stripe always see cents.
 
 ## Out of scope at v1 (don't gold-plate)
 
@@ -89,7 +92,6 @@ The following are explicit deferrals. Don't build them without confirming a scop
 - **Stripe billing portal link** for advertiser self-cancellation — manual via reply-to-email for now.
 - **Auctions / RTB** — explicitly out, forever (per Part A strategic decision).
 - **Per-workspace branded sender domains** — single shared sender via `AUTOSEND_FROM_EMAIL`.
-- **Yearly / weekly billing intervals** — monthly-only.
 - **SaaS plan gating** (Free/Pro for the publisher SaaS) — `Workspace.plan` was dropped; re-add when SaaS billing is a real concern.
 - **Cross-workspace ad network** — tiers stay workspace-defined; standardization is a future opt-in.
 

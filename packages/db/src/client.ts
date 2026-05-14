@@ -8,6 +8,7 @@ export type {
   Session,
   Subscription,
   Tier,
+  TierPrice,
   User,
   Verification,
   Workspace,
@@ -16,6 +17,7 @@ export type {
 
 export {
   AdStatus,
+  BillingInterval,
   FieldType,
   Prisma,
   SubscriptionStatus,

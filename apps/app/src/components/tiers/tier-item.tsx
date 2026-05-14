@@ -14,18 +14,35 @@ import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
+import { formatInterval, formatPrice, intervalRank } from "~/lib/currency"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
+
+type Tier = RouterOutputs["tier"]["getAll"][number]
 
 type TierItemProps = ComponentProps<"div"> & {
   workspaceId: string
-  tier: RouterOutputs["tier"]["getAll"][number]
+  tier: Tier
 }
 
-const formatPrice = (cents: number, currency: string) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(cents / 100)
+// Picks the smallest-interval active price as the headline for the list row.
+// `tier.prices` is already filtered to active rows by the trpc getAll query.
+const headlinePrice = (prices: Tier["prices"]): Tier["prices"][number] | undefined => {
+  if (prices.length === 0) return undefined
+  return [...prices].sort((a, b) => {
+    const rankDiff = intervalRank(a.interval) - intervalRank(b.interval)
+    if (rankDiff !== 0) return rankDiff
+    return a.amount - b.amount
+  })[0]
+}
+
+const renderPriceLine = (tier: Tier): string => {
+  const head = headlinePrice(tier.prices)
+  if (!head) return `No active prices · weight ${tier.weight}`
+  const headLabel = `${formatPrice(head.amount, head.currency)} / ${formatInterval(head)}`
+  const extra = tier.prices.length - 1
+  return extra > 0
+    ? `${headLabel} + ${extra} more · weight ${tier.weight}`
+    : `${headLabel} · weight ${tier.weight}`
 }
 
 const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => {
@@ -58,9 +75,7 @@ const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => 
           <H5 className="truncate">{tier.name}</H5>
           {!tier.isActive && <Badge variant="secondary">Archived</Badge>}
         </Stack>
-        <p className="text-sm text-muted-foreground">
-          {formatPrice(tier.priceMonthly, tier.currency)}/mo · weight {tier.weight}
-        </p>
+        <p className="text-sm text-muted-foreground">{renderPriceLine(tier)}</p>
         <span className="absolute inset-0" />
       </Link>
 

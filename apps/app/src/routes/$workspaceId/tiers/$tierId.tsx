@@ -1,5 +1,7 @@
+import { Stack } from "@openads/ui/stack"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { TierForm } from "~/components/tiers/tier-form"
+import { TierPriceList } from "~/components/tiers/tier-price-list"
 import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspaceId/tiers/$tierId")({
@@ -21,7 +23,7 @@ function TiersEditPage() {
   const { tier } = Route.useLoaderData()
 
   return (
-    <>
+    <Stack direction="column" size="lg">
       <H3>Edit Tier</H3>
 
       <TierForm
@@ -30,6 +32,8 @@ function TiersEditPage() {
         nextUrl={{ from: Route.fullPath, to: ".." }}
         className="mt-4"
       />
-    </>
+
+      <TierPriceList workspaceId={workspaceId} tier={tier} />
+    </Stack>
   )
 }

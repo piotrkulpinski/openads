@@ -1,9 +1,8 @@
-import { idSchema, tierSchema } from "@openads/db/schema"
+import { idSchema, tierPriceSchema, tierSchema } from "@openads/db/schema"
 import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
-  archivePrice,
   archiveTierProduct,
-  createMonthlyPrice,
+  createTierPrice,
   createTierProduct,
   updateTierProduct,
 } from "@openads/stripe/products"
@@ -16,12 +15,22 @@ import {
   workspaceProcedure,
 } from "../index"
 
+const createInputSchema = tierSchema.extend({
+  initialPrices: z.array(tierPriceSchema).min(1, "At least one price is required"),
+})
+
 export const tierRouter = router({
   // Read paths don't require Connect (publishers can browse what they have).
   getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { workspaceId } }) => {
     return await db.tier.findMany({
       where: { workspaceId },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      include: {
+        prices: {
+          where: { isActive: true },
+          orderBy: [{ interval: "asc" }, { amount: "asc" }],
+        },
+      },
     })
   }),
 
@@ -30,25 +39,27 @@ export const tierRouter = router({
     .query(async ({ ctx: { db }, input: { id, workspaceId } }) => {
       return await db.tier.findFirst({
         where: { id, workspaceId },
+        include: {
+          prices: {
+            orderBy: [{ isActive: "desc" }, { interval: "asc" }, { amount: "asc" }],
+          },
+        },
       })
     }),
 
   create: connectEnabledWorkspaceProcedure
-    .input(tierSchema)
+    .input(createInputSchema)
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
-        input: { name, description, weight, priceMonthly, currency, isActive, order },
+        input: { name, description, weight, isActive, order, initialPrices },
       }) => {
-        // Create the Tier row first so we can stamp its id onto the Stripe Product metadata —
-        // webhooks downstream rely on `tierId` for routing.
-        const created = await db.tier.create({
+        // Create the Tier row first so we can stamp its id onto the Stripe Product metadata.
+        const tier = await db.tier.create({
           data: {
             name,
             description: description ?? "",
             weight,
-            priceMonthly,
-            currency,
             isActive,
             order,
             workspaceId: workspace.id,
@@ -60,35 +71,66 @@ export const tierRouter = router({
           description,
           metadata: {
             workspaceId: workspace.id,
-            tierId: created.id,
+            tierId: tier.id,
             weight: String(weight),
           },
         })
 
-        const price = await createMonthlyPrice(stripe, {
-          productId: product.id,
-          unitAmount: priceMonthly,
-          currency,
-          metadata: {
-            workspaceId: workspace.id,
-            tierId: created.id,
-            weight: String(weight),
-          },
-        })
+        // Create the initial price rows + their Stripe Prices, one at a time so each
+        // local row's id can be stamped onto its Stripe Price metadata.
+        for (const price of initialPrices) {
+          const tierPriceRow = await db.tierPrice.create({
+            data: {
+              tierId: tier.id,
+              interval: price.interval,
+              intervalCount: price.intervalCount,
+              amount: price.amount,
+              currency: price.currency,
+            },
+          })
 
+          const stripePrice = await createTierPrice(stripe, {
+            productId: product.id,
+            unitAmount: price.amount,
+            currency: price.currency,
+            interval: price.interval,
+            intervalCount: price.intervalCount,
+            metadata: {
+              workspaceId: workspace.id,
+              tierId: tier.id,
+              tierPriceId: tierPriceRow.id,
+              interval: price.interval,
+              intervalCount: String(price.intervalCount),
+            },
+          })
+
+          await db.tierPrice.update({
+            where: { id: tierPriceRow.id },
+            data: { stripePriceId: stripePrice.id },
+          })
+        }
+
+        // Stamp the Stripe Product id back onto the Tier and return with prices nested.
         return await db.tier.update({
-          where: { id: created.id },
-          data: { stripeProductId: product.id, stripePriceId: price.id },
+          where: { id: tier.id },
+          data: { stripeProductId: product.id },
+          include: {
+            prices: {
+              orderBy: [{ isActive: "desc" }, { interval: "asc" }, { amount: "asc" }],
+            },
+          },
         })
       },
     ),
 
+  // Tier-level fields only. Price changes go through tierPrice.create / tierPrice.archive
+  // because Stripe Prices are immutable.
   update: connectEnabledWorkspaceProcedure
     .input(tierSchema.partial().extend(idSchema.shape))
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
-        input: { id, name, description, weight, priceMonthly, currency, isActive, order },
+        input: { id, name, description, weight, isActive, order },
       }) => {
         const existing = await db.tier.findFirst({
           where: { id, workspaceId: workspace.id },
@@ -98,7 +140,7 @@ export const tierRouter = router({
           throw new TRPCError({ code: "NOT_FOUND" })
         }
 
-        // Sync product-level metadata (name, description, weight, active) when changed.
+        // Sync Stripe Product when product-level fields change.
         if (existing.stripeProductId) {
           const productChanged =
             (name !== undefined && name !== existing.name) ||
@@ -120,52 +162,21 @@ export const tierRouter = router({
           }
         }
 
-        // Stripe Prices are immutable on unit_amount. Archive the old, create a new one.
-        let nextStripePriceId = existing.stripePriceId
-        const priceChanged =
-          (priceMonthly !== undefined && priceMonthly !== existing.priceMonthly) ||
-          (currency !== undefined && currency !== existing.currency)
-
-        if (priceChanged && existing.stripeProductId) {
-          if (existing.stripePriceId) {
-            await archivePrice(stripe, existing.stripePriceId)
-          }
-          const newPrice = await createMonthlyPrice(stripe, {
-            productId: existing.stripeProductId,
-            unitAmount: priceMonthly ?? existing.priceMonthly,
-            currency: currency ?? existing.currency,
-            metadata: {
-              workspaceId: workspace.id,
-              tierId: existing.id,
-              weight: String(weight ?? existing.weight),
-            },
-          })
-          nextStripePriceId = newPrice.id
-        }
-
         return await db.tier.update({
           where: { id },
-          data: {
-            name,
-            description,
-            weight,
-            priceMonthly,
-            currency,
-            isActive,
-            order,
-            stripePriceId: nextStripePriceId,
-          },
+          data: { name, description, weight, isActive, order },
         })
       },
     ),
 
-  // Soft delete: archive Stripe product + flip isActive. Existing subscriptions stay billable
-  // until they cancel naturally. Hard delete is intentionally not exposed.
+  // Soft delete: archive Stripe Product + all active prices + flip Tier.isActive.
+  // Existing subscriptions stay billable until they cancel naturally.
   delete: connectEnabledWorkspaceProcedure
     .input(idSchema)
     .mutation(async ({ ctx: { db, stripe, workspace }, input: { id } }) => {
       const existing = await db.tier.findFirst({
         where: { id, workspaceId: workspace.id },
+        include: { prices: { where: { isActive: true } } },
       })
 
       if (!existing) {
@@ -175,6 +186,19 @@ export const tierRouter = router({
       if (existing.stripeProductId) {
         await archiveTierProduct(stripe, existing.stripeProductId)
       }
+
+      // Archive every active Stripe Price under this tier (Stripe-side).
+      for (const tierPrice of existing.prices) {
+        if (tierPrice.stripePriceId) {
+          await stripe.prices.update(tierPrice.stripePriceId, { active: false })
+        }
+      }
+
+      // Flip local isActive on Tier + all its prices in one go.
+      await db.tierPrice.updateMany({
+        where: { tierId: id, isActive: true },
+        data: { isActive: false },
+      })
 
       return await db.tier.update({
         where: { id },
@@ -195,9 +219,18 @@ export const tierRouter = router({
             name: true,
             description: true,
             weight: true,
-            priceMonthly: true,
-            currency: true,
             order: true,
+            prices: {
+              where: { isActive: true },
+              orderBy: [{ interval: "asc" }, { amount: "asc" }],
+              select: {
+                id: true,
+                interval: true,
+                intervalCount: true,
+                amount: true,
+                currency: true,
+              },
+            },
           },
         })
       }),
@@ -205,21 +238,26 @@ export const tierRouter = router({
     createCheckout: publicProcedure
       .input(
         z.object({
-          tierId: z.string(),
+          tierPriceId: z.string(),
           email: z.email(),
         }),
       )
-      .mutation(async ({ ctx: { db, stripe, env }, input: { tierId, email } }) => {
-        const tier = await db.tier.findFirst({
-          where: { id: tierId, isActive: true },
-          include: { workspace: true },
+      .mutation(async ({ ctx: { db, stripe, env }, input: { tierPriceId, email } }) => {
+        const tierPrice = await db.tierPrice.findFirst({
+          where: { id: tierPriceId, isActive: true },
+          include: { tier: { include: { workspace: true } } },
         })
 
-        if (!tier || !tier.stripePriceId) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Tier not available." })
+        if (!tierPrice || !tierPrice.stripePriceId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Price not available." })
         }
 
+        const { tier } = tierPrice
         const { workspace } = tier
+
+        if (!tier.isActive) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Tier not available." })
+        }
 
         if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
           throw new TRPCError({
@@ -229,7 +267,7 @@ export const tierRouter = router({
         }
 
         const session = await createSubscriptionCheckoutSession(stripe, {
-          priceId: tier.stripePriceId,
+          priceId: tierPrice.stripePriceId,
           customerEmail: email,
           successUrl: `${env.APP_URL}/advertise/success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${env.APP_URL}/advertise/cancelled`,
@@ -238,6 +276,7 @@ export const tierRouter = router({
           metadata: {
             workspaceId: workspace.id,
             tierId: tier.id,
+            tierPriceId: tierPrice.id,
           },
         })
 

@@ -6,7 +6,7 @@ const features = [
   {
     title: "Your tiers, your prices",
     description:
-      "Create the tiers you want to sell — banner, sidebar, sponsored card. Set weights and monthly prices, then let advertisers subscribe.",
+      "Create the tiers you want to sell — banner, sidebar, sponsored card. Set weights and prices — monthly, yearly, or whatever cadence fits — then let advertisers subscribe.",
   },
   {
     title: "Self-service subscriptions",

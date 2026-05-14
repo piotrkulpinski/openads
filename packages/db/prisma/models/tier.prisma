@@ -3,10 +3,7 @@ model Tier {
   name            String
   description     String   @default("")
   weight          Float    @default(1.0)
-  priceMonthly    Int // Amount in cents
-  currency        String   @default("usd")
   stripeProductId String?  @unique
-  stripePriceId   String?  @unique
   isActive        Boolean  @default(true)
   order           Int      @default(0)
   createdAt       DateTime @default(now())
@@ -15,6 +12,7 @@ model Tier {
   // Relations
   workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId   String
+  prices        TierPrice[]
   subscriptions Subscription[]
 
   // Indexes

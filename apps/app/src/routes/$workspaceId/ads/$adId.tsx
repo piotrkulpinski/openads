@@ -10,6 +10,7 @@ import { AdStats } from "~/components/ads/ad-stats"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H4, H5 } from "~/components/ui/heading"
+import { formatTierPrice } from "~/lib/currency"
 import { type RouterOutputs, trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/$workspaceId/ads/$adId")({
@@ -93,6 +94,7 @@ function AdReviewPage() {
                 </Field>
                 <Field label="Weight">{ad.weight}</Field>
                 <Field label="Tier">{ad.subscription.tier.name}</Field>
+                <Field label="Billing">{formatTierPrice(ad.subscription.tierPrice)}</Field>
                 <Field label="Advertiser">
                   {ad.subscription.advertiser.email ?? ad.subscription.advertiser.name}
                 </Field>

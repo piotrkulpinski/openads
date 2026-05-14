@@ -134,6 +134,7 @@ export const adProcedure = workspaceProcedure
           include: {
             advertiser: true,
             tier: true,
+            tierPrice: true,
           },
         },
         meta: true,

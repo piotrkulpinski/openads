@@ -11,6 +11,7 @@ export interface CreateCheckoutSessionProps {
   metadata: {
     workspaceId: string
     tierId: string
+    tierPriceId: string
   }
 }
 

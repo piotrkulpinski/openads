@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
 import { Logo } from "~/components/ui/logo"
+import { formatInterval, formatPrice } from "~/lib/currency"
 import { trpc } from "~/lib/trpc"
 
 const defaultValues = {
@@ -29,16 +30,10 @@ export const Route = createFileRoute("/embed")({
   component: TierSelector,
 })
 
-const formatPrice = (cents: number, currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  }).format(cents / 100)
-
 function TierSelector() {
   const { workspaceId } = Route.useSearch()
   const [email, setEmail] = useState("")
-  const [pendingTierId, setPendingTierId] = useState<string | null>(null)
+  const [pendingTierPriceId, setPendingTierPriceId] = useState<string | null>(null)
 
   const tiersQuery = trpc.tier.public.listForWorkspace.useQuery(
     { workspaceId },
@@ -51,7 +46,7 @@ function TierSelector() {
     },
     onError: error => {
       toast.error(error.message)
-      setPendingTierId(null)
+      setPendingTierPriceId(null)
     },
   })
 
@@ -65,13 +60,13 @@ function TierSelector() {
     )
   }
 
-  const handleSubscribe = (tierId: string) => {
+  const handleSubscribe = (tierPriceId: string) => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error("Enter a valid email to continue.")
       return
     }
-    setPendingTierId(tierId)
-    checkout.mutate({ tierId, email })
+    setPendingTierPriceId(tierPriceId)
+    checkout.mutate({ tierPriceId, email })
   }
 
   return (
@@ -79,8 +74,8 @@ function TierSelector() {
       <div className="mb-8 grid gap-3 text-center">
         <h1 className="font-semibold text-2xl">Advertise on this site</h1>
         <p className="text-muted-foreground text-sm">
-          Pick a tier below — payment runs through Stripe and your ad goes live after a quick
-          review.
+          Pick a tier and billing interval below — payment runs through Stripe and your ad goes live
+          after a quick review.
         </p>
       </div>
 
@@ -106,29 +101,42 @@ function TierSelector() {
           </div>
         )}
         success={({ data }) => (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {data.map(tier => (
-              <div
-                key={tier.id}
-                className="flex items-center justify-between rounded-lg border p-4"
-              >
-                <div>
+              <div key={tier.id} className="rounded-lg border p-4">
+                <div className="mb-3">
                   <h2 className="font-medium">{tier.name}</h2>
                   {tier.description && (
                     <p className="mt-1 text-muted-foreground text-sm">{tier.description}</p>
                   )}
-                  <p className="mt-2 font-medium text-sm">
-                    {formatPrice(tier.priceMonthly, tier.currency)}/month
-                  </p>
                 </div>
 
-                <Button
-                  onClick={() => handleSubscribe(tier.id)}
-                  isPending={pendingTierId === tier.id && checkout.isPending}
-                  prefix={<CheckIcon />}
-                >
-                  Subscribe
-                </Button>
+                {tier.prices.length === 0 ? (
+                  <p className="text-muted-foreground text-sm italic">
+                    No prices available for this tier.
+                  </p>
+                ) : (
+                  <Stack direction="column" size="sm">
+                    {tier.prices.map(price => (
+                      <div
+                        key={price.id}
+                        className="flex items-center justify-between rounded-md border bg-background px-3 py-2"
+                      >
+                        <span className="font-medium text-sm">
+                          {formatPrice(price.amount, price.currency)} / {formatInterval(price)}
+                        </span>
+                        <Button
+                          size="sm"
+                          onClick={() => handleSubscribe(price.id)}
+                          isPending={pendingTierPriceId === price.id && checkout.isPending}
+                          prefix={<CheckIcon />}
+                        >
+                          Subscribe
+                        </Button>
+                      </div>
+                    ))}
+                  </Stack>
+                )}
               </div>
             ))}
           </div>

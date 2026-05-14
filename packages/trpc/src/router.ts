@@ -8,6 +8,7 @@ import { storageRouter } from "./routers/storage"
 import { stripeRouter } from "./routers/stripe"
 import { subscriptionRouter } from "./routers/subscription"
 import { tierRouter } from "./routers/tier"
+import { tierPriceRouter } from "./routers/tier-price"
 import { userRouter } from "./routers/user"
 import { workspaceRouter } from "./routers/workspace"
 
@@ -20,6 +21,7 @@ export const appRouter = router({
   workspace: workspaceRouter,
   field: fieldRouter,
   tier: tierRouter,
+  tierPrice: tierPriceRouter,
   ad: adRouter,
   subscription: subscriptionRouter,
 })
