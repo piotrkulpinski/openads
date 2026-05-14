@@ -1,5 +1,5 @@
 import { BillingInterval } from "@openads/db/client"
-import { tierSchema } from "@openads/db/schema"
+import { tierPriceSchema, tierSchema } from "@openads/db/schema"
 import type { AppRouter } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
+import { CurrencySelect } from "~/components/tiers/currency-select"
 import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
@@ -33,7 +34,7 @@ const initialPriceFormSchema = z.object({
   interval: z.enum(BillingInterval).default(BillingInterval.Month),
   intervalCount: z.number().int().positive().default(1),
   amountWhole: z.number().int().nonnegative(),
-  currency: z.string().trim().toLowerCase().length(3).default("usd"),
+  currency: tierPriceSchema.shape.currency,
 })
 
 const tierFormSchema = tierSchema.extend({
@@ -312,7 +313,7 @@ export const TierForm = ({
                     <FormItem>
                       <FormLabel className="text-xs">Currency</FormLabel>
                       <FormControl>
-                        <Input placeholder="usd" autoCapitalize="none" maxLength={3} {...field} />
+                        <CurrencySelect value={field.value} onValueChange={field.onChange} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
