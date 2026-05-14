@@ -4,7 +4,6 @@ import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { Switch } from "@openads/ui/switch"
 import { Textarea } from "@openads/ui/textarea"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
 import type { TRPCClientErrorLike } from "@trpc/client"
@@ -188,19 +187,6 @@ export const TierForm = ({
                 />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="isActive"
-          render={({ field: { value, onChange, ...field } }) => (
-            <FormItem className="col-span-full flex items-center justify-between gap-4 rounded-md border px-3 py-2">
-              <FormLabel>Active</FormLabel>
-              <FormControl>
-                <Switch checked={!!value} onCheckedChange={onChange} {...field} />
-              </FormControl>
             </FormItem>
           )}
         />
