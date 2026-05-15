@@ -52,6 +52,7 @@ export const storageRouter = router({
     createAdvertiserUpload: publicProcedure
       .input(
         z.object({
+          workspaceId: z.string().min(1),
           sessionId: z.string().min(1),
           fileName: z.string().min(1).max(200),
           contentType: z.string().min(1),
@@ -61,7 +62,7 @@ export const storageRouter = router({
       .mutation(
         async ({
           ctx: { db, s3, stripe, redis },
-          input: { sessionId, fileName, contentType, contentLength },
+          input: { workspaceId, sessionId, fileName, contentType, contentLength },
         }) => {
           if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
             throw new TRPCError({
@@ -77,7 +78,23 @@ export const storageRouter = router({
             })
           }
 
-          const session = await stripe.checkout.sessions.retrieve(sessionId)
+          const workspace = await db.workspace.findUnique({
+            where: { id: workspaceId },
+            select: { id: true, stripeConnectId: true },
+          })
+
+          if (!workspace?.stripeConnectId) {
+            throw new TRPCError({
+              code: "PRECONDITION_FAILED",
+              message: "This publisher cannot accept payments yet.",
+            })
+          }
+
+          const session = await stripe.checkout.sessions.retrieve(
+            sessionId,
+            {},
+            { stripeAccount: workspace.stripeConnectId },
+          )
 
           if (session.status !== "complete") {
             throw new TRPCError({
@@ -86,19 +103,8 @@ export const storageRouter = router({
             })
           }
 
-          const workspaceId = session.metadata?.workspaceId
-
-          if (!workspaceId) {
+          if (session.metadata?.workspaceId !== workspaceId) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
-          }
-
-          const workspace = await db.workspace.findUnique({
-            where: { id: workspaceId },
-            select: { id: true },
-          })
-
-          if (!workspace) {
-            throw new TRPCError({ code: "NOT_FOUND" })
           }
 
           const rateKey = `storage:advertiser-upload:${sessionId}`

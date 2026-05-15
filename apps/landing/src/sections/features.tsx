@@ -16,7 +16,7 @@ const features = [
   {
     title: "Instant Stripe payouts",
     description:
-      "Payments go straight from advertiser to your Stripe account via Connect. No 30-day net terms. You set the price, you get the price.",
+      "Advertisers pay through your Stripe account. No 30-day net terms. You set the price and OpenAds takes its platform fee from each sale.",
   },
 ]
 

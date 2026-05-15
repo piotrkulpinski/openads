@@ -17,7 +17,7 @@ const steps = [
   },
   {
     title: "Get paid",
-    description: "Advertisers subscribe. Money hits your Stripe instantly.",
+    description: "Advertisers subscribe through your Stripe account.",
   },
 ]
 

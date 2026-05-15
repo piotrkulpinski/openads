@@ -69,6 +69,7 @@ export const tierRouter = router({
         })
 
         const product = await createTierProduct(stripe, {
+          connectedAccountId: workspace.stripeConnectId,
           name,
           description,
           metadata: {
@@ -95,6 +96,7 @@ export const tierRouter = router({
             })
 
             const stripePrice = await createTierPrice(stripe, {
+              connectedAccountId: workspace.stripeConnectId,
               productId: product.id,
               unitAmount: price.amount,
               currency: price.currency,
@@ -120,8 +122,8 @@ export const tierRouter = router({
           // Best-effort cleanup. We swallow secondary errors so the user sees the
           // original failure, not the rollback noise.
           await Promise.allSettled([
-            ...createdStripePriceIds.map(id => archivePrice(stripe, id)),
-            archiveTierProduct(stripe, product.id),
+            ...createdStripePriceIds.map(id => archivePrice(stripe, workspace.stripeConnectId, id)),
+            archiveTierProduct(stripe, workspace.stripeConnectId, product.id),
           ])
           await db.tierPrice.deleteMany({ where: { tierId: tier.id } })
           await db.tier.delete({ where: { id: tier.id } })
@@ -173,7 +175,7 @@ export const tierRouter = router({
             featuresChanged
 
           if (productChanged) {
-            await updateTierProduct(stripe, existing.stripeProductId, {
+            await updateTierProduct(stripe, workspace.stripeConnectId, existing.stripeProductId, {
               name,
               description,
               active: isActive,
@@ -209,13 +211,13 @@ export const tierRouter = router({
       }
 
       if (existing.stripeProductId) {
-        await archiveTierProduct(stripe, existing.stripeProductId)
+        await archiveTierProduct(stripe, workspace.stripeConnectId, existing.stripeProductId)
       }
 
       // Archive every active Stripe Price under this tier (Stripe-side).
       for (const tierPrice of existing.prices) {
         if (tierPrice.stripePriceId) {
-          await stripe.prices.update(tierPrice.stripePriceId, { active: false })
+          await archivePrice(stripe, workspace.stripeConnectId, tierPrice.stripePriceId)
         }
       }
 
@@ -256,7 +258,7 @@ export const tierRouter = router({
             order: true,
             features: true,
             prices: {
-              where: { isActive: true },
+              where: { isActive: true, stripePriceId: { not: null } },
               orderBy: [{ interval: "asc" }, { amount: "asc" }],
               select: {
                 id: true,
@@ -304,10 +306,10 @@ export const tierRouter = router({
         const session = await createSubscriptionCheckoutSession(stripe, {
           priceId: tierPrice.stripePriceId,
           customerEmail: email,
-          successUrl: `${env.APP_URL}/advertise/success?session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: `${env.APP_URL}/advertise/success?workspace_id=${workspace.id}&session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${env.APP_URL}/advertise/cancelled`,
           applicationFeePercent: env.STRIPE_PLATFORM_FEE_PERCENT,
-          destinationAccountId: workspace.stripeConnectId,
+          connectedAccountId: workspace.stripeConnectId,
           metadata: {
             workspaceId: workspace.id,
             tierId: tier.id,

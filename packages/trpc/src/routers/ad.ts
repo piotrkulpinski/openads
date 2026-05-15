@@ -13,6 +13,7 @@ import { adProcedure, publicProcedure, router, workspaceProcedure } from "../ind
 import { findServingAd } from "../lib/ad-serving"
 
 const createFromCheckoutInput = z.object({
+  workspaceId: z.string().min(1),
   sessionId: z.string().min(1),
   name: z.string().trim().min(2),
   websiteUrl: z.url(),
@@ -28,6 +29,47 @@ const optionalNoteInput = z.object({ note: z.string().trim().max(500).optional()
 const TRACKING_WINDOW_SECONDS = 60
 const IMPRESSION_LIMIT_PER_MINUTE = 30
 const CLICK_LIMIT_PER_MINUTE = 10
+
+const checkoutSessionInput = z.object({
+  workspaceId: z.string().min(1),
+  sessionId: z.string().min(1),
+})
+
+const getConnectedCheckoutSession = async ({
+  db,
+  stripe,
+  workspaceId,
+  sessionId,
+}: {
+  db: typeof import("@openads/db").db
+  stripe: import("@openads/stripe").StripeClient
+  workspaceId: string
+  sessionId: string
+}) => {
+  const workspace = await db.workspace.findUnique({
+    where: { id: workspaceId },
+    select: { id: true, stripeConnectId: true },
+  })
+
+  if (!workspace?.stripeConnectId) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "This publisher cannot accept payments yet.",
+    })
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(
+    sessionId,
+    {},
+    { stripeAccount: workspace.stripeConnectId },
+  )
+
+  if (session.metadata?.workspaceId !== workspaceId) {
+    throw new TRPCError({ code: "BAD_REQUEST", message: "Checkout workspace mismatch." })
+  }
+
+  return { session, connectedAccountId: workspace.stripeConnectId }
+}
 
 export const adRouter = router({
   // Workspace dashboard surface.
@@ -129,7 +171,15 @@ export const adRouter = router({
 
       // Cancel the underlying Stripe subscription so the advertiser stops being billed.
       try {
-        await stripe.subscriptions.cancel(ad.subscription.stripeSubscriptionId)
+        if (!workspace.stripeConnectId) {
+          throw new Error("Workspace has no connected Stripe account")
+        }
+
+        await stripe.subscriptions.cancel(
+          ad.subscription.stripeSubscriptionId,
+          {},
+          { stripeAccount: workspace.stripeConnectId },
+        )
       } catch (err) {
         // Subscription may already be canceled or otherwise inaccessible — leave
         // local state correct and surface the failure in logs only.
@@ -270,9 +320,14 @@ export const adRouter = router({
       }),
 
     getCheckoutInfo: publicProcedure
-      .input(z.object({ sessionId: z.string().min(1) }))
-      .query(async ({ ctx: { db, stripe }, input: { sessionId } }) => {
-        const session = await stripe.checkout.sessions.retrieve(sessionId)
+      .input(checkoutSessionInput)
+      .query(async ({ ctx: { db, stripe }, input: { workspaceId, sessionId } }) => {
+        const { session } = await getConnectedCheckoutSession({
+          db,
+          stripe,
+          workspaceId,
+          sessionId,
+        })
 
         if (session.status !== "complete") {
           throw new TRPCError({
@@ -282,10 +337,9 @@ export const adRouter = router({
         }
 
         const metadata = session.metadata
-        const workspaceId = metadata?.workspaceId
         const tierPriceId = metadata?.tierPriceId
 
-        if (!workspaceId || !tierPriceId) {
+        if (!tierPriceId) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
         }
 
@@ -341,9 +395,14 @@ export const adRouter = router({
       .mutation(
         async ({
           ctx: { db, emails, logger, s3, stripe, env },
-          input: { sessionId, name, websiteUrl, meta },
+          input: { workspaceId, sessionId, name, websiteUrl, meta },
         }) => {
-          const session = await stripe.checkout.sessions.retrieve(sessionId)
+          const { connectedAccountId, session } = await getConnectedCheckoutSession({
+            db,
+            stripe,
+            workspaceId,
+            sessionId,
+          })
 
           if (session.status !== "complete") {
             throw new TRPCError({
@@ -359,9 +418,12 @@ export const adRouter = router({
             })
           }
 
-          const stripeSubscription = await stripe.subscriptions.retrieve(session.subscription)
+          const stripeSubscription = await stripe.subscriptions.retrieve(
+            session.subscription,
+            {},
+            { stripeAccount: connectedAccountId },
+          )
           const metadata = stripeSubscription.metadata ?? session.metadata
-          const workspaceId = metadata?.workspaceId
           const tierPriceId = metadata?.tierPriceId
           const customerEmail = session.customer_email
 

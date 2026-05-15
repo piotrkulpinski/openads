@@ -1,4 +1,5 @@
 import { db } from "@openads/db"
+import { Prisma } from "@openads/db/client"
 import {
   mapStripeSubscriptionStatus,
   readSubscriptionMetadata,
@@ -12,6 +13,10 @@ import { stripe } from "../../services/stripe"
 
 export const stripeWebhookRoute = new Hono()
 
+const constructStripeEvent = (body: string, signature: string) => {
+  return stripe.webhooks.constructEvent(body, signature, env.STRIPE_CONNECT_WEBHOOK_SECRET)
+}
+
 stripeWebhookRoute.post("/", async c => {
   const body = await c.req.text()
   const signature = c.req.header("stripe-signature")
@@ -23,7 +28,7 @@ stripeWebhookRoute.post("/", async c => {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET)
+    event = constructStripeEvent(body, signature)
   } catch (err) {
     return c.text(`Invalid signature: ${err}`, 400)
   }
@@ -31,7 +36,12 @@ stripeWebhookRoute.post("/", async c => {
   try {
     switch (event.type) {
       case "account.updated": {
-        await handleConnectAccountUpdate(event.data.object as Stripe.Account)
+        await handleConnectAccountUpdate(event.data.object as Stripe.Account, event.account)
+        break
+      }
+
+      case "account.application.deauthorized": {
+        await handleConnectAccountDeauthorized(event.account)
         break
       }
 
@@ -39,12 +49,12 @@ stripeWebhookRoute.post("/", async c => {
       case "customer.subscription.updated":
       case "customer.subscription.resumed":
       case "customer.subscription.paused": {
-        await upsertSubscription(event.data.object as Stripe.Subscription)
+        await upsertSubscription(event.data.object as Stripe.Subscription, event.account)
         break
       }
 
       case "customer.subscription.deleted": {
-        await markSubscriptionCanceled(event.data.object as Stripe.Subscription)
+        await markSubscriptionCanceled(event.data.object as Stripe.Subscription, event.account)
         break
       }
     }
@@ -56,9 +66,9 @@ stripeWebhookRoute.post("/", async c => {
   }
 })
 
-async function handleConnectAccountUpdate(account: Stripe.Account) {
+async function handleConnectAccountUpdate(account: Stripe.Account, connectedAccountId?: string) {
   const workspace = await db.workspace.findFirst({
-    where: { stripeConnectId: account.id },
+    where: { stripeConnectId: connectedAccountId ?? account.id },
   })
 
   if (!workspace) return
@@ -68,12 +78,43 @@ async function handleConnectAccountUpdate(account: Stripe.Account) {
     data: {
       stripeConnectStatus: account.charges_enabled ? "active" : "pending",
       stripeConnectEnabled: account.charges_enabled,
-      stripeConnectData: account as any,
+      stripeConnectData: {
+        integrationMode: "direct",
+        accountId: account.id,
+        chargesEnabled: account.charges_enabled,
+      },
     },
   })
 }
 
-async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
+async function handleConnectAccountDeauthorized(connectedAccountId?: string) {
+  if (!connectedAccountId) {
+    logger.warn("stripe account deauthorized event missing connected account")
+    return
+  }
+
+  await db.workspace.updateMany({
+    where: { stripeConnectId: connectedAccountId },
+    data: {
+      stripeConnectId: null,
+      stripeConnectStatus: null,
+      stripeConnectEnabled: false,
+      stripeConnectData: Prisma.JsonNull,
+    },
+  })
+}
+
+async function upsertSubscription(
+  stripeSubscription: Stripe.Subscription,
+  connectedAccountId?: string,
+) {
+  if (!connectedAccountId) {
+    logger.warn("stripe subscription event missing connected account", {
+      stripeSubscriptionId: stripeSubscription.id,
+    })
+    return
+  }
+
   const meta = readSubscriptionMetadata(stripeSubscription.metadata)
 
   // Without the workspace/tier metadata we can't link the subscription — surface
@@ -86,12 +127,26 @@ async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
     return
   }
 
+  const workspace = await db.workspace.findFirst({
+    where: { id: meta.workspaceId, stripeConnectId: connectedAccountId },
+    select: { id: true },
+  })
+
+  if (!workspace) {
+    logger.warn("stripe subscription workspace/account mismatch — skipping upsert", {
+      stripeSubscriptionId: stripeSubscription.id,
+      workspaceId: meta.workspaceId,
+      connectedAccountId,
+    })
+    return
+  }
+
   const customerId =
     typeof stripeSubscription.customer === "string"
       ? stripeSubscription.customer
       : stripeSubscription.customer.id
 
-  const customerEmail = await resolveCustomerEmail(stripeSubscription.customer)
+  const customerEmail = await resolveCustomerEmail(stripeSubscription.customer, connectedAccountId)
 
   const advertiser = customerEmail
     ? await findOrCreateAdvertiser({ workspaceId: meta.workspaceId, email: customerEmail })
@@ -127,9 +182,22 @@ async function upsertSubscription(stripeSubscription: Stripe.Subscription) {
   })
 }
 
-async function markSubscriptionCanceled(stripeSubscription: Stripe.Subscription) {
+async function markSubscriptionCanceled(
+  stripeSubscription: Stripe.Subscription,
+  connectedAccountId?: string,
+) {
+  if (!connectedAccountId) {
+    logger.warn("stripe subscription deletion event missing connected account", {
+      stripeSubscriptionId: stripeSubscription.id,
+    })
+    return
+  }
+
   await db.subscription.updateMany({
-    where: { stripeSubscriptionId: stripeSubscription.id },
+    where: {
+      stripeSubscriptionId: stripeSubscription.id,
+      workspace: { stripeConnectId: connectedAccountId },
+    },
     data: {
       status: "Canceled",
       cancelAtPeriodEnd: false,
@@ -139,9 +207,14 @@ async function markSubscriptionCanceled(stripeSubscription: Stripe.Subscription)
 
 async function resolveCustomerEmail(
   customer: string | Stripe.Customer | Stripe.DeletedCustomer,
+  connectedAccountId: string,
 ): Promise<string | null> {
   if (typeof customer === "string") {
-    const fetched = await stripe.customers.retrieve(customer)
+    const fetched = await stripe.customers.retrieve(
+      customer,
+      {},
+      { stripeAccount: connectedAccountId },
+    )
     if (fetched.deleted) return null
     return fetched.email ?? null
   }

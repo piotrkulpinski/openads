@@ -14,7 +14,7 @@ export const StripeConnectForm = ({ ...props }: ComponentProps<"div">) => {
           <HeaderTitle size="h4">Stripe Connect</HeaderTitle>
 
           <HeaderDescription>
-            Connect your Stripe account to receive payments for your ad zones.
+            Connect the Stripe account advertisers should pay for your ad subscriptions.
           </HeaderDescription>
         </Header>
 

@@ -71,14 +71,14 @@ export const StripeConnectButtons = ({
             )}
           >
             {workspace.stripeConnectStatus === "pending"
-              ? "Please complete your Stripe onboarding to start receiving payments."
-              : "Your Stripe account is connected and ready to receive payments."}
+              ? "Please finish connecting Stripe before advertisers can pay you."
+              : "Your Stripe account is connected. Advertisers will pay through this account."}
           </p>
 
           <ConfirmModal
             title="Disconnect from Stripe?"
             label="Disconnect"
-            description="Are you sure you want to disconnect from Stripe? This will close your Stripe account. You won't be able to create new charges, log in to your dashboard, or access your Stripe financial data."
+            description="Are you sure you want to disconnect OpenAds from Stripe? Your Stripe account stays open, but OpenAds will no longer be able to create ad subscriptions for this workspace."
             onConfirm={() => disconnectAccount.mutate({ workspaceId: workspace.id })}
             confirmText={workspace.slug}
           >

@@ -24,6 +24,7 @@ export interface Context extends FetchCreateContextFnOptions, Record<string, unk
   s3: S3BucketClient
   env: {
     APP_URL: string
+    STRIPE_CONNECT_CLIENT_ID?: string
     STRIPE_PLATFORM_FEE_PERCENT: number
   }
 }
@@ -120,8 +121,10 @@ export const connectEnabledWorkspaceProcedure = workspaceProcedure.use(
       })
     }
 
+    const stripeConnectedWorkspace = { ...workspace, stripeConnectId: workspace.stripeConnectId }
+
     return next({
-      ctx: { workspace },
+      ctx: { workspace: stripeConnectedWorkspace },
     })
   },
 )

@@ -55,6 +55,7 @@ const buildSchema = (fields: Field[]) => {
 }
 
 type AdFormProps = HTMLAttributes<HTMLFormElement> & {
+  workspaceId: string
   sessionId: string
   info: CheckoutInfo
   onSuccess?: () => void
@@ -62,6 +63,7 @@ type AdFormProps = HTMLAttributes<HTMLFormElement> & {
 
 export const AdForm = ({
   className,
+  workspaceId,
   sessionId,
   info,
   onSuccess: onSuccessCallback,
@@ -99,6 +101,7 @@ export const AdForm = ({
       .map(([fieldId, value]) => ({ fieldId, value }))
 
     submit.mutate({
+      workspaceId,
       sessionId,
       name: values.name,
       websiteUrl: values.websiteUrl,
@@ -156,7 +159,9 @@ export const AdForm = ({
                       {field.name}
                       {field.isRequired && <span className="ml-1 text-red-500">*</span>}
                     </FormLabel>
-                    <FormControl>{renderMetaInput(field, input, sessionId)}</FormControl>
+                    <FormControl>
+                      {renderMetaInput(field, input, workspaceId, sessionId)}
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -176,6 +181,7 @@ export const AdForm = ({
 function renderMetaInput(
   field: Field,
   input: { value: unknown; onChange: (value: unknown) => void; onBlur: () => void; name: string },
+  workspaceId: string,
   sessionId: string,
 ) {
   const placeholder = field.placeholder || undefined
@@ -199,6 +205,7 @@ function renderMetaInput(
   if (field.type === "Image") {
     return (
       <ImageUpload
+        workspaceId={workspaceId}
         sessionId={sessionId}
         value={(input.value as string | null) ?? null}
         onChange={url => input.onChange(url ?? "")}

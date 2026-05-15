@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { trpc } from "~/lib/trpc"
 
 type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
+  workspaceId: string
   sessionId: string
   value?: string | null
   onChange: (url: string | null) => void
@@ -15,6 +16,7 @@ type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
 const DEFAULT_ACCEPT = "image/png,image/jpeg,image/webp"
 
 export const ImageUpload = ({
+  workspaceId,
   sessionId,
   value,
   onChange,
@@ -39,6 +41,7 @@ export const ImageUpload = ({
     try {
       setIsUploading(true)
       const presigned = await createUpload.mutateAsync({
+        workspaceId,
         sessionId,
         fileName: file.name,
         contentType: file.type,

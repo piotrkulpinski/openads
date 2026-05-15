@@ -4,7 +4,8 @@ import { z } from "zod"
 export const env = createEnv({
   server: {
     STRIPE_SECRET_KEY: z.string(),
-    STRIPE_WEBHOOK_SECRET: z.string(),
+    STRIPE_CONNECT_CLIENT_ID: z.string().optional(),
+    STRIPE_CONNECT_WEBHOOK_SECRET: z.string(),
     STRIPE_PLATFORM_FEE_PERCENT: z.coerce.number().min(0).max(100).default(0),
   },
 

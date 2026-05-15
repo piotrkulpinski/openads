@@ -50,6 +50,7 @@ export const tierPriceRouter = router({
       })
 
       const stripePrice = await createTierPrice(stripe, {
+        connectedAccountId: workspace.stripeConnectId,
         productId: tier.stripeProductId,
         unitAmount: input.amount,
         currency: input.currency,
@@ -85,7 +86,7 @@ export const tierPriceRouter = router({
       }
 
       if (tierPrice.stripePriceId) {
-        await archivePrice(stripe, tierPrice.stripePriceId)
+        await archivePrice(stripe, workspace.stripeConnectId, tierPrice.stripePriceId)
       }
 
       return await db.tierPrice.update({

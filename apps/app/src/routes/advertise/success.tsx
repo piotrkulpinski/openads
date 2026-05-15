@@ -9,6 +9,7 @@ import { trpc } from "~/lib/trpc"
 
 export const Route = createFileRoute("/advertise/success")({
   validateSearch: z.object({
+    workspace_id: z.string().optional(),
     session_id: z.string().optional(),
   }),
 
@@ -16,15 +17,15 @@ export const Route = createFileRoute("/advertise/success")({
 })
 
 function AdvertiseSuccess() {
-  const { session_id: sessionId } = Route.useSearch()
+  const { workspace_id: workspaceId, session_id: sessionId } = Route.useSearch()
   const [submitted, setSubmitted] = useState(false)
 
   const infoQuery = trpc.ad.public.getCheckoutInfo.useQuery(
-    { sessionId: sessionId ?? "" },
-    { enabled: !!sessionId, retry: 3, retryDelay: 1500 },
+    { workspaceId: workspaceId ?? "", sessionId: sessionId ?? "" },
+    { enabled: !!workspaceId && !!sessionId, retry: 3, retryDelay: 1500 },
   )
 
-  if (!sessionId) {
+  if (!workspaceId || !sessionId) {
     return (
       <Centered>
         <p className="text-muted-foreground">Missing checkout session.</p>
@@ -66,7 +67,12 @@ function AdvertiseSuccess() {
           </p>
         )}
         success={({ data }) => (
-          <AdForm sessionId={sessionId} info={data} onSuccess={() => setSubmitted(true)} />
+          <AdForm
+            workspaceId={workspaceId}
+            sessionId={sessionId}
+            info={data}
+            onSuccess={() => setSubmitted(true)}
+          />
         )}
       />
 
