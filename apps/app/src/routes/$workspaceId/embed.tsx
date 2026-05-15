@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { EmbedSnippet } from "~/components/embed/embed-snippet"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
+import { useWorkspace } from "~/contexts/workspace-context"
 
 export const Route = createFileRoute("/$workspaceId/embed")({
   component: EmbedPage,
 })
 
 function EmbedPage() {
-  const { workspaceId } = Route.useParams()
+  const workspace = useWorkspace()
 
   return (
     <>
@@ -19,7 +20,7 @@ function EmbedPage() {
         </HeaderDescription>
       </Header>
 
-      <EmbedSnippet workspaceId={workspaceId} />
+      <EmbedSnippet slug={workspace.slug} />
     </>
   )
 }

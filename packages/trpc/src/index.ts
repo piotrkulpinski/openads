@@ -15,6 +15,7 @@ import { z, ZodError } from "zod"
  */
 export interface Context extends FetchCreateContextFnOptions, Record<string, unknown> {
   auth: Session | null
+  clientIp: string | null
   db: typeof db
   emails: EmailClient
   logger: Logger

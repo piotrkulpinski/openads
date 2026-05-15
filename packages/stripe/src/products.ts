@@ -35,6 +35,7 @@ export interface ProductCreateProps {
   name: string
   description?: string
   metadata: TierMetadata
+  features?: string[]
 }
 
 export async function createTierProduct(
@@ -45,6 +46,7 @@ export async function createTierProduct(
     name: props.name,
     description: props.description || undefined,
     metadata: props.metadata,
+    marketing_features: props.features?.map(name => ({ name })),
   })
 }
 
@@ -53,6 +55,7 @@ export interface ProductUpdateProps {
   description?: string
   active?: boolean
   metadata?: Partial<TierMetadata>
+  features?: string[]
 }
 
 export async function updateTierProduct(
@@ -65,6 +68,7 @@ export async function updateTierProduct(
     description: props.description ?? undefined,
     active: props.active,
     metadata: props.metadata as Record<string, string> | undefined,
+    marketing_features: props.features?.map(name => ({ name })),
   })
 }
 

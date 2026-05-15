@@ -53,7 +53,7 @@ export const tierRouter = router({
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
-        input: { name, description, weight, isActive, order, initialPrices },
+        input: { name, description, weight, isActive, order, features, initialPrices },
       }) => {
         // Create the Tier row first so we can stamp its id onto the Stripe Product metadata.
         const tier = await db.tier.create({
@@ -63,6 +63,7 @@ export const tierRouter = router({
             weight,
             isActive,
             order,
+            features,
             workspaceId: workspace.id,
           },
         })
@@ -75,6 +76,7 @@ export const tierRouter = router({
             tierId: tier.id,
             weight: String(weight),
           },
+          features,
         })
 
         // One at a time so each local id can be stamped onto its Stripe Price
@@ -146,7 +148,7 @@ export const tierRouter = router({
     .mutation(
       async ({
         ctx: { db, stripe, workspace },
-        input: { id, name, description, weight, isActive, order },
+        input: { id, name, description, weight, isActive, order, features },
       }) => {
         const existing = await db.tier.findFirst({
           where: { id, workspaceId: workspace.id },
@@ -158,11 +160,17 @@ export const tierRouter = router({
 
         // Sync Stripe Product when product-level fields change.
         if (existing.stripeProductId) {
+          const featuresChanged =
+            features !== undefined &&
+            (features.length !== existing.features.length ||
+              features.some((f, i) => f !== existing.features[i]))
+
           const productChanged =
             (name !== undefined && name !== existing.name) ||
             (description !== undefined && description !== existing.description) ||
             (weight !== undefined && weight !== existing.weight) ||
-            (isActive !== undefined && isActive !== existing.isActive)
+            (isActive !== undefined && isActive !== existing.isActive) ||
+            featuresChanged
 
           if (productChanged) {
             await updateTierProduct(stripe, existing.stripeProductId, {
@@ -174,13 +182,14 @@ export const tierRouter = router({
                 tierId: existing.id,
                 weight: String(weight ?? existing.weight),
               },
+              features: featuresChanged ? features : undefined,
             })
           }
         }
 
         return await db.tier.update({
           where: { id },
-          data: { name, description, weight, isActive, order },
+          data: { name, description, weight, isActive, order, features },
         })
       },
     ),
@@ -225,10 +234,19 @@ export const tierRouter = router({
   // Public surface: consumed by the embeddable tier selector (`/embed`).
   public: router({
     listForWorkspace: publicProcedure
-      .input(z.object({ workspaceId: z.string() }))
-      .query(async ({ ctx: { db }, input: { workspaceId } }) => {
+      .input(z.object({ slug: z.string() }))
+      .query(async ({ ctx: { db }, input: { slug } }) => {
+        const workspace = await db.workspace.findUnique({
+          where: { slug },
+          select: { id: true },
+        })
+
+        if (!workspace) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Workspace not found." })
+        }
+
         return await db.tier.findMany({
-          where: { workspaceId, isActive: true },
+          where: { workspaceId: workspace.id, isActive: true },
           orderBy: [{ order: "asc" }, { createdAt: "desc" }],
           select: {
             id: true,
@@ -236,6 +254,7 @@ export const tierRouter = router({
             description: true,
             weight: true,
             order: true,
+            features: true,
             prices: {
               where: { isActive: true },
               orderBy: [{ interval: "asc" }, { amount: "asc" }],

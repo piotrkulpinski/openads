@@ -12,7 +12,7 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { env } from "~/env"
 
 interface EmbedSnippetProps {
-  workspaceId: string
+  slug: string
 }
 
 const themeOptions = ["auto", "light", "dark"] as const
@@ -26,16 +26,16 @@ const themeLabels: Record<Theme, string> = {
 
 const PREVIEW_HEIGHT = 640
 
-export function EmbedSnippet({ workspaceId }: EmbedSnippetProps) {
+export function EmbedSnippet({ slug }: EmbedSnippetProps) {
   const clipboard = useClipboard({ timeout: 2000 })
   const [theme, setTheme] = useState<Theme>("auto")
 
   const baseUrl = env.VITE_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")
 
   const url = useMemo(() => {
-    const params = new URLSearchParams({ workspaceId, theme })
-    return `${baseUrl}/embed?${params.toString()}`
-  }, [baseUrl, workspaceId, theme])
+    const params = new URLSearchParams({ theme })
+    return `${baseUrl}/embed/${slug}?${params.toString()}`
+  }, [baseUrl, slug, theme])
 
   const snippet = useMemo(() => {
     if (!url) return ""

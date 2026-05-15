@@ -95,6 +95,22 @@ export const TierForm = ({
     name: "initialPrices",
   })
 
+  const features = form.watch("features") ?? []
+
+  const appendFeature = () => {
+    form.setValue("features", [...features, ""], { shouldDirty: true })
+  }
+
+  const removeFeature = (index: number) => {
+    form.setValue(
+      "features",
+      features.filter((_, i) => i !== index),
+      { shouldDirty: true },
+    )
+  }
+
+  const MAX_FEATURES = 15
+
   const afterSuccess = async () => {
     if (nextUrl) navigate(nextUrl)
     toast.success(`Tier ${isEditing ? "updated" : "created"} successfully`)
@@ -226,6 +242,58 @@ export const TierForm = ({
             </FormItem>
           )}
         />
+
+        <div className="col-span-full grid gap-3 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <FormLabel className="text-base">Features</FormLabel>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              prefix={<PlusIcon />}
+              disabled={features.length >= MAX_FEATURES}
+              onClick={appendFeature}
+            >
+              Add feature
+            </Button>
+          </div>
+
+          <p className="text-muted-foreground text-xs">
+            Start with <code>✓</code> for a positive feature, <code>•</code> for a neutral one, or{" "}
+            <code>✗</code> for a negative one. No prefix renders as neutral.
+          </p>
+
+          {features.length > 0 && (
+            <div className="grid gap-2">
+              {features.map((_, index) => (
+                <FormField
+                  // biome-ignore lint/suspicious/noArrayIndexKey: feature list isn't reordered
+                  key={index}
+                  control={form.control}
+                  name={`features.${index}`}
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <div className="grid w-full grid-cols-[1fr_auto] items-start gap-2">
+                        <FormControl>
+                          <Input placeholder="✓ Sidebar slot on every page" {...field} />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          prefix={<TrashIcon />}
+                          onClick={() => removeFeature(index)}
+                          aria-label="Remove feature"
+                        />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </div>
 
         {!isEditing && (
           <div className="col-span-full grid gap-3 border-t pt-4">

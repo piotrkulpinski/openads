@@ -4,17 +4,20 @@ import {
   readSubscriptionMetadata,
   toDate,
 } from "@openads/stripe/subscription"
+import { Hono } from "hono"
 import type Stripe from "stripe"
 import { env } from "~/env"
 import { logger } from "~/services/logger"
 import { stripe } from "../../services/stripe"
 
-export async function POST(req: Request) {
-  const body = await req.text()
-  const signature = req.headers.get("stripe-signature")
+export const stripeWebhookRoute = new Hono()
+
+stripeWebhookRoute.post("/", async c => {
+  const body = await c.req.text()
+  const signature = c.req.header("stripe-signature")
 
   if (!signature) {
-    return new Response("No signature", { status: 400 })
+    return c.text("No signature", 400)
   }
 
   let event: Stripe.Event
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
-    return new Response(`Invalid signature: ${err}`, { status: 400 })
+    return c.text(`Invalid signature: ${err}`, 400)
   }
 
   try {
@@ -46,12 +49,12 @@ export async function POST(req: Request) {
       }
     }
 
-    return new Response("OK", { status: 200 })
+    return c.text("OK", 200)
   } catch (err) {
     logger.error("stripe webhook handler failed", { err, type: event.type })
-    return new Response("Webhook handler failed", { status: 500 })
+    return c.text("Webhook handler failed", 500)
   }
-}
+})
 
 async function handleConnectAccountUpdate(account: Stripe.Account) {
   const workspace = await db.workspace.findFirst({

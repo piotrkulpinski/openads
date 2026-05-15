@@ -17,5 +17,10 @@ import { stripe } from "~/services/stripe"
 export const createContext = async (ctx: FetchCreateContextFnOptions): Promise<Context> => {
   const auth = await betterAuth.api.getSession({ headers: ctx.req.headers })
 
-  return { ...ctx, auth, db, emails, logger, redis, s3, stripe, env }
+  const clientIp =
+    ctx.req.headers.get("cf-connecting-ip") ??
+    ctx.req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    null
+
+  return { ...ctx, auth, clientIp, db, emails, logger, redis, s3, stripe, env }
 }
