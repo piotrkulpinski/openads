@@ -1,6 +1,7 @@
 import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server"
 import { router } from "./index"
 import { adRouter } from "./routers/ad"
+import { advertiserRouter } from "./routers/advertiser"
 import { authRouter } from "./routers/auth"
 import { fieldRouter } from "./routers/field"
 import { onboardingRouter } from "./routers/onboarding"
@@ -23,6 +24,7 @@ export const appRouter = router({
   tier: tierRouter,
   tierPrice: tierPriceRouter,
   ad: adRouter,
+  advertiser: advertiserRouter,
   subscription: subscriptionRouter,
 })
 
