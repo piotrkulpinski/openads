@@ -110,6 +110,11 @@ The following are explicit deferrals. Don't build them without confirming a scop
 - **TypeScript**: required everywhere, strict mode
 - **Formatting**: oxfmt (2 spaces, 100 line width, double quotes, no semicolons, trailing commas, arrow parens avoided)
 - **Imports**: sorted by oxfmt; absolute paths (`~/` for app src, `@openads/*` for packages)
+- **Utilities/helpers**: check `@dirstack/utils` first for shared utility functionality
+  (formatting, URL helpers, object helpers, parsing, file conversion, error helpers, etc.).
+  Prefer importing from `@dirstack/utils` over adding local helper functions. Add or keep a
+  local utility only when `@dirstack/utils` does not already provide a suitable option or the
+  local behavior is intentionally domain-specific.
 - **Naming**: PascalCase for React components, `use-` prefix for hooks, camelCase for utilities, kebab-case filenames
 - **Types**: use `@t3-oss/env-core` for env vars; prefer explicit types over `any`
 - **Error handling**: try/catch for async operations; throw descriptive `TRPCError` from procedures; pass errors to the logger as `{ err }` (see Logging)

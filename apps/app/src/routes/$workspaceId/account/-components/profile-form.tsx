@@ -1,4 +1,4 @@
-import { getInitials } from "@dirstack/utils"
+import { getInitials, toBase64 } from "@dirstack/utils"
 import { fileSchema, userSchema } from "@openads/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
@@ -15,7 +15,6 @@ import { Card } from "~/components/ui/card"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
-import { fileToDataUrl } from "~/lib/helpers"
 import { logger } from "~/lib/logger"
 import type { RouterOutputs } from "~/lib/trpc"
 import { trpc } from "~/lib/trpc"
@@ -75,7 +74,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
     try {
       setAvatar({
         file,
-        previewUrl: await fileToDataUrl(file),
+        previewUrl: await toBase64(file),
         isDirty: true,
         isRemoved: false,
       })

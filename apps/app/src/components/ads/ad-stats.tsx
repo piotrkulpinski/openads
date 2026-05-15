@@ -1,3 +1,4 @@
+import { formatNumber } from "@dirstack/utils"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
 import { QueryCell } from "~/components/query-cell"
@@ -5,12 +6,10 @@ import { Card } from "~/components/ui/card"
 import { H4 } from "~/components/ui/heading"
 import { trpc } from "~/lib/trpc"
 
-interface AdStatsProps {
+type AdStatsProps = {
   workspaceId: string
   adId: string
 }
-
-const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value)
 
 export function AdStats({ workspaceId, adId }: AdStatsProps) {
   const statsQuery = trpc.ad.getStats.useQuery({ workspaceId, adId, days: 30 })
@@ -27,8 +26,11 @@ export function AdStats({ workspaceId, adId }: AdStatsProps) {
           success={({ data }) => (
             <Stack direction="column" size="md" className="mt-4">
               <div className="grid grid-cols-2 gap-4">
-                <Tile label="Impressions" value={formatNumber(data.totals.impressions)} />
-                <Tile label="Clicks" value={formatNumber(data.totals.clicks)} />
+                <Tile
+                  label="Impressions"
+                  value={formatNumber(data.totals.impressions, "standard")}
+                />
+                <Tile label="Clicks" value={formatNumber(data.totals.clicks, "standard")} />
                 <Tile
                   label="CTR"
                   value={
@@ -53,8 +55,10 @@ export function AdStats({ workspaceId, adId }: AdStatsProps) {
                     {data.rows.map(row => (
                       <tr key={row.date.toISOString()} className="border-b last:border-b-0">
                         <td className="py-2">{row.date.toISOString().slice(0, 10)}</td>
-                        <td className="py-2 text-right">{formatNumber(row.impressions)}</td>
-                        <td className="py-2 text-right">{formatNumber(row.clicks)}</td>
+                        <td className="py-2 text-right">
+                          {formatNumber(row.impressions, "standard")}
+                        </td>
+                        <td className="py-2 text-right">{formatNumber(row.clicks, "standard")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -68,7 +72,7 @@ export function AdStats({ workspaceId, adId }: AdStatsProps) {
   )
 }
 
-function Tile({ label, value }: { label: string; value: string }) {
+const Tile = ({ label, value }: { label: string; value: string }) => {
   return (
     <div className="grid gap-1 rounded-md border px-3 py-2">
       <span className="text-muted-foreground text-xs uppercase tracking-wide">{label}</span>

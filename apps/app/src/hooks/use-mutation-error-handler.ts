@@ -1,3 +1,4 @@
+import { isEmptyObject } from "@dirstack/utils"
 import type { AppRouter } from "@openads/trpc/router"
 import type { TRPCClientErrorLike } from "@trpc/client"
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
@@ -15,7 +16,7 @@ export const useMutationErrorHandler = () => {
     // Type the data properly to avoid TypeScript errors
     const fieldErrors = data?.fieldErrors as Record<string, string[]> | undefined
 
-    if (!fieldErrors || !Object.keys(fieldErrors).length) {
+    if (!fieldErrors || isEmptyObject(fieldErrors)) {
       toast.error(message) // Show the error message
       form.reset() // Reset the form
 
