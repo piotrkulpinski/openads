@@ -1,9 +1,10 @@
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
+import { useMutation } from "@tanstack/react-query"
 import { ImageIcon, Loader2Icon, TrashIcon } from "lucide-react"
 import { type ChangeEvent, type ComponentProps, useRef, useState } from "react"
 import { toast } from "sonner"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
   workspaceId: string
@@ -27,7 +28,7 @@ export const ImageUpload = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
 
-  const createUpload = trpc.storage.public.createAdvertiserUpload.useMutation()
+  const createUpload = useMutation(orpc.storage.public.createAdvertiserUpload.mutationOptions())
 
   const handlePick = () => inputRef.current?.click()
 

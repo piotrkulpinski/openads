@@ -1,11 +1,10 @@
 import { BillingInterval } from "@openads/db/client"
 import { tierPriceSchema } from "@openads/db/schema"
-import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
-import type { TRPCClientErrorLike } from "@trpc/client"
+import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -14,7 +13,7 @@ import { CurrencySelect } from "~/components/tiers/currency-select"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
-import { trpc } from "~/lib/trpc"
+import { orpc, queryClient } from "~/lib/orpc"
 
 // Visible form schema uses whole units; the submit handler converts to cents.
 // Currency is borrowed from the canonical tierPriceSchema so the allow-list stays
@@ -48,7 +47,6 @@ export const TierPriceForm = ({
   onSuccess: onSuccessCallback,
   ...props
 }: TierPriceFormProps) => {
-  const utils = trpc.useUtils()
   const handleError = useMutationErrorHandler()
 
   const form = useZodForm(tierPriceFormSchema, {
@@ -60,17 +58,21 @@ export const TierPriceForm = ({
     },
   })
 
-  const createPrice = trpc.tierPrice.create.useMutation({
-    onSuccess: async () => {
-      toast.success("Price added")
-      await utils.tier.getById.invalidate({ id: tierId, workspaceId })
-      form.reset()
-      onSuccessCallback?.()
-    },
-    onError: (error: TRPCClientErrorLike<AppRouter>) => {
-      handleError({ error, form })
-    },
-  })
+  const createPrice = useMutation(
+    orpc.tierPrice.create.mutationOptions({
+      onSuccess: async () => {
+        toast.success("Price added")
+        await queryClient.invalidateQueries({
+          queryKey: orpc.tier.getById.key({ input: { id: tierId, workspaceId } }),
+        })
+        form.reset()
+        onSuccessCallback?.()
+      },
+      onError: error => {
+        handleError({ error, form })
+      },
+    }),
+  )
 
   const onSubmit = ({ amountWhole, ...rest }: TierPriceFormValues) => {
     createPrice.mutate({

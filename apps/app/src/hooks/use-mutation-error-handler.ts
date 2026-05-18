@@ -1,20 +1,25 @@
 import { isEmptyObject } from "@dirstack/utils"
-import type { AppRouter } from "@openads/trpc/router"
-import type { TRPCClientErrorLike } from "@trpc/client"
+import { ORPCError } from "@orpc/client"
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
 import { toast } from "sonner"
 
 export const useMutationErrorHandler = () => {
   type HandleError<T extends FieldValues> = {
-    error: TRPCClientErrorLike<AppRouter>
+    error: unknown
     form: UseFormReturn<T>
   }
 
   return <T extends FieldValues>({ error, form }: HandleError<T>) => {
-    const { data, message } = error
+    const message = error instanceof Error ? error.message : "Something went wrong"
 
-    // Type the data properly to avoid TypeScript errors
-    const fieldErrors = data?.fieldErrors as Record<string, string[]> | undefined
+    let fieldErrors: Record<string, string[]> | undefined
+    if (
+      error instanceof ORPCError &&
+      (error.code === "INPUT_VALIDATION_FAILED" || error.code === "CONFLICT_FIELD")
+    ) {
+      const data = error.data as { fieldErrors?: Record<string, string[]> } | undefined
+      fieldErrors = data?.fieldErrors
+    }
 
     if (!fieldErrors || isEmptyObject(fieldErrors)) {
       toast.error(message) // Show the error message

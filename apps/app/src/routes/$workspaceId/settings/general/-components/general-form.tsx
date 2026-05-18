@@ -1,6 +1,7 @@
 import { workspaceSchema } from "@openads/db/schema"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
+import { useMutation } from "@tanstack/react-query"
 import { useNavigate, useRouter } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
@@ -10,10 +11,9 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
-import { trpc } from "~/lib/trpc"
+import { orpc, queryClient } from "~/lib/orpc"
 
 export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
-  const trpcUtils = trpc.useUtils()
   const workspace = useWorkspace()
   const navigate = useNavigate()
   const router = useRouter()
@@ -23,25 +23,29 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
     values: workspace,
   })
 
-  const { mutate: updateWorkspace, isPending } = trpc.workspace.update.useMutation({
-    onSuccess: async ({ id }) => {
-      if (workspace.id !== id) {
-        navigate({ to: "/$workspaceId/settings/general", params: { workspaceId: id } })
-      }
+  const { mutate: updateWorkspace, isPending } = useMutation(
+    orpc.workspace.update.mutationOptions({
+      onSuccess: async ({ id }) => {
+        if (workspace.id !== id) {
+          navigate({ to: "/$workspaceId/settings/general", params: { workspaceId: id } })
+        }
 
-      // Show a success toast
-      toast.success("Settings updated successfully")
+        // Show a success toast
+        toast.success("Settings updated successfully")
 
-      // Invalidate the workspace list
-      await trpcUtils.workspace.getAll.invalidate()
-      await trpcUtils.workspace.getById.invalidate({ id })
+        // Invalidate the workspace list
+        await queryClient.invalidateQueries({ queryKey: orpc.workspace.getAll.key() })
+        await queryClient.invalidateQueries({
+          queryKey: orpc.workspace.getById.key({ input: { id } }),
+        })
 
-      // Invalidate the workspace settings
-      router.invalidate()
-    },
+        // Invalidate the workspace settings
+        router.invalidate()
+      },
 
-    onError: error => handleError({ error, form }),
-  })
+      onError: error => handleError({ error, form }),
+    }),
+  )
 
   return (
     <Card asChild {...props}>

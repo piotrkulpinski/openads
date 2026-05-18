@@ -9,7 +9,7 @@ export const corsMiddleware = cors({
 
     return env.APP_URL
   },
-  allowHeaders: ["Content-Type", "Authorization", "trpc-accept"],
+  allowHeaders: ["Content-Type", "Authorization"],
   allowMethods: ["POST", "GET", "OPTIONS"],
   exposeHeaders: ["Set-Cookie", "Content-Length"],
   credentials: true,

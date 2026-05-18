@@ -2,6 +2,7 @@ import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { Stack } from "@openads/ui/stack"
+import { useMutation } from "@tanstack/react-query"
 import { PlusIcon, TrashIcon } from "lucide-react"
 import { type ComponentProps, useState } from "react"
 import { toast } from "sonner"
@@ -10,7 +11,7 @@ import { TierPriceForm } from "~/components/tiers/tier-price-form"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { formatInterval, formatPrice } from "~/lib/currency"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type TierWithPrices = NonNullable<RouterOutputs["tier"]["getById"]>
 
@@ -20,16 +21,19 @@ type TierPriceListProps = ComponentProps<"div"> & {
 }
 
 export const TierPriceList = ({ workspaceId, tier, className, ...props }: TierPriceListProps) => {
-  const utils = trpc.useUtils()
   const [isAdding, setIsAdding] = useState(false)
 
-  const archivePrice = trpc.tierPrice.archive.useMutation({
-    onSuccess: async () => {
-      toast.success("Price archived")
-      await utils.tier.getById.invalidate({ id: tier.id, workspaceId })
-    },
-    onError: ({ message }) => toast.error(message),
-  })
+  const archivePrice = useMutation(
+    orpc.tierPrice.archive.mutationOptions({
+      onSuccess: async () => {
+        toast.success("Price archived")
+        await queryClient.invalidateQueries({
+          queryKey: orpc.tier.getById.key({ input: { id: tier.id, workspaceId } }),
+        })
+      },
+      onError: ({ message }) => toast.error(message),
+    }),
+  )
 
   return (
     <Card className={cx("", className)} {...props}>

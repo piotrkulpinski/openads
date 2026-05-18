@@ -1,10 +1,11 @@
 import { Button } from "@openads/ui/button"
+import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { Loader2Icon } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const Route = createFileRoute("/stripe/callback")({
   validateSearch: z.object({
@@ -23,15 +24,17 @@ function StripeCallbackPage() {
   const hasSubmitted = useRef(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const completeConnection = trpc.stripe.connect.callback.useMutation({
-    onSuccess: ({ workspaceId }) => {
-      toast.success("Stripe connected")
-      navigate({ to: "/$workspaceId/settings/general", params: { workspaceId } })
-    },
-    onError: error => {
-      setErrorMessage(error.message)
-    },
-  })
+  const completeConnection = useMutation(
+    orpc.stripe.connect.callback.mutationOptions({
+      onSuccess: ({ workspaceId }) => {
+        toast.success("Stripe connected")
+        navigate({ to: "/$workspaceId/settings/general", params: { workspaceId } })
+      },
+      onError: error => {
+        setErrorMessage(error.message)
+      },
+    }),
+  )
 
   useEffect(() => {
     if (hasSubmitted.current) return

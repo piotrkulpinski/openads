@@ -24,7 +24,7 @@
     "@openads/redis",
     "@openads/s3",
     "@openads/stripe",
-    "@openads/trpc",
+    "@openads/orpc",
     "@openads/tsconfig",
     "@openads/ui",
     "@openads/utils"

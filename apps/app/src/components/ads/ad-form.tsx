@@ -3,13 +3,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@openads/ui/input"
 import { Switch } from "@openads/ui/switch"
 import { Textarea } from "@openads/ui/textarea"
+import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { ImageUpload } from "~/components/ads/image-upload"
 import { FormButton } from "~/components/form-button"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, type RouterOutputs } from "~/lib/orpc"
 
 type CheckoutInfo = RouterOutputs["ad"]["public"]["getCheckoutInfo"]
 type Field = CheckoutInfo["fields"][number]
@@ -85,15 +86,17 @@ export const AdForm = ({
     } as FormValues,
   })
 
-  const submit = trpc.ad.public.createFromCheckout.useMutation({
-    onSuccess: () => {
-      toast.success("Ad submitted for review")
-      onSuccessCallback?.()
-    },
-    onError: error => {
-      toast.error(error.message)
-    },
-  })
+  const submit = useMutation(
+    orpc.ad.public.createFromCheckout.mutationOptions({
+      onSuccess: () => {
+        toast.success("Ad submitted for review")
+        onSuccessCallback?.()
+      },
+      onError: error => {
+        toast.error(error.message)
+      },
+    }),
+  )
 
   const onSubmit = (values: FormValues) => {
     const meta = Object.entries(values.meta ?? {})

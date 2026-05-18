@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { CheckCircle2Icon } from "lucide-react"
 import { useState } from "react"
@@ -5,7 +6,7 @@ import { z } from "zod"
 import { AdForm } from "~/components/ads/ad-form"
 import { QueryCell } from "~/components/query-cell"
 import { Logo } from "~/components/ui/logo"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const Route = createFileRoute("/advertise/success")({
   validateSearch: z.object({
@@ -20,9 +21,13 @@ function AdvertiseSuccess() {
   const { workspace_id: workspaceId, session_id: sessionId } = Route.useSearch()
   const [submitted, setSubmitted] = useState(false)
 
-  const infoQuery = trpc.ad.public.getCheckoutInfo.useQuery(
-    { workspaceId: workspaceId ?? "", sessionId: sessionId ?? "" },
-    { enabled: !!workspaceId && !!sessionId, retry: 3, retryDelay: 1500 },
+  const infoQuery = useQuery(
+    orpc.ad.public.getCheckoutInfo.queryOptions({
+      input: { workspaceId: workspaceId ?? "", sessionId: sessionId ?? "" },
+      enabled: !!workspaceId && !!sessionId,
+      retry: 3,
+      retryDelay: 1500,
+    }),
   )
 
   if (!workspaceId || !sessionId) {

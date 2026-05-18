@@ -5,8 +5,10 @@ import { TierPriceList } from "~/components/tiers/tier-price-list"
 import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspaceId/tiers/$tierId")({
-  loader: async ({ context: { trpc }, params: { workspaceId, tierId } }) => {
-    const tier = await trpc.tier.getById.fetch({ id: tierId, workspaceId })
+  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, tierId } }) => {
+    const tier = await queryClient.fetchQuery(
+      orpc.tier.getById.queryOptions({ input: { id: tierId, workspaceId } }),
+    )
 
     if (!tier) {
       throw notFound()

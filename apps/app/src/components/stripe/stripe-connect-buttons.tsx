@@ -1,11 +1,12 @@
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
+import { useMutation } from "@tanstack/react-query"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { StripeIcon } from "~/components/icons/stripe"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { logger } from "~/lib/logger"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type StripeConnectButtonsProps = ComponentProps<"div"> & {
   workspace: NonNullable<RouterOutputs["workspace"]["getById"]>
@@ -17,34 +18,40 @@ export const StripeConnectButtons = ({
   workspace,
   onSuccess,
 }: StripeConnectButtonsProps) => {
-  const utils = trpc.useUtils()
-
   // TODO Add a workspace provider from onboarding to make is simpler
 
-  const connectAccount = trpc.stripe.connect.create.useMutation({
-    onSuccess: data => {
-      utils.workspace.getById.invalidate({ id: workspace.id })
-      onSuccess?.()
-      window.location.href = data.url
-    },
+  const connectAccount = useMutation(
+    orpc.stripe.connect.create.mutationOptions({
+      onSuccess: data => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.workspace.getById.key({ input: { id: workspace.id } }),
+        })
+        onSuccess?.()
+        window.location.href = data.url
+      },
 
-    onError: error => {
-      logger.error("stripe.connect.create failed", { err: error, workspaceId: workspace.id })
-      toast.error("Failed to connect with Stripe")
-    },
-  })
+      onError: error => {
+        logger.error("stripe.connect.create failed", { err: error, workspaceId: workspace.id })
+        toast.error("Failed to connect with Stripe")
+      },
+    }),
+  )
 
-  const disconnectAccount = trpc.stripe.connect.delete.useMutation({
-    onSuccess: () => {
-      utils.workspace.getById.invalidate({ id: workspace.id })
-      onSuccess?.()
-    },
+  const disconnectAccount = useMutation(
+    orpc.stripe.connect.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.workspace.getById.key({ input: { id: workspace.id } }),
+        })
+        onSuccess?.()
+      },
 
-    onError: error => {
-      logger.error("stripe.connect.delete failed", { err: error, workspaceId: workspace.id })
-      toast.error("Failed to disconnect with Stripe")
-    },
-  })
+      onError: error => {
+        logger.error("stripe.connect.delete failed", { err: error, workspaceId: workspace.id })
+        toast.error("Failed to disconnect with Stripe")
+      },
+    }),
+  )
 
   return (
     <div className={className}>

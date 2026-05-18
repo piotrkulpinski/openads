@@ -1,20 +1,23 @@
 import type { OnboardingStep } from "@openads/utils"
+import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useCallback } from "react"
 import { toast } from "sonner"
 import { logger } from "~/lib/logger"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export function useOnboardingProgress() {
   const navigate = useNavigate()
   const preWorkspaceSteps = ["welcome", "workspace"]
 
-  const { mutateAsync, isPending, isSuccess } = trpc.onboarding.setProgress.useMutation({
-    onError: ({ data }) => {
-      logger.error("onboarding.setProgress failed", { data })
-      toast.error("Failed to update onboarding progress. Please try again.")
-    },
-  })
+  const { mutateAsync, isPending, isSuccess } = useMutation(
+    orpc.onboarding.setProgress.mutationOptions({
+      onError: error => {
+        logger.error("onboarding.setProgress failed", { err: error })
+        toast.error("Failed to update onboarding progress. Please try again.")
+      },
+    }),
+  )
 
   const continueTo = useCallback(
     async (step: OnboardingStep, id?: string) => {

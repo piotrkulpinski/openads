@@ -1,10 +1,11 @@
 import { formatNumber } from "@dirstack/utils"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
+import { useQuery } from "@tanstack/react-query"
 import { QueryCell } from "~/components/query-cell"
 import { Card } from "~/components/ui/card"
 import { H4 } from "~/components/ui/heading"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 type AdStatsProps = {
   workspaceId: string
@@ -12,7 +13,9 @@ type AdStatsProps = {
 }
 
 export function AdStats({ workspaceId, adId }: AdStatsProps) {
-  const statsQuery = trpc.ad.getStats.useQuery({ workspaceId, adId, days: 30 })
+  const statsQuery = useQuery(
+    orpc.ad.getStats.queryOptions({ input: { workspaceId, adId, days: 30 } }),
+  )
 
   return (
     <Card>

@@ -1,12 +1,13 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { PlusIcon, Rows3Icon } from "lucide-react"
 import { FieldItem } from "~/components/fields/field-item"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const Route = createFileRoute("/$workspaceId/fields/")({
   component: FieldsIndexPage,
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/$workspaceId/fields/")({
 
 function FieldsIndexPage() {
   const { workspaceId } = Route.useParams()
-  const fieldsQuery = trpc.field.getAll.useQuery({ workspaceId })
+  const fieldsQuery = useQuery(orpc.field.getAll.queryOptions({ input: { workspaceId } }))
 
   return (
     <>

@@ -8,7 +8,7 @@ import { createRoot } from "react-dom/client"
 import { ErrorRoute } from "~/components/errors/error"
 import { NotFoundRoute } from "~/components/errors/not-found"
 import { logger } from "~/lib/logger"
-import { queryClient, trpc, trpcClient, trpcUtils } from "~/lib/trpc"
+import { orpc, queryClient } from "~/lib/orpc"
 import { routeTree } from "~/routeTree.gen"
 
 // Create a new router instance
@@ -16,16 +16,12 @@ export const router = createRouter({
   routeTree,
   defaultPendingMinMs: 0,
   defaultStaleTime: Number.POSITIVE_INFINITY,
-  context: { trpc: trpcUtils },
+  context: { orpc, queryClient },
   defaultNotFoundComponent: NotFoundRoute,
   defaultErrorComponent: ErrorRoute,
   defaultPendingComponent: () => <LoaderIcon className="animate-spin mx-auto mt-[5vh]" />,
   Wrap: ({ children }: PropsWithChildren) => {
-    return (
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </trpc.Provider>
-    )
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   },
 })
 

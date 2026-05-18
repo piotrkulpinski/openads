@@ -2,6 +2,7 @@ import { Button } from "@openads/ui/button"
 import { Input } from "@openads/ui/input"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
 import { CheckIcon, LayersIcon, XIcon } from "lucide-react"
 import { useState } from "react"
@@ -10,8 +11,8 @@ import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
 import { Logo } from "~/components/ui/logo"
 import { formatInterval, formatPrice } from "~/lib/currency"
+import { orpc } from "~/lib/orpc"
 import { parseTierFeature } from "~/lib/tier-features"
-import { trpc } from "~/lib/trpc"
 
 const defaultValues = {
   theme: "auto",
@@ -34,17 +35,19 @@ function TierSelector() {
   const [email, setEmail] = useState("")
   const [pendingTierPriceId, setPendingTierPriceId] = useState<string | null>(null)
 
-  const tiersQuery = trpc.tier.public.listForWorkspace.useQuery({ slug })
+  const tiersQuery = useQuery(orpc.tier.public.listForWorkspace.queryOptions({ input: { slug } }))
 
-  const checkout = trpc.tier.public.createCheckout.useMutation({
-    onSuccess: ({ url }) => {
-      window.location.href = url
-    },
-    onError: error => {
-      toast.error(error.message)
-      setPendingTierPriceId(null)
-    },
-  })
+  const checkout = useMutation(
+    orpc.tier.public.createCheckout.mutationOptions({
+      onSuccess: ({ url }) => {
+        window.location.href = url
+      },
+      onError: error => {
+        toast.error(error.message)
+        setPendingTierPriceId(null)
+      },
+    }),
+  )
 
   const handleSubscribe = (tierPriceId: string) => {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

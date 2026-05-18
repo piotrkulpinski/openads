@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto"
 import { slugify } from "@dirstack/utils"
-import { TRPCError } from "@trpc/server"
+import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { authProcedure, publicProcedure, router, workspaceProcedure } from "../index"
+import { authProcedure, publicProcedure, workspaceMw } from "../index"
 
 const uploadImageInput = z.object({
   file: z.string().trim().min(1, "File data is required"),
@@ -28,27 +28,30 @@ const ADVERTISER_UPLOAD_TTL_SECONDS = 60 * 5 // 5 minutes to PUT after issuing t
 const ADVERTISER_UPLOAD_RATE_LIMIT = 20 // uploads per hour per checkout session
 const ADVERTISER_UPLOAD_WINDOW_SECONDS = 60 * 60
 
-export const storageRouter = router({
+export const storageRouter = {
   uploadUserImage: authProcedure
     .input(uploadImageInput)
-    .mutation(async ({ ctx: { s3, user }, input: { file, fileName, ...props } }) => {
+    .handler(async ({ context: { s3, user }, input: { file, fileName, ...props } }) => {
       const body = Buffer.from(file.split(",")[1]!, "base64")
       const key = `users/${user.id}/${generateObjectKey(fileName)}`
 
       return s3.uploadObject({ key, body, ...props })
     }),
 
-  deleteUser: authProcedure.mutation(async ({ ctx: { s3, user } }) => {
+  deleteUser: authProcedure.handler(async ({ context: { s3, user } }) => {
     return await s3.deletePrefix({ prefix: `users/${user.id}` })
   }),
 
-  deleteWorkspace: workspaceProcedure.mutation(async ({ ctx: { s3, workspace } }) => {
-    return await s3.deletePrefix({ prefix: `workspaces/${workspace.id}` })
-  }),
+  deleteWorkspace: authProcedure
+    .input(z.object({ workspaceId: z.string() }))
+    .use(workspaceMw)
+    .handler(async ({ context: { s3, workspace } }) => {
+      return await s3.deletePrefix({ prefix: `workspaces/${workspace.id}` })
+    }),
 
   // Anonymous endpoint: the Stripe Checkout session is the only auth, so
   // rate-limit per session to bound abuse from a leaked session id.
-  public: router({
+  public: {
     createAdvertiserUpload: publicProcedure
       .input(
         z.object({
@@ -59,21 +62,19 @@ export const storageRouter = router({
           contentLength: z.number().int().positive(),
         }),
       )
-      .mutation(
+      .handler(
         async ({
-          ctx: { db, s3, stripe, redis },
+          context: { db, s3, stripe, redis },
           input: { workspaceId, sessionId, fileName, contentType, contentLength },
         }) => {
           if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
+            throw new ORPCError("BAD_REQUEST", {
               message: "Unsupported file type. Use PNG, JPEG, or WebP.",
             })
           }
 
           if (contentLength > MAX_ADVERTISER_UPLOAD_BYTES) {
-            throw new TRPCError({
-              code: "BAD_REQUEST",
+            throw new ORPCError("BAD_REQUEST", {
               message: "File is too large. Maximum upload size is 2 MB.",
             })
           }
@@ -84,8 +85,7 @@ export const storageRouter = router({
           })
 
           if (!workspace?.stripeConnectId) {
-            throw new TRPCError({
-              code: "PRECONDITION_FAILED",
+            throw new ORPCError("PRECONDITION_FAILED", {
               message: "This publisher cannot accept payments yet.",
             })
           }
@@ -97,14 +97,13 @@ export const storageRouter = router({
           )
 
           if (session.status !== "complete") {
-            throw new TRPCError({
-              code: "PRECONDITION_FAILED",
+            throw new ORPCError("PRECONDITION_FAILED", {
               message: "Checkout has not completed yet.",
             })
           }
 
           if (session.metadata?.workspaceId !== workspaceId) {
-            throw new TRPCError({ code: "BAD_REQUEST", message: "Missing checkout metadata." })
+            throw new ORPCError("BAD_REQUEST", { message: "Missing checkout metadata." })
           }
 
           const rateKey = `storage:advertiser-upload:${sessionId}`
@@ -113,8 +112,7 @@ export const storageRouter = router({
             await redis.expire(rateKey, ADVERTISER_UPLOAD_WINDOW_SECONDS)
           }
           if (count > ADVERTISER_UPLOAD_RATE_LIMIT) {
-            throw new TRPCError({
-              code: "TOO_MANY_REQUESTS",
+            throw new ORPCError("TOO_MANY_REQUESTS", {
               message: "Too many uploads from this checkout. Please try again later.",
             })
           }
@@ -147,5 +145,5 @@ export const storageRouter = router({
           }
         },
       ),
-  }),
-})
+  },
+}

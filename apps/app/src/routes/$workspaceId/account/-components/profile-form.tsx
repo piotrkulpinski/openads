@@ -5,6 +5,7 @@ import { Button } from "@openads/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Stack } from "@openads/ui/stack"
+import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "@tanstack/react-router"
 import { ImageUpIcon, Trash2Icon } from "lucide-react"
 import { type ChangeEvent, type ComponentProps, useRef, useState } from "react"
@@ -16,8 +17,7 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { logger } from "~/lib/logger"
-import type { RouterOutputs } from "~/lib/trpc"
-import { trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type AvatarState = {
   file: File | null
@@ -31,7 +31,6 @@ type AccountProfileFormProps = ComponentProps<"div"> & {
 }
 
 export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) => {
-  const trpcUtils = trpc.useUtils()
   const router = useRouter()
   const handleError = useMutationErrorHandler()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
@@ -48,16 +47,20 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
     isRemoved: !user.image,
   })
 
-  const uploadImage = trpc.storage.uploadUserImage.useMutation({
-    onError: error => {
-      logger.error("storage.uploadUserImage failed", { err: error })
-      toast.error("Failed to upload image")
-    },
-  })
+  const uploadImage = useMutation(
+    orpc.storage.uploadUserImage.mutationOptions({
+      onError: error => {
+        logger.error("storage.uploadUserImage failed", { err: error })
+        toast.error("Failed to upload image")
+      },
+    }),
+  )
 
-  const updateProfile = trpc.user.update.useMutation({
-    onError: error => handleError({ error, form }),
-  })
+  const updateProfile = useMutation(
+    orpc.user.update.mutationOptions({
+      onError: error => handleError({ error, form }),
+    }),
+  )
 
   const isSubmitting = uploadImage.isPending || updateProfile.isPending
 
@@ -127,7 +130,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
       toast.success("Profile updated")
 
       // Invalidate the cache
-      await trpcUtils.user.me.invalidate()
+      await queryClient.invalidateQueries({ queryKey: orpc.user.me.key() })
 
       // Invalidate the route
       await router.invalidate()

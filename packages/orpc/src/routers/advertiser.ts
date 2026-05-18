@@ -1,24 +1,22 @@
 import { AdStatus, SubscriptionStatus } from "@openads/db/client"
-import { TRPCError } from "@trpc/server"
+import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { router, workspaceProcedure } from "../index"
-
-const advertiserIdSchema = z.object({
-  advertiserId: z.string().min(1),
-})
+import { authProcedure, workspaceMw } from "../index"
 
 const isActiveSubscriptionStatus = (status: SubscriptionStatus) => {
   return status === SubscriptionStatus.Active || status === SubscriptionStatus.Trialing
 }
 
-export const advertiserRouter = router({
-  getAll: workspaceProcedure
+export const advertiserRouter = {
+  getAll: authProcedure
     .input(
       z.object({
+        workspaceId: z.string(),
         query: z.string().trim().optional(),
       }),
     )
-    .query(async ({ ctx: { db, workspace }, input: { query } }) => {
+    .use(workspaceMw)
+    .handler(async ({ context: { db, workspace }, input: { query } }) => {
       const search = query?.trim()
 
       const advertisers = await db.advertiser.findMany({
@@ -117,9 +115,15 @@ export const advertiserRouter = router({
         })
     }),
 
-  getById: workspaceProcedure
-    .input(advertiserIdSchema)
-    .query(async ({ ctx: { db, workspace }, input: { advertiserId } }) => {
+  getById: authProcedure
+    .input(
+      z.object({
+        workspaceId: z.string(),
+        advertiserId: z.string().min(1),
+      }),
+    )
+    .use(workspaceMw)
+    .handler(async ({ context: { db, workspace }, input: { advertiserId } }) => {
       const since = new Date()
       since.setUTCHours(0, 0, 0, 0)
       since.setUTCDate(since.getUTCDate() - 29)
@@ -162,7 +166,7 @@ export const advertiserRouter = router({
       })
 
       if (!advertiser) {
-        throw new TRPCError({ code: "NOT_FOUND" })
+        throw new ORPCError("NOT_FOUND")
       }
 
       const subscriptions = advertiser.subscriptions.filter(subscription => subscription.ad)
@@ -242,4 +246,4 @@ export const advertiserRouter = router({
         ads,
       }
     }),
-})
+}

@@ -2,6 +2,7 @@ import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { CheckIcon, MessageSquareIcon, XIcon } from "lucide-react"
 import { useState } from "react"
@@ -11,13 +12,13 @@ import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H4, H5 } from "~/components/ui/heading"
 import { formatTierPrice } from "~/lib/currency"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 export const Route = createFileRoute("/$workspaceId/ads/$adId")({
-  loader: async ({ context: { trpc: utils }, params: { workspaceId, adId } }) => {
+  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, adId } }) => {
     const [ad, fields] = await Promise.all([
-      utils.ad.getById.fetch({ workspaceId, adId }),
-      utils.field.getAll.fetch({ workspaceId }),
+      queryClient.fetchQuery(orpc.ad.getById.queryOptions({ input: { workspaceId, adId } })),
+      queryClient.fetchQuery(orpc.field.getAll.queryOptions({ input: { workspaceId } })),
     ])
     if (!ad) throw notFound()
     return { ad, fields }
@@ -32,31 +33,42 @@ type FieldList = RouterOutputs["field"]["getAll"]
 function AdReviewPage() {
   const { workspaceId, adId } = Route.useParams()
   const { ad: initial, fields } = Route.useLoaderData()
-  const utils = trpc.useUtils()
 
-  const adQuery = trpc.ad.getById.useQuery({ workspaceId, adId }, { initialData: initial })
+  const adQuery = useQuery(
+    orpc.ad.getById.queryOptions({ input: { workspaceId, adId }, initialData: initial }),
+  )
   const ad = (adQuery.data ?? initial) as Ad
 
   const [note, setNote] = useState("")
 
   const onMutate = (action: string) => async () => {
     toast.success(`Ad ${action}`)
-    await utils.ad.getById.invalidate({ workspaceId, adId })
-    await utils.ad.getAll.invalidate({ workspaceId })
+    await queryClient.invalidateQueries({
+      queryKey: orpc.ad.getById.key({ input: { workspaceId, adId } }),
+    })
+    await queryClient.invalidateQueries({
+      queryKey: orpc.ad.getAll.key({ input: { workspaceId } }),
+    })
   }
 
-  const approve = trpc.ad.approve.useMutation({
-    onSuccess: onMutate("approved"),
-    onError: e => toast.error(e.message),
-  })
-  const reject = trpc.ad.reject.useMutation({
-    onSuccess: onMutate("rejected"),
-    onError: e => toast.error(e.message),
-  })
-  const requestChanges = trpc.ad.requestChanges.useMutation({
-    onSuccess: onMutate("changes requested"),
-    onError: e => toast.error(e.message),
-  })
+  const approve = useMutation(
+    orpc.ad.approve.mutationOptions({
+      onSuccess: onMutate("approved"),
+      onError: e => toast.error(e.message),
+    }),
+  )
+  const reject = useMutation(
+    orpc.ad.reject.mutationOptions({
+      onSuccess: onMutate("rejected"),
+      onError: e => toast.error(e.message),
+    }),
+  )
+  const requestChanges = useMutation(
+    orpc.ad.requestChanges.mutationOptions({
+      onSuccess: onMutate("changes requested"),
+      onError: e => toast.error(e.message),
+    }),
+  )
 
   const requireNote = () => {
     if (!note.trim()) {
