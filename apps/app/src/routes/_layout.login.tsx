@@ -9,8 +9,8 @@ export const Route = createFileRoute("/_layout/login")({
     callbackURL: z.string().optional(),
   }),
 
-  loader: async ({ context: { trpc } }) => {
-    const session = await trpc.auth.getSession.fetch()
+  loader: async ({ context: { orpc, queryClient } }) => {
+    const session = await queryClient.fetchQuery(orpc.auth.getSession.queryOptions())
 
     if (session?.user) {
       throw redirect({ to: "/" })

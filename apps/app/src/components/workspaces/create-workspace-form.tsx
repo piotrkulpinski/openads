@@ -1,13 +1,12 @@
 import { isValidUrl, slugify } from "@dirstack/utils"
 import { workspaceSchema } from "@openads/db/schema"
-import type { AppRouter } from "@openads/trpc/router"
 import { Avatar, AvatarImage } from "@openads/ui/avatar"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Stack } from "@openads/ui/stack"
-import type { TRPCClientErrorLike } from "@trpc/client"
+import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
@@ -16,7 +15,7 @@ import { useComputedField } from "~/hooks/use-computed-field"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { getWebsiteFavicon } from "~/lib/helpers"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
@@ -31,7 +30,6 @@ export const CreateWorkspaceForm = ({
   onSuccess,
   ...props
 }: CreateWorkspaceFormProps) => {
-  const utils = trpc.useUtils()
   const handleError = useMutationErrorHandler()
 
   const form = useZodForm(workspaceSchema, {
@@ -45,7 +43,7 @@ export const CreateWorkspaceForm = ({
     toast.success("Workspace created successfully")
 
     // Invalidate the workspaces cache
-    await utils.workspace.getAll.invalidate()
+    await queryClient.invalidateQueries({ queryKey: orpc.workspace.getAll.key() })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
@@ -54,14 +52,12 @@ export const CreateWorkspaceForm = ({
     onSuccess?.(data)
   }
 
-  const onError = (error: TRPCClientErrorLike<AppRouter>) => {
-    handleError({ error, form })
-  }
-
-  const { mutate: createWorkspace, isPending } = trpc.workspace.create.useMutation({
-    onSuccess: onSuccessHandler,
-    onError,
-  })
+  const { mutate: createWorkspace, isPending } = useMutation(
+    orpc.workspace.create.mutationOptions({
+      onSuccess: onSuccessHandler,
+      onError: error => handleError({ error, form }),
+    }),
+  )
 
   // Set the slug based on the name
   useComputedField({

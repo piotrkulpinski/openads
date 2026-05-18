@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Stack } from "@openads/ui/stack"
+import { useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { MoreVerticalIcon, Trash2 } from "lucide-react"
 import type { ComponentProps } from "react"
@@ -15,7 +16,7 @@ import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
 import { formatInterval, formatPrice, intervalRank } from "~/lib/currency"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type Tier = RouterOutputs["tier"]["getAll"][number]
 
@@ -25,7 +26,7 @@ type TierItemProps = ComponentProps<"div"> & {
 }
 
 // Picks the smallest-interval active price as the headline for the list row.
-// `tier.prices` is already filtered to active rows by the trpc getAll query.
+// `tier.prices` is already filtered to active rows by the tier.getAll query.
 const headlinePrice = (prices: Tier["prices"]): Tier["prices"][number] | undefined => {
   if (prices.length === 0) return undefined
   return [...prices].sort((a, b) => {
@@ -46,17 +47,19 @@ const renderPriceLine = (tier: Tier): string => {
 }
 
 const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => {
-  const utils = trpc.useUtils()
-
-  const { mutate, isPending } = trpc.tier.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Tier archived")
-      utils.tier.getAll.invalidate({ workspaceId })
-    },
-    onError: ({ message }) => {
-      toast.error(message)
-    },
-  })
+  const { mutate, isPending } = useMutation(
+    orpc.tier.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success("Tier archived")
+        queryClient.invalidateQueries({
+          queryKey: orpc.tier.getAll.key({ input: { workspaceId } }),
+        })
+      },
+      onError: ({ message }) => {
+        toast.error(message)
+      },
+    }),
+  )
 
   return (
     <div

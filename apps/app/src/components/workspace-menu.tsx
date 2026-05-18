@@ -11,27 +11,30 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { Check, ChevronDownIcon, Plus } from "lucide-react"
 import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
-import { trpc, trpcUtils } from "~/lib/trpc"
+import { orpc, queryClient } from "~/lib/orpc"
 import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 export const WorkspaceMenu = () => {
   const activeWorkspace = useWorkspace()
   const navigate = useNavigate()
 
-  const { data: workspaces, isFetching } = trpc.workspace.getAll.useQuery(undefined, {
-    initialData: [],
-  })
+  const { data: workspaces, isFetching } = useQuery(
+    orpc.workspace.getAll.queryOptions({ initialData: [] }),
+  )
 
-  const changeDefaultWorkspace = trpc.workspace.changeDefault.useMutation({
-    onSuccess: () => {
-      trpcUtils.user.me.invalidate()
-    },
-  })
+  const changeDefaultWorkspace = useMutation(
+    orpc.workspace.changeDefault.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.user.me.key() })
+      },
+    }),
+  )
 
   const changeWorkspace = (workspace?: Workspace) => {
     if (!workspace || workspace.slug === activeWorkspace.slug) return

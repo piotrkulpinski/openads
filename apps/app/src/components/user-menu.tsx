@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
+import { useQuery } from "@tanstack/react-query"
 import { Link, useRouter } from "@tanstack/react-router"
 import {
   BookOpenIcon,
@@ -21,14 +22,14 @@ import type { ComponentProps } from "react"
 import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { authClient } from "~/lib/auth"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
   const router = useRouter()
   const workspace = useWorkspace()
   const { open: openSupport } = useSupport()
 
-  const { data: user, isFetching } = trpc.user.me.useQuery()
+  const { data: user, isFetching } = useQuery(orpc.user.me.queryOptions())
 
   if (!user || isFetching) {
     return <NavButtonSkeleton />

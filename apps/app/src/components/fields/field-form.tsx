@@ -1,22 +1,20 @@
 import { FieldType } from "@openads/db/client"
 import { type FieldSchema, fieldSchema } from "@openads/db/schema"
-import type { AppRouter } from "@openads/trpc/router"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Switch } from "@openads/ui/switch"
+import { useMutation } from "@tanstack/react-query"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
-import type { TRPCClientErrorLike } from "@trpc/client"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
-import type { RouterOutputs } from "~/lib/trpc"
-import { trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 import type { router } from "~/main"
 
 type FieldFormProps = HTMLAttributes<HTMLFormElement> & {
@@ -48,7 +46,6 @@ export const FieldForm = ({
   onSuccess: onSuccessCallback,
   ...props
 }: FieldFormProps) => {
-  const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
   const isEditing = !!field?.id
@@ -65,17 +62,19 @@ export const FieldForm = ({
 
     toast.success(`Field ${isEditing ? "updated" : "created"} successfully`)
 
-    await utils.field.getAll.invalidate({ workspaceId })
+    await queryClient.invalidateQueries({
+      queryKey: orpc.field.getAll.key({ input: { workspaceId } }),
+    })
     form.reset({}, { keepValues: true })
     onSuccessCallback?.(data)
   }
 
-  const onError = (error: TRPCClientErrorLike<AppRouter>) => {
+  const onError = (error: unknown) => {
     handleError({ error, form })
   }
 
-  const createField = trpc.field.create.useMutation({ onSuccess, onError })
-  const updateField = trpc.field.update.useMutation({ onSuccess, onError })
+  const createField = useMutation(orpc.field.create.mutationOptions({ onSuccess, onError }))
+  const updateField = useMutation(orpc.field.update.mutationOptions({ onSuccess, onError }))
   const isPending = createField.isPending || updateField.isPending
 
   const onSubmit = (data: FieldSchema) => {

@@ -5,8 +5,10 @@ import { Sidebar, SidebarSkeleton } from "~/components/sidebar"
 import { WorkspaceContext } from "~/contexts/workspace-context"
 
 export const Route = createFileRoute("/$workspaceId")({
-  beforeLoad: async ({ context: { trpc }, params: { workspaceId } }) => {
-    const workspace = await trpc.workspace.getById.fetch({ id: workspaceId })
+  beforeLoad: async ({ context: { orpc, queryClient }, params: { workspaceId } }) => {
+    const workspace = await queryClient.fetchQuery(
+      orpc.workspace.getById.queryOptions({ input: { id: workspaceId } }),
+    )
 
     if (!workspace) {
       throw notFound()

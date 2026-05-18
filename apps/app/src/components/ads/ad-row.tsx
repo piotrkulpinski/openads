@@ -4,7 +4,7 @@ import { Stack } from "@openads/ui/stack"
 import { Link } from "@tanstack/react-router"
 import type { ComponentProps } from "react"
 import { H5 } from "~/components/ui/heading"
-import type { RouterOutputs } from "~/lib/trpc"
+import type { RouterOutputs } from "~/lib/orpc"
 
 type Ad = RouterOutputs["ad"]["getAll"][number]
 

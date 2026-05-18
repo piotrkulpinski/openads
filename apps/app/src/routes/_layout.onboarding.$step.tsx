@@ -1,4 +1,5 @@
 import { ONBOARDING_STEPS } from "@openads/utils"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, notFound } from "@tanstack/react-router"
 import { ArrowRightIcon, LoaderIcon } from "lucide-react"
 import { z } from "zod"
@@ -10,7 +11,7 @@ import { StripeConnectButtons } from "~/components/stripe/stripe-connect-buttons
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 import { siteConfig } from "~/config/site"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const Route = createFileRoute("/_layout/onboarding/$step")({
   params: {
@@ -35,7 +36,12 @@ function OnboardingStepPage() {
   const { workspaceId } = Route.useSearch()
   const { continueTo } = useOnboardingProgress()
 
-  const query = trpc.workspace.getById.useQuery({ id: workspaceId! }, { enabled: !!workspaceId })
+  const query = useQuery(
+    orpc.workspace.getById.queryOptions({
+      input: { id: workspaceId! },
+      enabled: !!workspaceId,
+    }),
+  )
 
   switch (step) {
     case "welcome":

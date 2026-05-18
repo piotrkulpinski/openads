@@ -3,8 +3,10 @@ import { FieldForm } from "~/components/fields/field-form"
 import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspaceId/fields/$fieldId")({
-  loader: async ({ context: { trpc }, params: { workspaceId, fieldId } }) => {
-    const field = await trpc.field.getById.fetch({ id: fieldId, workspaceId })
+  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, fieldId } }) => {
+    const field = await queryClient.fetchQuery(
+      orpc.field.getById.queryOptions({ input: { id: fieldId, workspaceId } }),
+    )
 
     if (!field) {
       throw notFound()

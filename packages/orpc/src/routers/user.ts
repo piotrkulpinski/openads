@@ -1,8 +1,8 @@
 import { userSchema } from "@openads/db/schema"
-import { authProcedure, router } from "../index"
+import { authProcedure } from "../index"
 
-export const userRouter = router({
-  me: authProcedure.query(async ({ ctx: { db, user } }) => {
+export const userRouter = {
+  me: authProcedure.handler(async ({ context: { db, user } }) => {
     return await db.user.findUniqueOrThrow({
       where: { id: user.id },
       include: { defaultWorkspace: true },
@@ -11,10 +11,10 @@ export const userRouter = router({
 
   update: authProcedure
     .input(userSchema)
-    .mutation(async ({ ctx: { db, user }, input: { ...data } }) => {
+    .handler(async ({ context: { db, user }, input: { ...data } }) => {
       return db.user.update({
         where: { id: user.id },
         data,
       })
     }),
-})
+}

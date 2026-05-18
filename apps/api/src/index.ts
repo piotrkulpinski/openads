@@ -1,5 +1,9 @@
-import { trpcServer } from "@hono/trpc-server"
-import { appRouter } from "@openads/trpc/router"
+import { appRouter, publicRouter } from "@openads/orpc/router"
+import { OpenAPIHandler } from "@orpc/openapi/fetch"
+import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins"
+import { RPCHandler } from "@orpc/server/fetch"
+import { ZodSmartCoercionPlugin } from "@orpc/zod"
+import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4"
 import { Hono } from "hono"
 import { showRoutes } from "hono/dev"
 import { createContext } from "~/context"
@@ -11,7 +15,6 @@ import { stripeWebhookRoute } from "~/routes/webhooks/stripe"
 import { auth } from "~/services/auth"
 import { logger } from "~/services/logger"
 import { loggerMiddleware } from "./middleware/logger"
-import { v1Route } from "./routes/v1"
 
 const app = new Hono({
   strict: false,
@@ -23,37 +26,86 @@ app.get("/", c => c.text("OpenAds API"))
 app.use("*", loggerMiddleware)
 app.use("*", corsMiddleware)
 
-// TRPC
-app.use(
-  "/trpc/*",
-  trpcServer({
-    router: appRouter,
-    createContext,
-    responseMeta: ({ info, errors }) => {
-      const cacheable =
-        errors.length === 0 &&
-        info?.type === "query" &&
-        info.calls.every(c => c.path === "ad.public.getForPlacement")
+const rpcHandler = new RPCHandler(appRouter)
 
-      if (!cacheable) return {}
+const restHandler = new OpenAPIHandler(publicRouter, {
+  plugins: [
+    new ZodSmartCoercionPlugin(),
+    new OpenAPIReferencePlugin({
+      docsPath: "/docs",
+      specPath: "/openapi.json",
+      schemaConverters: [new ZodToJsonSchemaConverter()],
+      specGenerateOptions: {
+        info: {
+          title: "OpenAds API",
+          version: "1.0.0",
+          description:
+            "Public surface of the OpenAds platform. Consumed by `@openads/sdk` and `@openads/react`.",
+        },
+        servers: [{ url: `${env.APP_URL.replace(/\/$/, "")}/v1` }],
+      },
+    }),
+  ],
+})
 
-      return {
-        headers: new Headers({
-          "Cache-Control": "public, max-age=5, s-maxage=15, stale-while-revalidate=60",
-        }),
-      }
-    },
-  }),
-)
+// Internal RPC surface: typed client used by apps/app.
+app.use("/rpc/*", async (c, next) => {
+  const context = await createContext({ headers: c.req.raw.headers })
+  const { matched, response } = await rpcHandler.handle(c.req.raw, {
+    prefix: "/rpc",
+    context,
+  })
+
+  if (matched) {
+    return c.newResponse(response.body, response)
+  }
+
+  await next()
+})
+
+const adsCurrentPath = /^\/v1\/workspaces\/[^/]+\/ads\/current$/
+
+// Public REST + OpenAPI surface (`/v1/openapi.json`, `/v1/docs`, plus the routed
+// procedures themselves). Consumed by `@openads/sdk` and any third-party API
+// integrators.
+app.use("/v1/*", async (c, next) => {
+  const context = await createContext({ headers: c.req.raw.headers })
+  const { matched, response } = await restHandler.handle(c.req.raw, {
+    prefix: "/v1",
+    context,
+  })
+
+  if (!matched) {
+    await next()
+    return
+  }
+
+  // Cache the public ads-serving endpoint at the edge — short max-age plus a
+  // longer stale-while-revalidate window so a brief publisher traffic spike
+  // can't hammer the API.
+  if (
+    c.req.method === "GET" &&
+    adsCurrentPath.test(new URL(c.req.url).pathname) &&
+    response.status >= 200 &&
+    response.status < 300
+  ) {
+    const headers = new Headers(response.headers)
+    headers.set("Cache-Control", "public, max-age=5, s-maxage=15, stale-while-revalidate=60")
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    })
+  }
+
+  return c.newResponse(response.body, response)
+})
 
 // Auth
 app.on(["POST", "GET"], "/api/auth/**", c => auth.handler(c.req.raw))
 
 // Browser log ingestion
 app.route("/log", logRoute)
-
-// Public SDK API
-app.route("/v1", v1Route)
 
 // Stripe webhooks
 app.route("/webhooks/stripe", stripeWebhookRoute)

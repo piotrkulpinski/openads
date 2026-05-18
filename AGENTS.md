@@ -13,13 +13,13 @@ The model is based on OpenAlternative's existing setup ($5k+ MRR), generalized t
 Monorepo, Bun + Turbo. Three apps and twelve packages.
 
 **Apps**
-- `apps/api` — Hono server hosting tRPC + Stripe webhooks + presigned-upload endpoints + the public `/v1` SDK API
-- `apps/app` — Publisher/advertiser dashboard (TanStack Router + tRPC)
+- `apps/api` — Hono server hosting oRPC (typed RPC at `/rpc` + REST + OpenAPI at `/v1`) + Stripe webhooks + presigned-upload endpoints. Scalar API docs at `/v1/docs`; OpenAPI 3.1 spec at `/v1/openapi.json`
+- `apps/app` — Publisher/advertiser dashboard (TanStack Router + oRPC typed client via `@orpc/tanstack-query`)
 - `apps/landing` — Marketing site (TanStack Start, Cloudflare Workers)
 
 **Packages**
 - `@openads/db` — Prisma schema (`relationMode = "prisma"`, no migrations folder — uses `db:push`)
-- `@openads/trpc` — Routers, procedures (`authProcedure`, `workspaceProcedure`, `connectEnabledWorkspaceProcedure`, `adProcedure`), shared serving algorithm
+- `@openads/orpc` — Routers + procedure builders (`publicProcedure`, `authProcedure`) + dependent-context middlewares (`workspaceMw`, `connectEnabledMw`, `adMw`), shared ad-serving algorithm. Exports `appRouter` (internal RPC, mounted at `/rpc`) and `publicRouter` (REST + OpenAPI, mounted at `/v1`)
 - `@openads/auth` — better-auth (Google OAuth)
 - `@openads/stripe` — Stripe client + product/checkout/subscription helpers
 - `@openads/emails` — AutoSend client + React Email v6 templates
@@ -120,9 +120,9 @@ The following are explicit deferrals. Don't build them without confirming a scop
   local behavior is intentionally domain-specific.
 - **Naming**: PascalCase for React components, `use-` prefix for hooks, camelCase for utilities, kebab-case filenames
 - **Types**: use `@t3-oss/env-core` for env vars; prefer explicit types over `any`
-- **Error handling**: try/catch for async operations; throw descriptive `TRPCError` from procedures; pass errors to the logger as `{ err }` (see Logging)
+- **Error handling**: try/catch for async operations; throw descriptive `ORPCError` (with one of the standard codes like `UNAUTHORIZED` / `FORBIDDEN` / `NOT_FOUND` / `PRECONDITION_FAILED`) from procedures; pass errors to the logger as `{ err }` (see Logging). Form-validation errors go through the typed `INPUT_VALIDATION_FAILED` / `CONFLICT_FIELD` errors defined on the base builder in `packages/orpc/src/index.ts` so `apps/app`'s `useMutationErrorHandler` can surface them on the form.
 - **React**: functional components with hooks; named exports preferred; avoid default exports
-- **tRPC**: procedures use Zod schemas; auth via `authProcedure` / `workspaceProcedure` / `connectEnabledWorkspaceProcedure` / `adProcedure`; public surface lives under `<router>.public.<procedure>`
+- **oRPC**: procedures use Zod schemas. Auth via `authProcedure` (adds `user` to context). Workspace-scoped procedures declare `workspaceId` in their `.input()` schema and chain `.use(workspaceMw)` (also `connectEnabledMw` for routes that hit Stripe Connect). Ad-scoped procedures declare both `workspaceId` and `adId` and chain `.use(adMw)`. oRPC only allows ONE `.input()` per procedure — don't try to extend `workspaceMw` with more input; declare the full input shape up front. Public REST endpoints add `.route({ method, path, tags, summary })` and `.output(schema)` and are re-exported under `publicRouter` in `packages/orpc/src/router.ts`.
 - **Email templates** (`packages/emails/src/templates/*.tsx`): **every new template must start with `/** @jsxImportSource react */`** — the apps/api Hono JSX config otherwise tries to compile React JSX as Hono JSX and fails (see Operational gotchas)
 - **Commits**: Conventional Commits enforced by commitlint (`feat:`, `fix:`, `refactor:`, `chore:`)
 
@@ -159,10 +159,12 @@ These all bit during earlier iterations; they will bite the next agent the same 
 - **Stripe API version**: Pinned at `2026-04-22.dahlia` in `packages/stripe/src/index.ts`. At this version `current_period_start` / `current_period_end` are **not** on `Subscription` directly — they live on `subscription.items.data[0].current_period_*`. Both the webhook handler and the AdForm submission path read them via items.
 - **JSX cross-package leakage**: `apps/api` sets `jsxImportSource: "hono/jsx"`. When it type-checks transitively through `@openads/emails`, the email templates (React JSX) get compiled with Hono's runtime and fail. Workarounds in place:
   - Pragma `/** @jsxImportSource react */` at the top of every email template `.tsx` file
-  - `"jsx": "react-jsx"` in `packages/trpc/tsconfig.json`
+  - `"jsx": "react-jsx"` in `packages/orpc/tsconfig.json`
   - `"types": ["node"]` in `packages/emails/tsconfig.json` and `packages/s3/tsconfig.json`
   - **Apply the pragma to every new email template.** Real fix is dropping `hono/jsx` from apps/api (we don't render Hono JSX) — a future cleanup.
 - **SSH push to GitHub timing out**: Common on restrictive networks. Workaround is SSH-over-443 (`Host github.com / Hostname ssh.github.com / Port 443 / User git` in `~/.ssh/config`) or temporarily switch to HTTPS remote.
 - **React Email v6**: imports come from `"react-email"` (single package), **not** `@react-email/components` (v5 legacy). Preview server is `@react-email/ui`, invoked via `email dev --dir src/templates` (the `--dir` flag is required because templates aren't in the default `./emails` folder).
 - **AutoSend** is the email provider (not Resend). Used by `apps/landing` for the waitlist and by `@openads/emails` for all transactional. Env vars: `AUTOSEND_API_KEY`, `AUTOSEND_FROM_EMAIL`, `AUTOSEND_FROM_NAME`, plus `AUTOSEND_WAITLIST_LIST_ID` in landing only.
-- **Public tRPC procedures**: must use `publicProcedure` and tolerate cross-origin requests. CORS is wired in `apps/api/src/index.ts`. No API key auth required for read endpoints (ads are public) or for impression/click tracking.
+- **Public REST procedures**: live in `publicRouter` (`packages/orpc/src/router.ts`) and are served by the `OpenAPIHandler` mounted at `/v1`. They use `publicProcedure` (no auth) and carry `.route({ method, path, tags })` + `.output(schema)` so the OpenAPI spec auto-generates correctly. The `ZodSmartCoercionPlugin` parses query strings into Zod-typed input (no manual `z.coerce` needed in the schema). CORS is wired permissively for `/v1/*` in `apps/api/src/middleware/cors.ts`. No API key auth required for read endpoints (ads are public) or for impression/click tracking. The `GET /v1/workspaces/{slug}/ads/current` response gets a 5s edge-cache header set in `apps/api/src/index.ts`.
+- **Internal RPC procedures**: live in `appRouter` (everything under auth, workspace, tier, field, ad, advertiser, stripe, storage, onboarding, user) and are served by `RPCHandler` mounted at `/rpc`. `apps/app` calls them via `@orpc/client` + `@orpc/tanstack-query` (`orpc.foo.bar.queryOptions({ input })` / `mutationOptions({...})`).
+- **OpenAPI surface**: spec generated from the `publicRouter` and served at `/v1/openapi.json`; Scalar UI at `/v1/docs`. Both are wired via `OpenAPIReferencePlugin` inside `apps/api/src/index.ts`. Touching `.input()` / `.output()` / `.route()` on a public procedure regenerates the spec on the next request — no separate build step.

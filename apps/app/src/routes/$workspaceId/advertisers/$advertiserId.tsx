@@ -10,6 +10,7 @@ import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { ExternalLinkIcon } from "lucide-react"
 import type { ComponentProps } from "react"
@@ -18,7 +19,7 @@ import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5 } from "~/components/ui/heading"
 import { formatTierPrice } from "~/lib/currency"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, type RouterOutputs } from "~/lib/orpc"
 
 type Advertiser = RouterOutputs["advertiser"]["getById"]
 type AdvertiserAd = Advertiser["ads"][number]
@@ -126,9 +127,11 @@ const AdvertiserDetailPage = () => {
   const { workspaceId, advertiserId } = Route.useParams()
   const initial = Route.useLoaderData()
 
-  const advertiserQuery = trpc.advertiser.getById.useQuery(
-    { workspaceId, advertiserId },
-    { initialData: initial },
+  const advertiserQuery = useQuery(
+    orpc.advertiser.getById.queryOptions({
+      input: { workspaceId, advertiserId },
+      initialData: initial,
+    }),
   )
 
   return (
@@ -198,8 +201,10 @@ const AdvertiserDetailPage = () => {
 }
 
 export const Route = createFileRoute("/$workspaceId/advertisers/$advertiserId")({
-  loader: async ({ context: { trpc: utils }, params: { workspaceId, advertiserId } }) => {
-    return await utils.advertiser.getById.fetch({ workspaceId, advertiserId })
+  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, advertiserId } }) => {
+    return await queryClient.fetchQuery(
+      orpc.advertiser.getById.queryOptions({ input: { workspaceId, advertiserId } }),
+    )
   },
 
   component: AdvertiserDetailPage,

@@ -6,10 +6,11 @@ import { useEffect } from "react"
 import { Toaster } from "~/components/toaster"
 import { siteConfig } from "~/config/site"
 import { env } from "~/env"
-import type { trpcUtils } from "~/lib/trpc"
+import type { orpc, queryClient } from "~/lib/orpc"
 
 export type RouterAppContext = {
-  trpc: typeof trpcUtils
+  orpc: typeof orpc
+  queryClient: typeof queryClient
 }
 
 // Only `/embed` is intended to be framed. Other routes must refuse to render
@@ -49,7 +50,7 @@ function RootComponent() {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  beforeLoad: async ({ context: { trpc }, location: { pathname, searchStr } }) => {
+  beforeLoad: async ({ context: { orpc, queryClient }, location: { pathname, searchStr } }) => {
     if (
       pathname === "/login" ||
       pathname === "/embed" ||
@@ -59,7 +60,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       return
     }
 
-    const session = await trpc.auth.getSession.fetch()
+    const session = await queryClient.fetchQuery(orpc.auth.getSession.queryOptions())
 
     if (!session?.user) {
       const callbackURL = new URL(pathname + searchStr, siteConfig.url).toString()

@@ -4,6 +4,7 @@ import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Stack } from "@openads/ui/stack"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { SearchIcon, UsersIcon, XIcon } from "lucide-react"
 import { type ComponentProps, useState } from "react"
@@ -11,7 +12,7 @@ import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5 } from "~/components/ui/heading"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, type RouterOutputs } from "~/lib/orpc"
 
 type Advertiser = RouterOutputs["advertiser"]["getAll"][number]
 
@@ -122,10 +123,14 @@ const AdvertisersIndexPage = () => {
   const { workspaceId } = Route.useParams()
   const [search, setSearch] = useState("")
   const query = search.trim()
-  const advertisersQuery = trpc.advertiser.getAll.useQuery({
-    workspaceId,
-    query: query.length > 0 ? query : undefined,
-  })
+  const advertisersQuery = useQuery(
+    orpc.advertiser.getAll.queryOptions({
+      input: {
+        workspaceId,
+        query: query.length > 0 ? query : undefined,
+      },
+    }),
+  )
 
   return (
     <>

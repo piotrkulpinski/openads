@@ -1,12 +1,13 @@
 import { Button } from "@openads/ui/button"
 import { Skeleton } from "@openads/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { LayersIcon, PlusIcon } from "lucide-react"
 import { QueryCell } from "~/components/query-cell"
 import { TierItem } from "~/components/tiers/tier-item"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 export const Route = createFileRoute("/$workspaceId/tiers/")({
   component: TiersIndexPage,
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/$workspaceId/tiers/")({
 
 function TiersIndexPage() {
   const { workspaceId } = Route.useParams()
-  const tiersQuery = trpc.tier.getAll.useQuery({ workspaceId })
+  const tiersQuery = useQuery(orpc.tier.getAll.queryOptions({ input: { workspaceId } }))
 
   return (
     <>

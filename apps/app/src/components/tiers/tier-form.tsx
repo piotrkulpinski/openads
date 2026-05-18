@@ -1,6 +1,5 @@
 import { BillingInterval } from "@openads/db/client"
 import { tierPriceSchema, tierSchema } from "@openads/db/schema"
-import type { AppRouter } from "@openads/trpc/router"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
@@ -9,8 +8,8 @@ import { Input } from "@openads/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
+import { useMutation } from "@tanstack/react-query"
 import { type NavigateOptions, useNavigate } from "@tanstack/react-router"
-import type { TRPCClientErrorLike } from "@trpc/client"
 import { PlusIcon, TrashIcon } from "lucide-react"
 import type { HTMLAttributes } from "react"
 import { useFieldArray } from "react-hook-form"
@@ -23,8 +22,7 @@ import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
-import type { RouterOutputs } from "~/lib/trpc"
-import { trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 import type { router } from "~/main"
 
 // In-form representation of an initial price row. The visible field is `amountWhole`
@@ -66,7 +64,6 @@ export const TierForm = ({
   onSuccess: onSuccessCallback,
   ...props
 }: TierFormProps) => {
-  const utils = trpc.useUtils()
   const navigate = useNavigate()
   const handleError = useMutationErrorHandler()
   const isEditing = !!tier?.id
@@ -114,28 +111,38 @@ export const TierForm = ({
   const afterSuccess = async () => {
     if (nextUrl) navigate(nextUrl)
     toast.success(`Tier ${isEditing ? "updated" : "created"} successfully`)
-    await utils.tier.getAll.invalidate({ workspaceId })
-    if (tier?.id) await utils.tier.getById.invalidate({ id: tier.id, workspaceId })
+    await queryClient.invalidateQueries({
+      queryKey: orpc.tier.getAll.key({ input: { workspaceId } }),
+    })
+    if (tier?.id) {
+      await queryClient.invalidateQueries({
+        queryKey: orpc.tier.getById.key({ input: { id: tier.id, workspaceId } }),
+      })
+    }
     form.reset({}, { keepValues: true })
   }
 
-  const onError = (error: TRPCClientErrorLike<AppRouter>) => {
+  const onError = (error: unknown) => {
     handleError({ error, form })
   }
 
-  const createTier = trpc.tier.create.useMutation({
-    onSuccess: async data => {
-      await afterSuccess()
-      onSuccessCallback?.(data)
-    },
-    onError,
-  })
-  const updateTier = trpc.tier.update.useMutation({
-    onSuccess: async () => {
-      await afterSuccess()
-    },
-    onError,
-  })
+  const createTier = useMutation(
+    orpc.tier.create.mutationOptions({
+      onSuccess: async data => {
+        await afterSuccess()
+        onSuccessCallback?.(data)
+      },
+      onError,
+    }),
+  )
+  const updateTier = useMutation(
+    orpc.tier.update.mutationOptions({
+      onSuccess: async () => {
+        await afterSuccess()
+      },
+      onError,
+    }),
+  )
   const isPending = createTier.isPending || updateTier.isPending
 
   const onSubmit = (data: TierFormValues) => {

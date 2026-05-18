@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto"
 import { Prisma } from "@openads/db/client"
-import { TRPCError } from "@trpc/server"
+import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { authProcedure, router, workspaceProcedure } from "../index"
+import { authProcedure, workspaceMw } from "../index"
 
 const STRIPE_OAUTH_STATE_TTL_SECONDS = 60 * 10
 
@@ -10,8 +10,7 @@ const stripeOAuthCallbackPath = "/stripe/callback"
 
 const getStripeConnectClientId = (clientId: string | undefined) => {
   if (!clientId) {
-    throw new TRPCError({
-      code: "PRECONDITION_FAILED",
+    throw new ORPCError("PRECONDITION_FAILED", {
       message: "Stripe Connect OAuth is not configured.",
     })
   }
@@ -52,35 +51,37 @@ const resetWorkspaceStripeObjects = async (
   ])
 }
 
-export const stripeRouter = router({
-  connect: router({
-    create: workspaceProcedure.mutation(async ({ ctx: { redis, user, workspace, env } }) => {
-      const state = randomUUID()
-      await redis.set(
-        getOAuthStateKey(state),
-        JSON.stringify({ userId: user.id, workspaceId: workspace.id }),
-      )
-      await redis.expire(getOAuthStateKey(state), STRIPE_OAUTH_STATE_TTL_SECONDS)
+export const stripeRouter = {
+  connect: {
+    create: authProcedure
+      .input(z.object({ workspaceId: z.string() }))
+      .use(workspaceMw)
+      .handler(async ({ context: { redis, user, workspace, env } }) => {
+        const state = randomUUID()
+        await redis.set(
+          getOAuthStateKey(state),
+          JSON.stringify({ userId: user.id, workspaceId: workspace.id }),
+        )
+        await redis.expire(getOAuthStateKey(state), STRIPE_OAUTH_STATE_TTL_SECONDS)
 
-      const url = new URL("https://connect.stripe.com/oauth/authorize")
-      url.searchParams.set("response_type", "code")
-      url.searchParams.set("client_id", getStripeConnectClientId(env.STRIPE_CONNECT_CLIENT_ID))
-      url.searchParams.set("scope", "read_write")
-      url.searchParams.set("state", state)
-      url.searchParams.set("redirect_uri", `${env.APP_URL}${stripeOAuthCallbackPath}`)
+        const url = new URL("https://connect.stripe.com/oauth/authorize")
+        url.searchParams.set("response_type", "code")
+        url.searchParams.set("client_id", getStripeConnectClientId(env.STRIPE_CONNECT_CLIENT_ID))
+        url.searchParams.set("scope", "read_write")
+        url.searchParams.set("state", state)
+        url.searchParams.set("redirect_uri", `${env.APP_URL}${stripeOAuthCallbackPath}`)
 
-      return { url: url.toString() }
-    }),
+        return { url: url.toString() }
+      }),
 
     callback: authProcedure
       .input(z.object({ code: z.string().min(1), state: z.string().min(1) }))
-      .mutation(async ({ ctx: { db, redis, stripe, user }, input: { code, state } }) => {
+      .handler(async ({ context: { db, redis, stripe, user }, input: { code, state } }) => {
         const stateKey = getOAuthStateKey(state)
         const storedState = await redis.get<string>(stateKey)
 
         if (!storedState) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
+          throw new ORPCError("BAD_REQUEST", {
             message: "Stripe connection expired. Please try again.",
           })
         }
@@ -90,7 +91,7 @@ export const stripeRouter = router({
         const parsedState = JSON.parse(storedState) as { userId: string; workspaceId: string }
 
         if (parsedState.userId !== user.id) {
-          throw new TRPCError({ code: "FORBIDDEN" })
+          throw new ORPCError("FORBIDDEN")
         }
 
         const workspace = await db.workspace.findFirst({
@@ -98,7 +99,7 @@ export const stripeRouter = router({
         })
 
         if (!workspace) {
-          throw new TRPCError({ code: "FORBIDDEN" })
+          throw new ORPCError("FORBIDDEN")
         }
 
         const token = await stripe.oauth.token({
@@ -107,8 +108,7 @@ export const stripeRouter = router({
         })
 
         if (!token.stripe_user_id) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
+          throw new ORPCError("BAD_REQUEST", {
             message: "Stripe did not return a connected account.",
           })
         }
@@ -139,43 +139,46 @@ export const stripeRouter = router({
         return { workspaceId: workspace.id }
       }),
 
-    delete: workspaceProcedure.mutation(async ({ ctx: { db, env, workspace, stripe } }) => {
-      if (!workspace.stripeConnectId) {
-        throw new TRPCError({ code: "NOT_FOUND" })
-      }
+    delete: authProcedure
+      .input(z.object({ workspaceId: z.string() }))
+      .use(workspaceMw)
+      .handler(async ({ context: { db, env, workspace, stripe } }) => {
+        if (!workspace.stripeConnectId) {
+          throw new ORPCError("NOT_FOUND")
+        }
 
-      const activeSubscriptions = await db.subscription.count({
-        where: {
-          workspaceId: workspace.id,
-          status: { in: ["Active", "Trialing"] },
-        },
-      })
-
-      if (activeSubscriptions > 0) {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: "Cancel or resolve active advertiser subscriptions before disconnecting Stripe.",
+        const activeSubscriptions = await db.subscription.count({
+          where: {
+            workspaceId: workspace.id,
+            status: { in: ["Active", "Trialing"] },
+          },
         })
-      }
 
-      await stripe.oauth.deauthorize({
-        client_id: getStripeConnectClientId(env.STRIPE_CONNECT_CLIENT_ID),
-        stripe_user_id: workspace.stripeConnectId,
-      })
+        if (activeSubscriptions > 0) {
+          throw new ORPCError("PRECONDITION_FAILED", {
+            message:
+              "Cancel or resolve active advertiser subscriptions before disconnecting Stripe.",
+          })
+        }
 
-      await resetWorkspaceStripeObjects(db, workspace.id)
+        await stripe.oauth.deauthorize({
+          client_id: getStripeConnectClientId(env.STRIPE_CONNECT_CLIENT_ID),
+          stripe_user_id: workspace.stripeConnectId,
+        })
 
-      await db.workspace.update({
-        where: { id: workspace.id },
-        data: {
-          stripeConnectId: null,
-          stripeConnectStatus: null,
-          stripeConnectEnabled: false,
-          stripeConnectData: Prisma.JsonNull,
-        },
-      })
+        await resetWorkspaceStripeObjects(db, workspace.id)
 
-      return { success: true }
-    }),
-  }),
-})
+        await db.workspace.update({
+          where: { id: workspace.id },
+          data: {
+            stripeConnectId: null,
+            stripeConnectStatus: null,
+            stripeConnectEnabled: false,
+            stripeConnectData: Prisma.JsonNull,
+          },
+        })
+
+        return { success: true }
+      }),
+  },
+}

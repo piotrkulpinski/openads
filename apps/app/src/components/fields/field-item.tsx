@@ -8,13 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@openads/ui/dropdown-menu"
 import { Stack } from "@openads/ui/stack"
+import { useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { MoreVerticalIcon, Trash2 } from "lucide-react"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
-import { type RouterOutputs, trpc } from "~/lib/trpc"
+import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type FieldItemProps = ComponentProps<"div"> & {
   workspaceId: string
@@ -22,17 +23,19 @@ type FieldItemProps = ComponentProps<"div"> & {
 }
 
 export const FieldItem = ({ workspaceId, field, className, ...props }: FieldItemProps) => {
-  const utils = trpc.useUtils()
-
-  const { mutate, isPending } = trpc.field.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Field deleted")
-      utils.field.getAll.invalidate({ workspaceId })
-    },
-    onError: ({ message }) => {
-      toast.error(message)
-    },
-  })
+  const { mutate, isPending } = useMutation(
+    orpc.field.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success("Field deleted")
+        queryClient.invalidateQueries({
+          queryKey: orpc.field.getAll.key({ input: { workspaceId } }),
+        })
+      },
+      onError: ({ message }) => {
+        toast.error(message)
+      },
+    }),
+  )
 
   return (
     <div

@@ -7,37 +7,45 @@ import {
   createTierProduct,
   updateTierProduct,
 } from "@openads/stripe/products"
-import { TRPCError } from "@trpc/server"
+import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import {
-  connectEnabledWorkspaceProcedure,
-  publicProcedure,
-  router,
-  workspaceProcedure,
-} from "../index"
+import { authProcedure, connectEnabledMw, publicProcedure, workspaceMw } from "../index"
+
+const workspaceIdSchema = z.object({ workspaceId: z.string() })
 
 const createInputSchema = tierSchema.extend({
+  workspaceId: z.string(),
   initialPrices: z.array(tierPriceSchema).min(1, "At least one price is required"),
 })
 
-export const tierRouter = router({
-  // Read paths don't require Connect (publishers can browse what they have).
-  getAll: workspaceProcedure.query(async ({ ctx: { db }, input: { workspaceId } }) => {
-    return await db.tier.findMany({
-      where: { workspaceId },
-      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
-      include: {
-        prices: {
-          where: { isActive: true },
-          orderBy: [{ interval: "asc" }, { amount: "asc" }],
-        },
-      },
-    })
-  }),
+const updateInputSchema = tierSchema
+  .partial()
+  .extend(idSchema.extend({ workspaceId: z.string() }).shape)
 
-  getById: workspaceProcedure
-    .input(idSchema)
-    .query(async ({ ctx: { db }, input: { id, workspaceId } }) => {
+const deleteInputSchema = idSchema.extend({ workspaceId: z.string() })
+
+export const tierRouter = {
+  // Read paths don't require Connect (publishers can browse what they have).
+  getAll: authProcedure
+    .input(workspaceIdSchema)
+    .use(workspaceMw)
+    .handler(async ({ context: { db }, input: { workspaceId } }) => {
+      return await db.tier.findMany({
+        where: { workspaceId },
+        orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+        include: {
+          prices: {
+            where: { isActive: true },
+            orderBy: [{ interval: "asc" }, { amount: "asc" }],
+          },
+        },
+      })
+    }),
+
+  getById: authProcedure
+    .input(idSchema.extend({ workspaceId: z.string() }))
+    .use(workspaceMw)
+    .handler(async ({ context: { db }, input: { id, workspaceId } }) => {
       return await db.tier.findFirst({
         where: { id, workspaceId },
         include: {
@@ -48,11 +56,13 @@ export const tierRouter = router({
       })
     }),
 
-  create: connectEnabledWorkspaceProcedure
+  create: authProcedure
     .input(createInputSchema)
-    .mutation(
+    .use(workspaceMw)
+    .use(connectEnabledMw)
+    .handler(
       async ({
-        ctx: { db, stripe, workspace },
+        context: { db, stripe, workspace },
         input: { name, description, weight, isActive, order, features, initialPrices },
       }) => {
         // Create the Tier row first so we can stamp its id onto the Stripe Product metadata.
@@ -145,11 +155,13 @@ export const tierRouter = router({
 
   // Tier-level fields only. Price changes go through tierPrice.create / tierPrice.archive
   // because Stripe Prices are immutable.
-  update: connectEnabledWorkspaceProcedure
-    .input(tierSchema.partial().extend(idSchema.shape))
-    .mutation(
+  update: authProcedure
+    .input(updateInputSchema)
+    .use(workspaceMw)
+    .use(connectEnabledMw)
+    .handler(
       async ({
-        ctx: { db, stripe, workspace },
+        context: { db, stripe, workspace },
         input: { id, name, description, weight, isActive, order, features },
       }) => {
         const existing = await db.tier.findFirst({
@@ -157,7 +169,7 @@ export const tierRouter = router({
         })
 
         if (!existing) {
-          throw new TRPCError({ code: "NOT_FOUND" })
+          throw new ORPCError("NOT_FOUND")
         }
 
         // Sync Stripe Product when product-level fields change.
@@ -198,16 +210,18 @@ export const tierRouter = router({
 
   // Soft delete: archive Stripe Product + all active prices + flip Tier.isActive.
   // Existing subscriptions stay billable until they cancel naturally.
-  delete: connectEnabledWorkspaceProcedure
-    .input(idSchema)
-    .mutation(async ({ ctx: { db, stripe, workspace }, input: { id } }) => {
+  delete: authProcedure
+    .input(deleteInputSchema)
+    .use(workspaceMw)
+    .use(connectEnabledMw)
+    .handler(async ({ context: { db, stripe, workspace }, input: { id } }) => {
       const existing = await db.tier.findFirst({
         where: { id, workspaceId: workspace.id },
         include: { prices: { where: { isActive: true } } },
       })
 
       if (!existing) {
-        throw new TRPCError({ code: "NOT_FOUND" })
+        throw new ORPCError("NOT_FOUND")
       }
 
       if (existing.stripeProductId) {
@@ -234,17 +248,17 @@ export const tierRouter = router({
     }),
 
   // Public surface: consumed by the embeddable tier selector (`/embed`).
-  public: router({
+  public: {
     listForWorkspace: publicProcedure
       .input(z.object({ slug: z.string() }))
-      .query(async ({ ctx: { db }, input: { slug } }) => {
+      .handler(async ({ context: { db }, input: { slug } }) => {
         const workspace = await db.workspace.findUnique({
           where: { slug },
           select: { id: true },
         })
 
         if (!workspace) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Workspace not found." })
+          throw new ORPCError("NOT_FOUND", { message: "Workspace not found." })
         }
 
         return await db.tier.findMany({
@@ -279,26 +293,25 @@ export const tierRouter = router({
           email: z.email(),
         }),
       )
-      .mutation(async ({ ctx: { db, stripe, env }, input: { tierPriceId, email } }) => {
+      .handler(async ({ context: { db, stripe, env }, input: { tierPriceId, email } }) => {
         const tierPrice = await db.tierPrice.findFirst({
           where: { id: tierPriceId, isActive: true },
           include: { tier: { include: { workspace: true } } },
         })
 
         if (!tierPrice || !tierPrice.stripePriceId) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Price not available." })
+          throw new ORPCError("NOT_FOUND", { message: "Price not available." })
         }
 
         const { tier } = tierPrice
         const { workspace } = tier
 
         if (!tier.isActive) {
-          throw new TRPCError({ code: "NOT_FOUND", message: "Tier not available." })
+          throw new ORPCError("NOT_FOUND", { message: "Tier not available." })
         }
 
         if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
-          throw new TRPCError({
-            code: "PRECONDITION_FAILED",
+          throw new ORPCError("PRECONDITION_FAILED", {
             message: "This publisher cannot accept payments yet.",
           })
         }
@@ -318,13 +331,12 @@ export const tierRouter = router({
         })
 
         if (!session.url) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
+          throw new ORPCError("INTERNAL_SERVER_ERROR", {
             message: "Stripe did not return a checkout URL.",
           })
         }
 
         return { url: session.url, sessionId: session.id }
       }),
-  }),
-})
+  },
+}

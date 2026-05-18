@@ -1,5 +1,6 @@
 import { Skeleton } from "@openads/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@openads/ui/tabs"
+import { useQuery } from "@tanstack/react-query"
 import { createFileRoute } from "@tanstack/react-router"
 import { MegaphoneIcon } from "lucide-react"
 import { z } from "zod"
@@ -7,7 +8,7 @@ import { AdRow } from "~/components/ads/ad-row"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderTitle } from "~/components/ui/header"
-import { trpc } from "~/lib/trpc"
+import { orpc } from "~/lib/orpc"
 
 const statusValues = ["Pending", "Approved", "Rejected"] as const
 
@@ -24,7 +25,7 @@ function AdsIndexPage() {
   const { status } = Route.useSearch()
   const navigate = Route.useNavigate()
 
-  const adsQuery = trpc.ad.getAll.useQuery({ workspaceId, status })
+  const adsQuery = useQuery(orpc.ad.getAll.queryOptions({ input: { workspaceId, status } }))
 
   return (
     <>
