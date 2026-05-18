@@ -9,8 +9,12 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "check-types": "turbo run check-types",
     "lint": "oxlint",
     "format": "oxfmt --write .",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:publish": "turbo run build --filter=@openads/sdk... --filter=@openads/react... --filter=@openads/browser... && changeset publish",
     "db:generate": "bun run --cwd packages/db db:generate",
     "db:migrate": "bun run --cwd packages/db db:migrate",
     "db:studio": "bun run --cwd packages/db db:studio",
@@ -19,6 +23,8 @@
     "postinstall": "bun run db:generate || true"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
     "@dirstack/kodeks": "^1.2.0",
@@ -26,6 +32,7 @@
     "lefthook": "^2.1.6",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.64.0",
+    "tsdown": "^0.16.8",
     "turbo": "^2.9.14",
     "typescript": "^6.0.3"
   },

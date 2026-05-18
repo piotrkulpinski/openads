@@ -11,6 +11,7 @@ import { TRPCError } from "@trpc/server"
 import { z } from "zod"
 import { adProcedure, publicProcedure, router, workspaceProcedure } from "../index"
 import { findServingAd } from "../lib/ad-serving"
+import { recordAdClick, recordAdImpression } from "../lib/ad-tracking"
 
 const createFromCheckoutInput = z.object({
   workspaceId: z.string().min(1),
@@ -25,10 +26,6 @@ const createFromCheckoutInput = z.object({
 
 const reviewNoteInput = z.object({ note: z.string().trim().min(1).max(500) })
 const optionalNoteInput = z.object({ note: z.string().trim().max(500).optional() })
-
-const TRACKING_WINDOW_SECONDS = 60
-const IMPRESSION_LIMIT_PER_MINUTE = 30
-const CLICK_LIMIT_PER_MINUTE = 10
 
 const checkoutSessionInput = z.object({
   workspaceId: z.string().min(1),
@@ -265,58 +262,20 @@ export const adRouter = router({
           db,
           workspaceId: workspace.id,
           weightGte: input.weightGte,
-          excludeId: input.excludeId,
+          excludeIds: input.excludeId ? [input.excludeId] : [],
         })
       }),
 
     recordImpression: publicProcedure
       .input(z.object({ adId: z.string() }))
       .mutation(async ({ ctx: { db, redis, clientIp }, input: { adId } }) => {
-        const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
-        if (!ad) return { success: false }
-
-        if (clientIp) {
-          const rateKey = `ratelimit:impression:${adId}:${clientIp}`
-          const count = await redis.incr(rateKey)
-          if (count === 1) await redis.expire(rateKey, TRACKING_WINDOW_SECONDS)
-          if (count > IMPRESSION_LIMIT_PER_MINUTE) return { success: false }
-        }
-
-        const today = new Date()
-        today.setUTCHours(0, 0, 0, 0)
-
-        await db.adStat.upsert({
-          where: { adId_date: { adId, date: today } },
-          create: { adId, date: today, impressions: 1, clicks: 0 },
-          update: { impressions: { increment: 1 } },
-        })
-
-        return { success: true }
+        return await recordAdImpression({ db, redis, clientIp, adId })
       }),
 
     recordClick: publicProcedure
       .input(z.object({ adId: z.string() }))
       .mutation(async ({ ctx: { db, redis, clientIp }, input: { adId } }) => {
-        const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
-        if (!ad) return { success: false }
-
-        if (clientIp) {
-          const rateKey = `ratelimit:click:${adId}:${clientIp}`
-          const count = await redis.incr(rateKey)
-          if (count === 1) await redis.expire(rateKey, TRACKING_WINDOW_SECONDS)
-          if (count > CLICK_LIMIT_PER_MINUTE) return { success: false }
-        }
-
-        const today = new Date()
-        today.setUTCHours(0, 0, 0, 0)
-
-        await db.adStat.upsert({
-          where: { adId_date: { adId, date: today } },
-          create: { adId, date: today, impressions: 0, clicks: 1 },
-          update: { clicks: { increment: 1 } },
-        })
-
-        return { success: true }
+        return await recordAdClick({ db, redis, clientIp, adId })
       }),
 
     getCheckoutInfo: publicProcedure

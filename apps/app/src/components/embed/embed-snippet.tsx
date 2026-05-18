@@ -29,15 +29,17 @@ const PREVIEW_HEIGHT = 640
 export function EmbedSnippet({ slug }: EmbedSnippetProps) {
   const clipboard = useClipboard({ timeout: 2000 })
   const [theme, setTheme] = useState<Theme>("auto")
+  const [copiedSnippet, setCopiedSnippet] = useState("")
 
   const baseUrl = env.VITE_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")
+  const apiUrl = env.VITE_API_URL
 
   const url = useMemo(() => {
     const params = new URLSearchParams({ theme })
     return `${baseUrl}/embed/${slug}?${params.toString()}`
   }, [baseUrl, slug, theme])
 
-  const snippet = useMemo(() => {
+  const iframeSnippet = useMemo(() => {
     if (!url) return ""
     return `<iframe
   src="${url}"
@@ -45,6 +47,76 @@ export function EmbedSnippet({ slug }: EmbedSnippetProps) {
   loading="lazy"
 ></iframe>`
   }, [url])
+
+  const scriptSnippet = useMemo(() => {
+    return `<div id="openads-advertise"></div>
+<script>
+  window.OpenAds = window.OpenAds || {
+    q: [],
+    init(...args) { this.q.push({ method: "init", args }) },
+    updateConfig(...args) { this.q.push({ method: "updateConfig", args }) },
+    destroy(...args) { this.q.push({ method: "destroy", args }) },
+  }
+  window.OpenAds.init({
+    slug: "${slug}",
+    container: "#openads-advertise",
+    theme: "${theme}",
+  })
+</script>
+<script async src="${baseUrl}/embed.js"></script>`
+  }, [baseUrl, slug, theme])
+
+  const serverSnippet = useMemo(() => {
+    return `import { createOpenAdsClient } from "@openads/sdk"
+
+const openads = createOpenAdsClient({
+  workspaceSlug: "${slug}",
+  apiUrl: "${apiUrl}",
+})
+
+export const AdSlot = async () => {
+  const ad = await openads.getAd({
+    weightGte: 2.5,
+    request: { cache: "no-store" },
+  })
+
+  if (!ad) return null
+
+  return (
+    <a href={ad.websiteUrl}>
+      {ad.name}
+    </a>
+  )
+}`
+  }, [apiUrl, slug])
+
+  const reactSnippet = useMemo(() => {
+    return `import { OpenAdsProvider, useOpenAdsAd, useOpenAdsTracking } from "@openads/react"
+
+const AdSlot = () => {
+  const { data: ad } = useOpenAdsAd({ weightGte: 2.5 })
+  const { impressionRef, getClickProps } = useOpenAdsTracking(ad)
+
+  if (!ad) return null
+
+  return (
+    <a ref={impressionRef} href={ad.websiteUrl} {...getClickProps()}>
+      {ad.name}
+    </a>
+  )
+}
+
+export const Ads = () => (
+  <OpenAdsProvider workspaceSlug="${slug}" apiUrl="${apiUrl}">
+    <AdSlot />
+  </OpenAdsProvider>
+)`
+  }, [apiUrl, slug])
+
+  const copySnippet = (id: string, value: string) => {
+    setCopiedSnippet(id)
+    clipboard.copy(value)
+  }
 
   return (
     <Card>
@@ -100,30 +172,76 @@ export function EmbedSnippet({ slug }: EmbedSnippetProps) {
 
       <Card.Section>
         <Stack direction="column" size="sm" className="w-full">
-          <Label htmlFor="embed-snippet">Embed code</Label>
+          <SnippetBlock
+            id="embed-iframe-snippet"
+            label="Iframe embed"
+            value={iframeSnippet}
+            copied={clipboard.copied && copiedSnippet === "iframe"}
+            onCopy={() => copySnippet("iframe", iframeSnippet)}
+          />
 
-          <div className="relative w-full">
-            <Textarea
-              id="embed-snippet"
-              value={snippet}
-              readOnly
-              spellCheck={false}
-              className="break-all pr-28 font-mono text-xs leading-relaxed"
-            />
+          <SnippetBlock
+            id="embed-script-snippet"
+            label="Script embed"
+            value={scriptSnippet}
+            copied={clipboard.copied && copiedSnippet === "script"}
+            onCopy={() => copySnippet("script", scriptSnippet)}
+          />
 
-            <Button
-              size="sm"
-              variant="secondary"
-              prefix={clipboard.copied ? <CheckIcon className="text-green-500" /> : <CopyIcon />}
-              onClick={() => clipboard.copy(snippet)}
-              disabled={!snippet}
-              className="absolute top-2 right-2"
-            >
-              {clipboard.copied ? "Copied" : "Copy"}
-            </Button>
-          </div>
+          <SnippetBlock
+            id="sdk-server-snippet"
+            label="Server-side ad fetching"
+            value={serverSnippet}
+            copied={clipboard.copied && copiedSnippet === "server"}
+            onCopy={() => copySnippet("server", serverSnippet)}
+          />
+
+          <SnippetBlock
+            id="react-tracking-snippet"
+            label="React fetching and tracking"
+            value={reactSnippet}
+            copied={clipboard.copied && copiedSnippet === "react"}
+            onCopy={() => copySnippet("react", reactSnippet)}
+          />
         </Stack>
       </Card.Section>
     </Card>
+  )
+}
+
+type SnippetBlockProps = {
+  id: string
+  label: string
+  value: string
+  copied: boolean
+  onCopy: () => void
+}
+
+const SnippetBlock = ({ id, label, value, copied, onCopy }: SnippetBlockProps) => {
+  return (
+    <Stack direction="column" size="sm" className="w-full">
+      <Label htmlFor={id}>{label}</Label>
+
+      <div className="relative w-full">
+        <Textarea
+          id={id}
+          value={value}
+          readOnly
+          spellCheck={false}
+          className="min-h-36 break-all pr-28 font-mono text-xs leading-relaxed"
+        />
+
+        <Button
+          size="sm"
+          variant="secondary"
+          prefix={copied ? <CheckIcon className="text-green-500" /> : <CopyIcon />}
+          onClick={onCopy}
+          disabled={!value}
+          className="absolute top-2 right-2"
+        >
+          {copied ? "Copied" : "Copy"}
+        </Button>
+      </div>
+    </Stack>
   )
 }

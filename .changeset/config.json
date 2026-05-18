@@ -1,0 +1,32 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "piotrkulpinski/openads"
+    }
+  ],
+  "commit": false,
+  "fixed": [["@openads/sdk", "@openads/react", "@openads/browser"]],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "minor",
+  "ignore": [
+    "@openads/api",
+    "@openads/app",
+    "@openads/landing",
+    "@openads/auth",
+    "@openads/db",
+    "@openads/emails",
+    "@openads/events",
+    "@openads/logger",
+    "@openads/redis",
+    "@openads/s3",
+    "@openads/stripe",
+    "@openads/trpc",
+    "@openads/tsconfig",
+    "@openads/ui",
+    "@openads/utils"
+  ]
+}

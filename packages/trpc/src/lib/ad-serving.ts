@@ -1,11 +1,21 @@
 import type { db } from "@openads/db"
+import type { FieldType } from "@openads/db/client"
 
-export interface ServingCandidate {
+export type ServingFieldValue = {
+  id: string
+  name: string
+  type: FieldType
+  value: unknown
+}
+
+export type ServingAd = {
   id: string
   weight: number
   name: string
   websiteUrl: string
-  meta: Array<{ fieldId: string; value: unknown }>
+  faviconUrl: string
+  meta: Record<string, unknown>
+  fields: Array<ServingFieldValue>
 }
 
 interface FindServingAdProps {
@@ -13,7 +23,7 @@ interface FindServingAdProps {
   workspaceId: string
   /** Optional minimum effective weight floor (e.g. 2.5 for premium placements). */
   weightGte?: number
-  excludeId?: string
+  excludeIds?: Array<string>
   /** Maximum boost applied to the least-served ad (1.2 = +20%). */
   leastServedBoostMax?: number
   /**
@@ -22,6 +32,18 @@ interface FindServingAdProps {
    * day-bucketed granularity of `AdStat`.
    */
   fairnessWindowDays?: number
+}
+
+type FindServingAdsProps = FindServingAdProps & {
+  count?: number
+}
+
+const getFaviconUrl = (websiteUrl: string): string => {
+  return `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(websiteUrl)}`
+}
+
+const getMetaRecord = (fields: Array<ServingFieldValue>): Record<string, unknown> => {
+  return Object.fromEntries(fields.map(field => [field.name, field.value]))
 }
 
 /**
@@ -37,14 +59,14 @@ export async function findServingAd({
   db,
   workspaceId,
   weightGte,
-  excludeId,
+  excludeIds = [],
   leastServedBoostMax = 1.2,
   fairnessWindowDays = 1,
-}: FindServingAdProps): Promise<ServingCandidate | null> {
+}: FindServingAdProps): Promise<ServingAd | null> {
   const rows = await db.ad.findMany({
     where: {
       status: "Approved",
-      ...(excludeId ? { NOT: { id: excludeId } } : {}),
+      ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
       subscription: {
         workspaceId,
         status: { in: ["Active", "Trialing"] },
@@ -58,17 +80,33 @@ export async function findServingAd({
       name: true,
       websiteUrl: true,
       subscription: { select: { tier: { select: { weight: true } } } },
-      meta: { select: { fieldId: true, value: true } },
+      meta: {
+        select: {
+          value: true,
+          field: { select: { id: true, name: true, type: true } },
+        },
+      },
     },
   })
 
-  const ads: ServingCandidate[] = rows.map(r => ({
-    id: r.id,
-    name: r.name,
-    websiteUrl: r.websiteUrl,
-    weight: r.subscription.tier.weight,
-    meta: r.meta,
-  }))
+  const ads: Array<ServingAd> = rows.map(row => {
+    const fields = row.meta.map(item => ({
+      id: item.field.id,
+      name: item.field.name,
+      type: item.field.type,
+      value: item.value,
+    }))
+
+    return {
+      id: row.id,
+      name: row.name,
+      websiteUrl: row.websiteUrl,
+      faviconUrl: getFaviconUrl(row.websiteUrl),
+      weight: row.subscription.tier.weight,
+      meta: getMetaRecord(fields),
+      fields,
+    }
+  })
 
   if (ads.length === 0) return null
   if (ads.length === 1) return ads[0] ?? null
@@ -83,7 +121,7 @@ export async function findServingAd({
   const stats = await db.adStat.groupBy({
     by: ["adId"],
     where: {
-      adId: { in: ads.map(a => a.id) },
+      adId: { in: ads.map(ad => ad.id) },
       date: { gte: since },
     },
     _sum: { impressions: true },
@@ -91,7 +129,7 @@ export async function findServingAd({
 
   const impressionsByAd = new Map<string, number>(stats.map(s => [s.adId, s._sum.impressions ?? 0]))
 
-  const counts = ads.map(a => impressionsByAd.get(a.id) ?? 0)
+  const counts = ads.map(ad => impressionsByAd.get(ad.id) ?? 0)
   const min = Math.min(...counts)
   const max = Math.max(...counts)
   const hasVariance = max > min
@@ -106,7 +144,7 @@ export async function findServingAd({
     return { ad, effectiveWeight }
   })
 
-  const total = weighted.reduce((sum, w) => sum + w.effectiveWeight, 0)
+  const total = weighted.reduce((sum, item) => sum + item.effectiveWeight, 0)
   if (total <= 0) return ads[0] ?? null
 
   let cursor = Math.random() * total
@@ -115,4 +153,28 @@ export async function findServingAd({
     if (cursor <= 0) return ad
   }
   return weighted[0]?.ad ?? null
+}
+
+export const findServingAds = async ({
+  count = 1,
+  excludeIds = [],
+  ...props
+}: FindServingAdsProps): Promise<Array<ServingAd>> => {
+  const ads: Array<ServingAd> = []
+  const selectedIds = new Set(excludeIds)
+  const limit = Math.max(1, Math.min(count, 20))
+
+  for (let index = 0; index < limit; index += 1) {
+    const ad = await findServingAd({
+      ...props,
+      excludeIds: Array.from(selectedIds),
+    })
+
+    if (!ad) break
+
+    ads.push(ad)
+    selectedIds.add(ad.id)
+  }
+
+  return ads
 }

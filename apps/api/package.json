@@ -1,6 +1,7 @@
 {
   "name": "@openads/api",
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "bun run --hot src/index.ts"

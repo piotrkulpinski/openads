@@ -1,0 +1,42 @@
+{
+  "name": "@openads/react",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Headless React hooks and tracking helpers for OpenAds publisher integrations.",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./src/index.tsx",
+  "module": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "build": "tsdown && bun run prepare-package",
+    "check-types": "tsc --noEmit --project tsconfig.json",
+    "prepare-package": "bun ../../scripts/prepare-package.ts",
+    "pub:release": "bun run build && npm publish ./dist --access public",
+    "pub:beta": "bun run build && npm publish ./dist --access public --tag beta --no-git-checks",
+    "pub:next": "bun run build && npm publish ./dist --access public --tag next --no-git-checks"
+  },
+  "dependencies": {
+    "@openads/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@openads/tsconfig": "*",
+    "@types/react": "^19.2.14",
+    "react": "^19.2.6",
+    "typescript": "^6.0.3"
+  },
+  "peerDependencies": {
+    "react": ">=18 <20"
+  }
+}

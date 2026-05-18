@@ -11,6 +11,7 @@ import { stripeWebhookRoute } from "~/routes/webhooks/stripe"
 import { auth } from "~/services/auth"
 import { logger } from "~/services/logger"
 import { loggerMiddleware } from "./middleware/logger"
+import { v1Route } from "./routes/v1"
 
 const app = new Hono({
   strict: false,
@@ -50,6 +51,9 @@ app.on(["POST", "GET"], "/api/auth/**", c => auth.handler(c.req.raw))
 
 // Browser log ingestion
 app.route("/log", logRoute)
+
+// Public SDK API
+app.route("/v1", v1Route)
 
 // Stripe webhooks
 app.route("/webhooks/stripe", stripeWebhookRoute)

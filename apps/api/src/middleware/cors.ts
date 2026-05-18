@@ -2,7 +2,13 @@ import { cors } from "hono/cors"
 import { env } from "~/env"
 
 export const corsMiddleware = cors({
-  origin: env.APP_URL,
+  origin: (origin, context) => {
+    if (context.req.path.startsWith("/v1/")) {
+      return origin || env.APP_URL
+    }
+
+    return env.APP_URL
+  },
   allowHeaders: ["Content-Type", "Authorization", "trpc-accept"],
   allowMethods: ["POST", "GET", "OPTIONS"],
   exposeHeaders: ["Set-Cookie", "Content-Length"],
