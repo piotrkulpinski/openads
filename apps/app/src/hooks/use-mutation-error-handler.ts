@@ -22,8 +22,9 @@ export const useMutationErrorHandler = () => {
     }
 
     if (!fieldErrors || isEmptyObject(fieldErrors)) {
-      toast.error(message) // Show the error message
-      form.reset() // Reset the form
+      toast.error(message)
+      // Non-field errors leave no reliable target for inline form feedback.
+      form.reset()
 
       return
     }

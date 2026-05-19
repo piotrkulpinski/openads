@@ -45,8 +45,7 @@ const o = os.$context<Context>().errors({
     status: 422,
     data: inputValidationErrorData,
   },
-  // Mirrors the tRPC convention of returning a fieldErrors map for unique
-  // constraint violations so existing form-error rendering keeps working.
+  // Return a fieldErrors map so form mutations can attach conflicts to inputs.
   CONFLICT_FIELD: {
     status: 409,
     data: inputValidationErrorData,

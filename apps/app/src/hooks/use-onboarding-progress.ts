@@ -21,12 +21,11 @@ export function useOnboardingProgress() {
 
   const continueTo = useCallback(
     async (step: OnboardingStep, id?: string) => {
-      // Update the onboarding progress
+      // Persist progress before navigation so refreshes resume from the next step.
       await mutateAsync({ step })
 
-      // If we're on the last step, navigate to the workspace
       if (step === "completed") {
-        // If we have a workspace, navigate to it
+        // A completed onboarding run should land in the created workspace when possible.
         if (id) {
           return navigate({
             to: "/$workspaceId",
@@ -35,7 +34,7 @@ export function useOnboardingProgress() {
           })
         }
 
-        // Otherwise, navigate to the root route
+        // Fallback for cases where the workspace was already deleted or never created.
         return navigate({ to: "/" })
       }
 

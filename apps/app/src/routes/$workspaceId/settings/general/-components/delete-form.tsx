@@ -18,10 +18,9 @@ export const DeleteForm = (props: ComponentProps<"div">) => {
       onSuccess: async () => {
         navigate({ to: "/" })
 
-        // Show a success toast
         toast.success("Workspace deleted successfully")
 
-        // Invalidate the workspace list
+        // Remove the deleted workspace from menus and workspace selectors.
         await queryClient.invalidateQueries({ queryKey: orpc.workspace.getAll.key() })
       },
 

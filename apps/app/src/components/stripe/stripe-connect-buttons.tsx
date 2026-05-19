@@ -18,8 +18,6 @@ export const StripeConnectButtons = ({
   workspace,
   onSuccess,
 }: StripeConnectButtonsProps) => {
-  // TODO Add a workspace provider from onboarding to make is simpler
-
   const connectAccount = useMutation(
     orpc.stripe.connect.create.mutationOptions({
       onSuccess: data => {

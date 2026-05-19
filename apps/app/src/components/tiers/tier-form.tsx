@@ -27,7 +27,7 @@ import type { router } from "~/main"
 
 // In-form representation of an initial price row. The visible field is `amountWhole`
 // (integer whole units); we convert to cents at submit time so the wire / DB / Stripe
-// see cents — see plan file `i-want-to-go-sunny-knuth.md`.
+// always receive minor units.
 const initialPriceFormSchema = z.object({
   interval: z.enum(BillingInterval).default(BillingInterval.Month),
   intervalCount: z.number().int().positive().default(1),
@@ -71,7 +71,7 @@ export const TierForm = ({
   const form = useZodForm(tierFormSchema, {
     defaultValues: {
       ...init(tierFormSchema),
-      // Sensible weight baseline: 1.0 means "served at parity with other tiers".
+      // 1.0 means "served at parity with other tiers".
       weight: 1,
       ...tier,
       initialPrices: isEditing

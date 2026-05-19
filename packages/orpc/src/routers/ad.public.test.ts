@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { createOpenAdsClient } from "@openads/sdk"
 import { OpenAPIHandler } from "@orpc/openapi/fetch"
-// Must match the plugin `apps/api` mounts — the `/zod4` build, not the root
+// Must match the handler `apps/api` mounts — the `/zod4` build, not the root
 // (Zod v3) export, which no-ops against this project's v4 schemas.
 import { experimental_ZodSmartCoercionPlugin as ZodSmartCoercionPlugin } from "@orpc/zod/zod4"
 import type { Context } from "../index"
