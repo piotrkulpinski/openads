@@ -1,6 +1,7 @@
 import type { AppRouter, AppRouterClient, RouterInputs, RouterOutputs } from "@openads/orpc/router"
 import { createORPCClient, ORPCError } from "@orpc/client"
 import { RPCLink } from "@orpc/client/fetch"
+import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins"
 import { createTanstackQueryUtils } from "@orpc/tanstack-query"
 import { QueryCache, QueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
@@ -8,6 +9,7 @@ import { env } from "~/env"
 
 const link = new RPCLink({
   url: `${env.VITE_API_URL}/rpc`,
+  plugins: [new SimpleCsrfProtectionLinkPlugin()],
   fetch: (request, init) => fetch(request, { ...init, credentials: "include" }),
 })
 
