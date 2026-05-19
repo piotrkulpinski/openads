@@ -1,22 +1,29 @@
 import type { db } from "@openads/db"
-import type { FieldType } from "@openads/db/client"
+import { FieldType } from "@openads/db/client"
+import { z } from "zod"
 
-export type ServingFieldValue = {
-  id: string
-  name: string
-  type: FieldType
-  value: unknown
-}
+// Single source of truth for the ad-serving shape. The SDK `/v1` endpoint
+// `.output()`, the embed serving shape, and the runtime types all derive from
+// these schemas, so the OpenAPI spec and the code can't drift apart.
+export const servingFieldSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(FieldType),
+  value: z.unknown(),
+})
 
-export type ServingAd = {
-  id: string
-  weight: number
-  name: string
-  websiteUrl: string
-  faviconUrl: string
-  meta: Record<string, unknown>
-  fields: Array<ServingFieldValue>
-}
+export const servingAdSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  websiteUrl: z.string(),
+  faviconUrl: z.string(),
+  weight: z.number(),
+  meta: z.record(z.string(), z.unknown()),
+  fields: z.array(servingFieldSchema),
+})
+
+export type ServingFieldValue = z.infer<typeof servingFieldSchema>
+export type ServingAd = z.infer<typeof servingAdSchema>
 
 interface FindServingAdProps {
   db: typeof db

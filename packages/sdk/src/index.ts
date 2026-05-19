@@ -1,5 +1,9 @@
 const DEFAULT_API_URL = "https://api.openads.co"
 
+// Mirrors the Prisma `FieldType` enum (packages/db/prisma/models/field.prisma).
+// Kept as a standalone literal union because the SDK is published with zero
+// deps and cannot import `@openads/db`; the server tightens its `/v1` schema to
+// the same enum, so any drift surfaces in `/v1/openapi.json`.
 export type OpenAdsFieldType = "Text" | "Textarea" | "Url" | "Number" | "Switch" | "Image"
 
 export type OpenAdsFieldValue = {
@@ -20,7 +24,8 @@ export type OpenAdsAd = {
 }
 
 export type OpenAdsRequestOptions = RequestInit & {
-  next?: unknown
+  /** Next.js `fetch` extension (App Router caching). Ignored by other runtimes. */
+  next?: { revalidate?: number | false; tags?: Array<string> }
 }
 
 export type OpenAdsClientOptions = {
@@ -45,7 +50,6 @@ export type OpenAdsTrackOptions = {
 }
 
 type CurrentAdsResponse = {
-  ad: OpenAdsAd | null
   ads: Array<OpenAdsAd>
 }
 
@@ -156,7 +160,7 @@ export const createOpenAdsClient = ({
       placementRequest,
     )
 
-    return response.ad
+    return response.ads[0] ?? null
   }
 
   const recordImpression = async (

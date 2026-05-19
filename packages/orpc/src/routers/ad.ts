@@ -10,7 +10,7 @@ import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscriptio
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
 import { adMw, authProcedure, publicProcedure, workspaceMw } from "../index"
-import { findServingAds } from "../lib/ad-serving"
+import { findServingAds, servingAdSchema } from "../lib/ad-serving"
 import { recordAdClick, recordAdImpression } from "../lib/ad-tracking"
 
 const createFromCheckoutInput = z.object({
@@ -32,24 +32,6 @@ const checkoutSessionInput = z.object({
 const adIdentitySchema = z.object({
   workspaceId: z.string(),
   adId: z.string(),
-})
-
-// Shared between the SDK `current` endpoint output and the embed serving shape.
-const servingFieldSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: z.string(),
-  value: z.unknown(),
-})
-
-const servingAdSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  websiteUrl: z.string(),
-  faviconUrl: z.string(),
-  weight: z.number(),
-  meta: z.record(z.string(), z.unknown()),
-  fields: z.array(servingFieldSchema),
 })
 
 const trackingResultSchema = z.object({ success: z.boolean() })
@@ -102,16 +84,26 @@ export const getCurrentAds = publicProcedure
     z.object({
       slug: z.string(),
       weightGte: z.number().positive().optional(),
-      excludeIds: z.array(z.string()).optional().default([]),
+      // The SDK serializes `excludeIds` as a single comma-joined query value
+      // (`?excludeIds=a,b`). The OpenAPI deserializer only builds arrays from
+      // bracket/repeated notation, so split the comma form here while still
+      // accepting a real array if a caller sends one.
+      excludeIds: z
+        .preprocess(value => {
+          if (Array.isArray(value)) return value
+          if (typeof value === "string") {
+            return value
+              .split(",")
+              .map(id => id.trim())
+              .filter(Boolean)
+          }
+          return []
+        }, z.array(z.string()))
+        .default([]),
       count: z.number().int().min(1).max(20).default(1),
     }),
   )
-  .output(
-    z.object({
-      ad: servingAdSchema.nullable(),
-      ads: z.array(servingAdSchema),
-    }),
-  )
+  .output(z.object({ ads: z.array(servingAdSchema) }))
   .handler(async ({ context: { db }, input }) => {
     const workspace = await db.workspace.findUnique({
       where: { slug: input.slug },
@@ -130,7 +122,7 @@ export const getCurrentAds = publicProcedure
       count: input.count,
     })
 
-    return { ad: ads[0] ?? null, ads }
+    return { ads }
   })
 
 export const recordImpression = publicProcedure
@@ -605,10 +597,11 @@ export const adRouter = {
       return updated
     }),
 
-  // Public surface used internally by apps/app from unauthenticated routes
-  // (advertise/success, embed/*). NOT part of `/v1` — those endpoints live
-  // in `publicRouter` and only accept REST traffic.
-  public: {
+  // Unauthenticated checkout flow used internally by apps/app
+  // (advertise/success, embed/*). NOT part of the `/v1` REST surface — those
+  // endpoints live in `publicRouter`. Named `checkout` (not `public`) so it
+  // doesn't read as the `publicRouter` REST surface.
+  checkout: {
     getCheckoutInfo,
     createFromCheckout,
   },

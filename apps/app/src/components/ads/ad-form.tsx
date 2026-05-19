@@ -12,7 +12,7 @@ import { ImageUpload } from "~/components/ads/image-upload"
 import { FormButton } from "~/components/form-button"
 import { orpc, type RouterOutputs } from "~/lib/orpc"
 
-type CheckoutInfo = RouterOutputs["ad"]["public"]["getCheckoutInfo"]
+type CheckoutInfo = RouterOutputs["ad"]["checkout"]["getCheckoutInfo"]
 type Field = CheckoutInfo["fields"][number]
 
 const buildSchema = (fields: Field[]) => {
@@ -87,7 +87,7 @@ export const AdForm = ({
   })
 
   const submit = useMutation(
-    orpc.ad.public.createFromCheckout.mutationOptions({
+    orpc.ad.checkout.createFromCheckout.mutationOptions({
       onSuccess: () => {
         toast.success("Ad submitted for review")
         onSuccessCallback?.()

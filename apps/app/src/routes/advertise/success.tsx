@@ -22,7 +22,7 @@ function AdvertiseSuccess() {
   const [submitted, setSubmitted] = useState(false)
 
   const infoQuery = useQuery(
-    orpc.ad.public.getCheckoutInfo.queryOptions({
+    orpc.ad.checkout.getCheckoutInfo.queryOptions({
       input: { workspaceId: workspaceId ?? "", sessionId: sessionId ?? "" },
       enabled: !!workspaceId && !!sessionId,
       retry: 3,

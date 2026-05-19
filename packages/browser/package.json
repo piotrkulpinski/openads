@@ -20,7 +20,8 @@
     "directory": "dist"
   },
   "scripts": {
-    "build": "tsdown && bun run prepare-package",
+    "build": "tsdown && bun run prepare-package && bun run sync:embed",
+    "sync:embed": "bun scripts/sync-embed.ts",
     "check-types": "tsc --noEmit --project tsconfig.json",
     "prepare-package": "bun ../../scripts/prepare-package.ts",
     "pub:release": "bun run build && npm publish ./dist --access public",

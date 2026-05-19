@@ -2,8 +2,13 @@ import { appRouter, publicRouter } from "@openads/orpc/router"
 import { OpenAPIHandler } from "@orpc/openapi/fetch"
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins"
 import { RPCHandler } from "@orpc/server/fetch"
-import { ZodSmartCoercionPlugin } from "@orpc/zod"
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4"
+// Both must come from the `/zod4` entry: the root `@orpc/zod` export is the
+// Zod v3 build and its coercion plugin silently no-ops against our v4 schemas,
+// which 422s every coerced query param (weightGte/count/excludeIds) on /v1.
+import {
+  experimental_ZodSmartCoercionPlugin as ZodSmartCoercionPlugin,
+  ZodToJsonSchemaConverter,
+} from "@orpc/zod/zod4"
 import { Hono } from "hono"
 import { showRoutes } from "hono/dev"
 import { createContext } from "~/context"
@@ -40,7 +45,11 @@ const restHandler = new OpenAPIHandler(publicRouter, {
           title: "OpenAds API",
           version: "1.0.0",
           description:
-            "Public surface of the OpenAds platform. Consumed by `@openads/sdk` and `@openads/react`.",
+            "Public surface of the OpenAds platform. Consumed by `@openads/sdk` and `@openads/react`.\n\n" +
+            "**Errors** are returned as an oRPC envelope: " +
+            "`{ defined: boolean, code: string, status: number, message: string, data?: object }`. " +
+            'Input-validation failures return HTTP **422** with `code: "INPUT_VALIDATION_FAILED"` ' +
+            "and `data.fieldErrors` / `data.formErrors`.",
         },
         servers: [{ url: `${env.APP_URL.replace(/\/$/, "")}/v1` }],
       },

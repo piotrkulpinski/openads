@@ -23,7 +23,7 @@ describe("createOpenAdsClient", () => {
     const calls: Array<{ url: string; options?: RequestInit }> = []
     const fetcher: typeof fetch = async (url, options) => {
       calls.push({ url: String(url), options })
-      return Response.json({ ad: sampleAd, ads: [sampleAd] })
+      return Response.json({ ads: [sampleAd] })
     }
 
     const client = createOpenAdsClient({
@@ -51,7 +51,7 @@ describe("createOpenAdsClient", () => {
     const calls: Array<string> = []
     const fetcher: typeof fetch = async url => {
       calls.push(String(url))
-      return Response.json({ ad: sampleAd, ads: [sampleAd] })
+      return Response.json({ ads: [sampleAd] })
     }
 
     const client = createOpenAdsClient({
@@ -92,7 +92,11 @@ describe("createOpenAdsClient", () => {
 
   it("throws typed API errors for failed requests", async () => {
     const fetcher: typeof fetch = async () => {
-      return Response.json({ error: "workspace not found" }, { status: 404 })
+      // Real post-oRPC error envelope (was `{ error }` / 400 pre-migration).
+      return Response.json(
+        { defined: false, code: "NOT_FOUND", status: 404, message: "Workspace not found." },
+        { status: 404 },
+      )
     }
 
     const client = createOpenAdsClient({
