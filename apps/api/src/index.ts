@@ -1,7 +1,9 @@
 import { appRouter, publicRouter } from "@openads/orpc/router"
 import { OpenAPIHandler } from "@orpc/openapi/fetch"
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins"
+import { onError as onORPCError } from "@orpc/server"
 import { RPCHandler } from "@orpc/server/fetch"
+import { SimpleCsrfProtectionHandlerPlugin } from "@orpc/server/plugins"
 // Both must come from the `/zod4` entry: the root `@orpc/zod` export is the
 // Zod v3 build and its coercion plugin silently no-ops against our v4 schemas,
 // which 422s every coerced query param (weightGte/count/excludeIds) on /v1.
@@ -14,7 +16,7 @@ import { showRoutes } from "hono/dev"
 import { createContext } from "~/context"
 import { env } from "~/env"
 import { corsMiddleware } from "~/middleware/cors"
-import { onError } from "~/middleware/on-error"
+import { onError as honoOnError } from "~/middleware/on-error"
 import { logRoute } from "~/routes/log"
 import { stripeWebhookRoute } from "~/routes/webhooks/stripe"
 import { auth } from "~/services/auth"
@@ -31,7 +33,15 @@ app.get("/", c => c.text("OpenAds API"))
 app.use("*", loggerMiddleware)
 app.use("*", corsMiddleware)
 
-const rpcHandler = new RPCHandler(appRouter)
+const rpcHandler = new RPCHandler(appRouter, {
+  strictGetMethodPluginEnabled: false,
+  plugins: [new SimpleCsrfProtectionHandlerPlugin()],
+  interceptors: [
+    onORPCError(error => {
+      logger.error("orpc rpc handler error", { err: error, surface: "rpc" })
+    }),
+  ],
+})
 
 const restHandler = new OpenAPIHandler(publicRouter, {
   plugins: [
@@ -51,8 +61,13 @@ const restHandler = new OpenAPIHandler(publicRouter, {
             'Input-validation failures return HTTP **422** with `code: "INPUT_VALIDATION_FAILED"` ' +
             "and `data.fieldErrors` / `data.formErrors`.",
         },
-        servers: [{ url: `${env.APP_URL.replace(/\/$/, "")}/v1` }],
+        servers: [{ url: `${env.API_URL.replace(/\/$/, "")}/v1` }],
       },
+    }),
+  ],
+  interceptors: [
+    onORPCError(error => {
+      logger.error("orpc openapi handler error", { err: error, surface: "v1" })
     }),
   ],
 })
@@ -120,7 +135,7 @@ app.route("/log", logRoute)
 app.route("/webhooks/stripe", stripeWebhookRoute)
 
 // Error Handling
-app.onError(onError)
+app.onError(honoOnError)
 
 if (env.NODE_ENV === "development") {
   showRoutes(app, { verbose: true, colorize: true })

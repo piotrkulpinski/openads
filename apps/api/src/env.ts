@@ -14,6 +14,7 @@ export const env = createEnv({
     NODE_ENV: z.enum(["development", "production"]).default("development"),
     PORT: z.coerce.number().default(3001),
     APP_URL: z.url(),
+    API_URL: z.url(),
   },
 
   /**

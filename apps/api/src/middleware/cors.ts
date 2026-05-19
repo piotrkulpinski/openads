@@ -16,7 +16,7 @@ const v1Cors = cors({
 // credentials for the session.
 const appCors = cors({
   origin: env.APP_URL,
-  allowHeaders: ["Content-Type", "Authorization"],
+  allowHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
   allowMethods: ["POST", "GET", "OPTIONS"],
   exposeHeaders: ["Set-Cookie", "Content-Length"],
   credentials: true,

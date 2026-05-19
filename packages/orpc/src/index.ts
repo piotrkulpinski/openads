@@ -25,6 +25,7 @@ export interface Context {
   s3: S3BucketClient
   env: {
     APP_URL: string
+    API_URL: string
     STRIPE_CONNECT_CLIENT_ID?: string
     STRIPE_PLATFORM_FEE_PERCENT: number
   }
