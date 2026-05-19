@@ -38,7 +38,7 @@ Monorepo, Bun + Turbo. Three apps and twelve packages.
 
 ## Core product decisions and rationale
 
-These were locked in across the strategic-pivot conversations and reflect the *current* product shape. Don't deviate without checking the plan file first.
+These are the current product constraints. Don't deviate without confirming a scope change.
 
 ### 1. Subscription tiers, not time-based bookings
 Earlier the product had time-based campaign bookings (a `Campaign` model with `startsAt`/`endsAt`). That model is **deleted**. The replacement is recurring monthly subscriptions:
@@ -152,7 +152,7 @@ The following are explicit deferrals. Don't build them without confirming a scop
 
 ## Operational gotchas (learned the hard way)
 
-These all bit during earlier iterations; they will bite the next agent the same way unless they're aware.
+These are recurring integration pitfalls worth preserving for future contributors.
 
 - **Prisma client + hot reload**: After `db:push`, the *generated* client (`packages/db/src/generated/prisma/`) is updated on disk, but the running `bun --hot` process holds the old `PrismaClient` instance in `globalThis.prismaGlobal`. Regenerated types alone aren't enough — kill and restart `bun run dev`.
 - **`db:push` and destructive changes**: When dropping columns or models, Prisma refuses without `--accept-data-loss`. The dev DB has been treated as ephemeral throughout — confirm empty rows with `SELECT count(*) FROM "TableName"` before pushing, then pass the flag.
@@ -161,7 +161,7 @@ These all bit during earlier iterations; they will bite the next agent the same 
   - Pragma `/** @jsxImportSource react */` at the top of every email template `.tsx` file
   - `"jsx": "react-jsx"` in `packages/orpc/tsconfig.json`
   - `"types": ["node"]` in `packages/emails/tsconfig.json` and `packages/s3/tsconfig.json`
-  - **Apply the pragma to every new email template.** Real fix is dropping `hono/jsx` from apps/api (we don't render Hono JSX) — a future cleanup.
+  - **Apply the pragma to every new email template.** Long-term fix is dropping `hono/jsx` from apps/api (we don't render Hono JSX).
 - **SSH push to GitHub timing out**: Common on restrictive networks. Workaround is SSH-over-443 (`Host github.com / Hostname ssh.github.com / Port 443 / User git` in `~/.ssh/config`) or temporarily switch to HTTPS remote.
 - **React Email v6**: imports come from `"react-email"` (single package), **not** `@react-email/components` (v5 legacy). Preview server is `@react-email/ui`, invoked via `email dev --dir src/templates` (the `--dir` flag is required because templates aren't in the default `./emails` folder).
 - **AutoSend** is the email provider (not Resend). Used by `apps/landing` for the waitlist and by `@openads/emails` for all transactional. Env vars: `AUTOSEND_API_KEY`, `AUTOSEND_FROM_EMAIL`, `AUTOSEND_FROM_NAME`, plus `AUTOSEND_WAITLIST_LIST_ID` in landing only.

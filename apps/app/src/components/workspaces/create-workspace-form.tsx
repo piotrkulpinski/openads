@@ -19,7 +19,7 @@ import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
   /**
-   * A callback to call when the mutation is successful
+   * Runs after the workspace exists and the workspace list cache has been refreshed.
    */
   onSuccess?: (data: RouterOutputs["workspace"]["create"]) => void
 }
@@ -39,16 +39,14 @@ export const CreateWorkspaceForm = ({
   })
 
   const onSuccessHandler = async (data: RouterOutputs["workspace"]["create"]) => {
-    // Show a success toast
     toast.success("Workspace created successfully")
 
-    // Invalidate the workspaces cache
+    // Workspace menus and route loaders depend on the full workspace list.
     await queryClient.invalidateQueries({ queryKey: orpc.workspace.getAll.key() })
 
     // Reset the `isDirty` state of the form while keeping the values for optimistic UI
     form.reset({}, { keepValues: true })
 
-    // Call the callback if provided
     onSuccess?.(data)
   }
 
@@ -59,7 +57,7 @@ export const CreateWorkspaceForm = ({
     }),
   )
 
-  // Set the slug based on the name
+  // Keep the editable slug in sync until the user overrides it.
   useComputedField({
     form,
     sourceField: "name",

@@ -129,10 +129,8 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
       toast.success("Profile updated")
 
-      // Invalidate the cache
+      // Refresh both the user cache and route context so headers/menus update immediately.
       await queryClient.invalidateQueries({ queryKey: orpc.user.me.key() })
-
-      // Invalidate the route
       await router.invalidate()
     } catch (error) {
       logger.error("profile update failed", { err: error })

@@ -30,16 +30,14 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
           navigate({ to: "/$workspaceId/settings/general", params: { workspaceId: id } })
         }
 
-        // Show a success toast
         toast.success("Settings updated successfully")
 
-        // Invalidate the workspace list
+        // Workspace name/slug changes are visible in menus, loaders, and this settings route.
         await queryClient.invalidateQueries({ queryKey: orpc.workspace.getAll.key() })
         await queryClient.invalidateQueries({
           queryKey: orpc.workspace.getById.key({ input: { id } }),
         })
 
-        // Invalidate the workspace settings
         router.invalidate()
       },
 

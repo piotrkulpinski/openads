@@ -92,7 +92,7 @@ describe("createOpenAdsClient", () => {
 
   it("throws typed API errors for failed requests", async () => {
     const fetcher: typeof fetch = async () => {
-      // Real post-oRPC error envelope (was `{ error }` / 400 pre-migration).
+      // Public API errors use the same envelope as the OpenAPI surface.
       return Response.json(
         { defined: false, code: "NOT_FOUND", status: 404, message: "Workspace not found." },
         { status: 404 },

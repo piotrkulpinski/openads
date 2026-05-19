@@ -11,7 +11,6 @@ import { logger } from "~/lib/logger"
 import { orpc, queryClient } from "~/lib/orpc"
 import { routeTree } from "~/routeTree.gen"
 
-// Create a new router instance
 export const router = createRouter({
   routeTree,
   defaultPendingMinMs: 0,
@@ -32,12 +31,11 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// reloads the app if there is an error fetching an outdated chunk due to a new build deployed
+// Reload when a deployed build invalidates the current route chunk.
 window.addEventListener("vite:preloadError", () => {
   window.location.reload()
 })
 
-// Render the app
 const rootElement = document.getElementById("app")
 if (rootElement && !rootElement.innerHTML) {
   createRoot(rootElement, {
