@@ -9,6 +9,9 @@
     "./server": "./src/server.ts",
     "./browser": "./src/browser.ts"
   },
+  "scripts": {
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
   "dependencies": {
     "pino": "^10.3.1",
     "pino-pretty": "^13.1.3"

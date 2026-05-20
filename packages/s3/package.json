@@ -7,6 +7,9 @@
     ".": "./src/index.ts",
     "./*": "./src/*.ts"
   },
+  "scripts": {
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1047.0",
     "@aws-sdk/s3-presigned-post": "^3.1047.0",

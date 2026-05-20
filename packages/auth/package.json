@@ -6,6 +6,9 @@
   "exports": {
     "./*": "./src/*.ts"
   },
+  "scripts": {
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
   "dependencies": {
     "@openads/db": "*",
     "@t3-oss/env-core": "^0.13.11",

@@ -3,4 +3,5 @@ import { defineConfig } from "oxlint"
 
 export default defineConfig({
   ...baseConfig,
+  ignorePatterns: ["apps/app/public/embed.js"],
 })

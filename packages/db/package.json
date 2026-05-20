@@ -9,6 +9,7 @@
   },
   "scripts": {
     "postinstall": "prisma generate --no-hints",
+    "check-types": "tsc --noEmit --project tsconfig.json",
     "db:generate": "prisma generate --no-hints",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
