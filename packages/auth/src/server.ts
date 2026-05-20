@@ -9,7 +9,11 @@ export interface AuthConfig {
   APP_URL: string
 }
 
-export function createAuthServer(config: AuthConfig) {
+// Split in two on purpose — see the explanation in packages/auth/src/client.ts.
+// The inner builder's inferred return type can't be named across package
+// boundaries (TS2742); we capture it as `AuthServer` and re-export a public
+// factory with that explicit annotation. Don't collapse back into one function.
+const createConfiguredAuthServer = (config: AuthConfig) => {
   return betterAuth({
     database: prismaAdapter(db, {
       provider: "postgresql",
@@ -50,5 +54,10 @@ export function createAuthServer(config: AuthConfig) {
   })
 }
 
-export type AuthServer = ReturnType<typeof createAuthServer>
+export type AuthServer = ReturnType<typeof createConfiguredAuthServer>
+
+export const createAuthServer = (config: AuthConfig): AuthServer => {
+  return createConfiguredAuthServer(config)
+}
+
 export type Session = AuthServer["$Infer"]["Session"]
