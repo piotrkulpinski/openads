@@ -82,6 +82,7 @@ export const CreateWorkspaceForm = ({
 
               <FormControl>
                 <Input
+                  // oxlint-disable-next-line jsx-a11y/no-autofocus -- single-field create form; focusing the sole input on mount is the expected UX, not unexpected focus on a content page
                   autoFocus
                   placeholder="Acme Co"
                   autoComplete="off"
