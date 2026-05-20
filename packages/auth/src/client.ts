@@ -6,12 +6,22 @@ export interface AuthClientConfig {
   credentials?: RequestCredentials
 }
 
-export function createAuthClient(config: AuthClientConfig) {
+// The factory is split in two on purpose: the inner builder's return type is
+// inferred from better-auth internals and can't be named across package
+// boundaries (TS2742) under `check-types`. We capture it once as `AuthClient`,
+// then re-export a public factory with that explicit return type annotation.
+// Don't collapse these back into a single exported function — it reintroduces
+// the portability error. See packages/auth/src/server.ts for the mirror.
+const createConfiguredAuthClient = (config: AuthClientConfig) => {
   return createBetterAuthClient({
     baseURL: config.baseURL,
-    credentials: config.credentials || "include",
+    credentials: config.credentials ?? "include",
     plugins: [adminClient(), lastLoginMethodClient()],
   })
 }
 
-export type AuthClient = ReturnType<typeof createAuthClient>
+export type AuthClient = ReturnType<typeof createConfiguredAuthClient>
+
+export const createAuthClient = (config: AuthClientConfig): AuthClient => {
+  return createConfiguredAuthClient(config)
+}
