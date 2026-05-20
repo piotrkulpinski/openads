@@ -7,7 +7,7 @@ export const Logo = ({ ...props }: ComponentProps<"svg">) => {
       viewBox="0 0 180 40"
       width="180"
       height="40"
-      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- inline SVG can't be an <img>; role="img" + aria-label is the correct accessible-name pattern
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- inline SVG; role + aria-label is the cross-screen-reader accessible-name pattern
       role="img"
       aria-label="Logo"
       fill="none"
