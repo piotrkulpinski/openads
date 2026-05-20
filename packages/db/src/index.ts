@@ -8,7 +8,7 @@ const prismaClientSingleton = () => {
 }
 
 declare global {
-  // `var` is required here: `let`/`const` can't augment the global scope in an ambient declaration.
+  // `var` is required to augment the global scope; `let`/`const` won't.
   var prismaGlobal: ReturnType<typeof prismaClientSingleton> | undefined
 }
 

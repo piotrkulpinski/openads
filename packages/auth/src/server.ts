@@ -9,10 +9,7 @@ export interface AuthConfig {
   APP_URL: string
 }
 
-// Split in two on purpose — see the explanation in packages/auth/src/client.ts.
-// The inner builder's inferred return type can't be named across package
-// boundaries (TS2742); we capture it as `AuthServer` and re-export a public
-// factory with that explicit annotation. Don't collapse back into one function.
+// Split factory — see packages/auth/src/client.ts for the rationale (TS2742).
 const createConfiguredAuthServer = (config: AuthConfig) => {
   return betterAuth({
     database: prismaAdapter(db, {
