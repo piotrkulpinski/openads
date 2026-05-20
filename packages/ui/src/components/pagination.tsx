@@ -31,7 +31,13 @@ const PaginationLink = ({
   size = "sm",
   ...props
 }: PaginationLinkProps) => (
-  <Button variant={isActive ? "secondary" : "ghost"} size={size} prefix={prefix} asChild>
+  <Button
+    variant={isActive ? "secondary" : "ghost"}
+    size={size}
+    prefix={prefix}
+    className={className}
+    asChild
+  >
     <a aria-current={isActive ? "page" : undefined} {...props} />
   </Button>
 )
