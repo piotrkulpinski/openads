@@ -7,7 +7,8 @@
     "dev": "vite dev --port 4321",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "bun run build && wrangler deploy"
+    "deploy": "bun run build && wrangler deploy",
+    "check-types": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "@openads/emails": "workspace:*",

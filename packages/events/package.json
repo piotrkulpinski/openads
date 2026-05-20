@@ -11,9 +11,10 @@
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
+    "check-types": "tsc --noEmit --project tsconfig.json",
     "lint": "oxlint",
     "format": "oxfmt --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bun run check-types"
   },
   "dependencies": {
     "@openpanel/nextjs": "^1.5.1",

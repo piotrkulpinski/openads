@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "check-types": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "@dirstack/utils": "^1.6.2",

@@ -4,7 +4,9 @@
   "private": true,
   "sideEffects": false,
   "main": "src/index.ts",
-  "scripts": {},
+  "scripts": {
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
   "devDependencies": {
     "@openads/tsconfig": "*",
     "typescript": "^6.0.3",

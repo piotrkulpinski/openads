@@ -7,6 +7,9 @@
     ".": "./src/index.ts",
     "./*": "./src/*.ts"
   },
+  "scripts": {
+    "check-types": "tsc --noEmit --project tsconfig.json"
+  },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.11",
     "@upstash/redis": "^1.38.0",

@@ -10,9 +10,10 @@
   },
   "scripts": {
     "dev": "email dev --dir src/templates",
+    "check-types": "tsc --noEmit --project tsconfig.json",
     "lint": "oxlint",
     "format": "oxfmt --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bun run check-types"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.11",
