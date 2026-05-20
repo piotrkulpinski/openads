@@ -4,7 +4,7 @@
 
 OpenAds is a **self-serve subscription advertising platform for content publishers**. Publishers configure ad tiers and custom creative fields in the OpenAds dashboard; advertisers find the publisher's site, click a "Subscribe to advertise" widget, pay through Stripe, fill in a creative form, and wait for approval. Once approved, their ad is available via the OpenAds API for the publisher to render on their own site however they want.
 
-**OpenAds does not render ads.** It owns: subscription billing (Stripe Connect with destination charges), advertiser onboarding, the approval queue, the weighted-rotation selection algorithm, impression/click tracking, and the embeddable tier selector. Publishers render ads themselves using a future SDK (which is **out of scope** at v1 — see deferred list below). The only embeddable surface OpenAds ships today is `/embed` (the tier selector iframe for advertiser acquisition).
+**OpenAds does not render ads.** It owns: subscription billing (Stripe Connect direct charges on publisher connected accounts), advertiser onboarding, the approval queue, the weighted-rotation selection algorithm, impression/click tracking, and the embeddable tier selector. Publishers render ads themselves using a future SDK (which is **out of scope** at v1 — see deferred list below). The only embeddable surface OpenAds ships today is `/embed` (the tier selector iframe for advertiser acquisition).
 
 The model is based on OpenAlternative's existing setup ($5k+ MRR), generalized to multi-tenant SaaS.
 
@@ -57,9 +57,9 @@ The `Ad` model has **two fixed fields** (`name`, `websiteUrl`) plus a `Meta` arr
 - **Why everything else is custom**: Different publishers need different creative shapes. OpenAds doesn't know whether you need a banner image, a tagline, a discount code, or all three. Publishers define it.
 - **Field types**: `Text`, `Textarea`, `Url`, `Number`, `Switch`, `Image` (S3-backed upload).
 
-### 4. Stripe Connect with destination charges (not direct charges)
-Subscriptions live on the **platform** Stripe account; funds transfer to the publisher's Connect account via `transfer_data.destination`; OpenAds takes `application_fee_percent`.
-- **Why**: Best fit for the future ad network (advertisers see "OpenAds" as merchant of record, consistent across publishers). Single config knob for the platform fee. OpenAds handles disputes — acceptable at low volume.
+### 4. Stripe Connect with direct charges on connected accounts
+Subscriptions live on the **publisher's connected Stripe account**. Products, prices, checkout sessions, customers, subscriptions, and subscription webhooks are scoped with `stripeAccount: workspace.stripeConnectId`; OpenAds takes `application_fee_percent` from those connected-account subscriptions.
+- **Why**: Publishers can use their own Stripe accounts as the merchant of record, keep billing ownership close to their business, and still let OpenAds collect a platform fee automatically. This also keeps advertiser payment data and subscription objects in the publisher's Stripe account, matching how publishers expect to manage their own billing.
 
 ### 5. Approval gating is decoupled from Stripe status
 An ad serves only if **both** `Ad.status = Approved` AND `Subscription.status ∈ (Active, Trialing)`.
