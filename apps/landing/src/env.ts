@@ -9,6 +9,12 @@ export const env = createEnv({
     AUTOSEND_WAITLIST_LIST_ID: z.string(),
   },
 
-  runtimeEnv: process.env,
+  client: {
+    VITE_BASE_URL: z.url(),
+  },
+
+  clientPrefix: "VITE_",
+
+  runtimeEnv: { ...process.env, ...import.meta.env },
   emptyStringAsUndefined: true,
 })

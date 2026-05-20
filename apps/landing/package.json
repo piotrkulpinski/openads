@@ -11,6 +11,7 @@
     "check-types": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
+    "@dirstack/utils": "^1.6.2",
     "@openads/emails": "workspace:*",
     "@openads/ui": "workspace:*",
     "@t3-oss/env-core": "^0.13.11",

@@ -21,6 +21,7 @@ import {
 import type { ComponentProps } from "react"
 import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { useWorkspace } from "~/contexts/workspace-context"
+import { env } from "~/env"
 import { authClient } from "~/lib/auth"
 import { orpc } from "~/lib/orpc"
 
@@ -67,7 +68,7 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
         <DropdownMenuLabel>Resources</DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
-          <a href="https://api.openads.co/v1/docs" target="_blank" rel="noopener">
+          <a href={`${env.VITE_API_URL}/v1/docs`} target="_blank" rel="noopener">
             <BookOpenIcon />
             Docs
           </a>

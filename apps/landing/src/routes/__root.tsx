@@ -1,5 +1,7 @@
+import { getDomain } from "@dirstack/utils"
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router"
 import { PropsWithChildren } from "react"
+import { env } from "~/env"
 import appCss from "~/styles.css?url"
 
 export const Route = createRootRoute({
@@ -24,7 +26,7 @@ export const Route = createRootRoute({
     scripts: [
       {
         defer: true,
-        "data-domain": "openads.co",
+        "data-domain": getDomain(env.VITE_BASE_URL),
         src: "https://p.kulp.in/js/script.js",
       },
     ],

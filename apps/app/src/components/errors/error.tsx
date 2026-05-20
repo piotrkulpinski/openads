@@ -1,3 +1,4 @@
+import { getDomain } from "@dirstack/utils"
 import { Button } from "@openads/ui/button"
 import type { ErrorRouteComponent } from "@tanstack/react-router"
 import { CircleXIcon } from "lucide-react"
@@ -20,7 +21,8 @@ export const ErrorRoute: ErrorRouteComponent = ({ error, reset }) => {
         <HeaderDescription size="md">
           <p className="max-w-lg">
             We're sorry, but we couldn't load this page. Please{" "}
-            <a href="mailto:hello@openads.co">reach out to support</a> if this error persists.
+            <a href={`mailto:hello@${getDomain(env.VITE_BASE_URL)}`}>reach out to support</a> if
+            this error persists.
           </p>
         </HeaderDescription>
 
