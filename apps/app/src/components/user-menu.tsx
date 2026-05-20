@@ -67,7 +67,7 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
         <DropdownMenuLabel>Resources</DropdownMenuLabel>
 
         <DropdownMenuItem asChild>
-          <a href="#" target="_blank" rel="noopener">
+          <a href="https://api.openads.co/v1/docs" target="_blank" rel="noopener">
             <BookOpenIcon />
             Docs
           </a>

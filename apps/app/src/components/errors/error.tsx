@@ -19,8 +19,8 @@ export const ErrorRoute: ErrorRouteComponent = ({ error, reset }) => {
 
         <HeaderDescription size="md">
           <p className="max-w-lg">
-            We're sorry, but we couldn't load this page. Please <a href="#">reach out to support</a>{" "}
-            if this error persists.
+            We're sorry, but we couldn't load this page. Please{" "}
+            <a href="mailto:hello@openads.co">reach out to support</a> if this error persists.
           </p>
         </HeaderDescription>
 
