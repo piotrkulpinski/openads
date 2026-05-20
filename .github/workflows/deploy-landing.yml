@@ -30,6 +30,8 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build landing
+        env:
+          VITE_BASE_URL: "https://openads.co"
         run: bun run --filter @openads/landing build
 
       - name: Deploy to Cloudflare Workers
