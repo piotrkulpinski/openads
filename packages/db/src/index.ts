@@ -7,9 +7,10 @@ const prismaClientSingleton = () => {
   return new PrismaClient({ adapter }).$extends(customIdExtension).$extends(modelFilterExtension)
 }
 
-declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>
-} & typeof global
+declare global {
+  // `var` is required here: `let`/`const` can't augment the global scope in an ambient declaration.
+  var prismaGlobal: ReturnType<typeof prismaClientSingleton> | undefined
+}
 
 const db = globalThis.prismaGlobal ?? prismaClientSingleton()
 
