@@ -10,8 +10,10 @@ export const env = createEnv({
   client: {
     VITE_BASE_URL: z.string(),
     VITE_API_URL: z.string(),
-    VITE_OPENPANEL_CLIENT_ID: z.string().min(1),
-    VITE_COSSISTANT_PUBLIC_KEY: z.string().min(1),
+    // Optional third-party integrations (product analytics + support widget).
+    // Omit them for a self-hosted build — both features no-op when unset.
+    VITE_OPENPANEL_CLIENT_ID: z.string().min(1).optional(),
+    VITE_COSSISTANT_PUBLIC_KEY: z.string().min(1).optional(),
   },
 
   /**
