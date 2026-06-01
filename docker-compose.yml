@@ -1,0 +1,149 @@
+name: openads
+
+# Self-hostable OpenAds stack. Object storage is BYO (S3/R2) or the opt-in
+# `storage` profile below. See docs/self-hosting.md.
+#   cp .env.example .env   # fill in secrets
+#   docker compose up -d --build
+# Dashboard → http://localhost:8080   API → http://localhost:3001
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-openads}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openads}
+      POSTGRES_DB: ${POSTGRES_DB:-openads}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # No host port: the DB is only reached over the compose network. For host
+    # psql access use `docker compose exec postgres psql -U openads`.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-openads} -d ${POSTGRES_DB:-openads}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "no"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Upstash REST shim in front of Redis (the app uses the Upstash client).
+  serverless-redis-http:
+    image: hiett/serverless-redis-http:latest
+    restart: unless-stopped
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: ${REDIS_REST_TOKEN:-openads}
+      SRH_CONNECTION_STRING: redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  # One-shot schema sync. Swap to `prisma migrate deploy` once migrations land.
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    working_dir: /app/packages/db
+    # Client is already generated in the image; Prisma 7 dropped --skip-generate.
+    command: ["bunx", "prisma", "db", "push"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openads}:${POSTGRES_PASSWORD:-openads}@postgres:5432/${POSTGRES_DB:-openads}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    # Secrets (auth, Stripe, AutoSend, S3, Google) come from .env. The infra
+    # below is wired by compose, so .env never needs DB/Redis values.
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      API_URL: ${API_URL:-http://localhost:3001}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:8080}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-openads}:${POSTGRES_PASSWORD:-openads}@postgres:5432/${POSTGRES_DB:-openads}
+      REDIS_REST_URL: http://serverless-redis-http:80
+      REDIS_REST_TOKEN: ${REDIS_REST_TOKEN:-openads}
+    ports:
+      - "${API_PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      serverless-redis-http:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
+
+  app:
+    build:
+      context: .
+      dockerfile: apps/app/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3001}
+        VITE_BASE_URL: ${VITE_BASE_URL:-http://localhost:8080}
+        VITE_OPENPANEL_CLIENT_ID: ${VITE_OPENPANEL_CLIENT_ID:-}
+        VITE_COSSISTANT_PUBLIC_KEY: ${VITE_COSSISTANT_PUBLIC_KEY:-}
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    depends_on:
+      - api
+
+  # Optional self-hosted storage:  docker compose --profile storage up -d --build
+  # On localhost, S3_ENDPOINT must be reachable by both browser and API for
+  # presigned uploads — see docs/self-hosting.md. R2/S3 is simpler.
+  minio:
+    image: minio/minio:latest
+    profiles: ["storage"]
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY_ID:-openads}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_ACCESS_KEY:-openads-secret}
+    volumes:
+      - minio-data:/data
+    # Loopback-only: never expose object storage or its admin console to the
+    # network. For a real deployment, front it with your reverse proxy/domain.
+    ports:
+      - "127.0.0.1:${MINIO_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
+
+  minio-init:
+    image: minio/mc:latest
+    profiles: ["storage"]
+    restart: "no"
+    depends_on:
+      minio:
+        condition: service_started
+    # Public-read download is intentional: this bucket holds ad creative
+    # (banners/images) that render on third-party publisher sites via plain
+    # URLs. Uploads are presigned (write stays private). Keep this bucket
+    # dedicated to public ad assets — don't store anything sensitive in it.
+    entrypoint: >
+      sh -c "
+      until mc alias set local http://minio:9000 $${S3_ACCESS_KEY_ID:-openads} $${S3_SECRET_ACCESS_KEY:-openads-secret}; do echo 'waiting for minio...'; sleep 1; done &&
+      mc mb -p local/$${S3_BUCKET:-openads} &&
+      mc anonymous set download local/$${S3_BUCKET:-openads} &&
+      echo 'minio bucket ready'
+      "
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:

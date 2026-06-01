@@ -1,0 +1,34 @@
+# Dependencies & build output (regenerated inside the image)
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+packages/db/src/generated
+
+# Local env files — never bake secrets into an image.
+# Runtime config is provided via docker-compose `env_file` / `--env-file`.
+**/.env
+**/.env.*
+!**/.env.example
+
+# VCS, tooling, editor, OS cruft
+.git
+.github
+.changeset
+.codex
+.claude
+.cursor
+**/.vscode
+**/.idea
+**/.DS_Store
+
+# Logs & misc
+logs
+**/logs
+*.log
+**/*.tsbuildinfo
+
+# Docker artifacts themselves
+**/Dockerfile
+.dockerignore
+docker-compose*.yml
