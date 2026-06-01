@@ -42,7 +42,7 @@ function RootComponent() {
       <TooltipProvider delayDuration={100}>
         <Outlet />
 
-        <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />
+        {env.VITE_OPENPANEL_CLIENT_ID && <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />}
         <Toaster />
       </TooltipProvider>
     </SupportProvider>
