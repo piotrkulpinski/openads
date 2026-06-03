@@ -78,7 +78,7 @@ export const stripeRouter = {
       .input(z.object({ code: z.string().min(1), state: z.string().min(1) }))
       .handler(async ({ context: { db, redis, stripe, user }, input: { code, state } }) => {
         const stateKey = getOAuthStateKey(state)
-        const storedState = await redis.get<string>(stateKey)
+        const storedState = await redis.get(stateKey)
 
         if (!storedState) {
           throw new ORPCError("BAD_REQUEST", {

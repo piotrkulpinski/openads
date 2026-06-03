@@ -31,7 +31,7 @@ The `migrate` service runs `prisma db push` once on startup to sync the schema, 
 
 ## Configuration
 
-All runtime configuration is via environment variables in a single `.env` (copied from `.env.example`). Compose wires the bundled Postgres and Redis automatically — it overrides `DATABASE_URL`/`REDIS_REST_URL` regardless of what `.env` says — so for the bundled stack you only fill in secrets. Two important nuances:
+All runtime configuration is via environment variables in a single `.env` (copied from `.env.example`). Compose wires the bundled Postgres and Redis automatically — it overrides `DATABASE_URL`/`REDIS_URL` regardless of what `.env` says — so for the bundled stack you only fill in secrets. Two important nuances:
 
 ### The dashboard's config is baked at build time
 
@@ -51,9 +51,9 @@ docker build -f apps/app/Dockerfile -t openads-app \
 
 `VITE_OPENPANEL_CLIENT_ID` and `VITE_COSSISTANT_PUBLIC_KEY` are optional third-party integrations (product analytics / support widget). Leave them empty for a self-hosted instance — both features no-op when unset (OpenPanel isn't mounted; the Cossistant support widget stays dormant).
 
-### Redis is reached over the Upstash REST protocol
+### Redis
 
-The app talks to Redis through the Upstash REST client. Compose runs `hiett/serverless-redis-http` in front of a plain Redis container so you don't need an Upstash cloud account — `REDIS_REST_URL=http://serverless-redis-http:80` and `REDIS_REST_TOKEN` must equal the proxy's `SRH_TOKEN`. To use Upstash cloud instead, just point those two vars at your Upstash database and remove the `redis` / `serverless-redis-http` services.
+The API connects to Redis over a standard connection string (`ioredis`). Compose runs a plain Redis container and wires the API to it via `REDIS_URL=redis://redis:6379`. To use an external/managed Redis instead, point `REDIS_URL` at it and remove the bundled `redis` service.
 
 ## Object storage
 
