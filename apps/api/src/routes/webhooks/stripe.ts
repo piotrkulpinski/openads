@@ -13,8 +13,12 @@ import { stripe } from "../../services/stripe"
 
 export const stripeWebhookRoute = new Hono()
 
+// Must be the async variant: under the Bun runtime the Stripe SDK uses the
+// SubtleCrypto provider, whose HMAC is async-only — the synchronous
+// `constructEvent` throws "cannot be used in a synchronous context", which
+// would 400 every real webhook and break subscription sync.
 const constructStripeEvent = (body: string, signature: string) => {
-  return stripe.webhooks.constructEvent(body, signature, env.STRIPE_CONNECT_WEBHOOK_SECRET)
+  return stripe.webhooks.constructEventAsync(body, signature, env.STRIPE_CONNECT_WEBHOOK_SECRET)
 }
 
 stripeWebhookRoute.post("/", async c => {
@@ -28,7 +32,7 @@ stripeWebhookRoute.post("/", async c => {
   let event: Stripe.Event
 
   try {
-    event = constructStripeEvent(body, signature)
+    event = await constructStripeEvent(body, signature)
   } catch (err) {
     return c.text(`Invalid signature: ${err}`, 400)
   }
