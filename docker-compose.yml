@@ -36,18 +36,6 @@ services:
       timeout: 3s
       retries: 10
 
-  # Upstash REST shim in front of Redis (the app uses the Upstash client).
-  serverless-redis-http:
-    image: hiett/serverless-redis-http:latest
-    restart: unless-stopped
-    environment:
-      SRH_MODE: env
-      SRH_TOKEN: ${REDIS_REST_TOKEN:-openads}
-      SRH_CONNECTION_STRING: redis://redis:6379
-    depends_on:
-      redis:
-        condition: service_healthy
-
   # One-shot schema sync. Swap to `prisma migrate deploy` once migrations land.
   migrate:
     build:
@@ -78,15 +66,14 @@ services:
       API_URL: ${API_URL:-http://localhost:3001}
       BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:8080}
       DATABASE_URL: postgresql://${POSTGRES_USER:-openads}:${POSTGRES_PASSWORD:-openads}@postgres:5432/${POSTGRES_DB:-openads}
-      REDIS_REST_URL: http://serverless-redis-http:80
-      REDIS_REST_TOKEN: ${REDIS_REST_TOKEN:-openads}
+      REDIS_URL: redis://redis:6379
     ports:
       - "${API_PORT:-3001}:3001"
     depends_on:
       postgres:
         condition: service_healthy
-      serverless-redis-http:
-        condition: service_started
+      redis:
+        condition: service_healthy
       migrate:
         condition: service_completed_successfully
 

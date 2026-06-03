@@ -3,8 +3,7 @@ import { z } from "zod"
 
 export const env = createEnv({
   server: {
-    REDIS_REST_URL: z.string(),
-    REDIS_REST_TOKEN: z.string(),
+    REDIS_URL: z.string(),
   },
 
   runtimeEnv: process.env,

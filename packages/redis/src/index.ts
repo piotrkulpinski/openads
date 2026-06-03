@@ -1,15 +1,25 @@
-import { Redis } from "@upstash/redis"
+import Redis, { type RedisOptions } from "ioredis"
+
+const RETRY_DELAY_MS = 200
+const MAX_RETRY_DELAY_MS = 2000
 
 export interface RedisConfig {
-  REDIS_REST_URL: string
-  REDIS_REST_TOKEN: string
+  REDIS_URL: string
+  options?: RedisOptions
 }
 
-export function createRedisClient(config: RedisConfig) {
-  return new Redis({
-    url: config.REDIS_REST_URL,
-    token: config.REDIS_REST_TOKEN,
+export function createRedisClient({ REDIS_URL, options }: RedisConfig) {
+  const client = new Redis(REDIS_URL, {
+    maxRetriesPerRequest: 3,
+    retryStrategy: times => Math.min(times * RETRY_DELAY_MS, MAX_RETRY_DELAY_MS),
+    ...options,
   })
+
+  // Swallow transient connection errors so they don't crash the process;
+  // callers handle failures per operation.
+  client.on("error", () => {})
+
+  return client
 }
 
-export type RedisClient = ReturnType<typeof createRedisClient>
+export type RedisClient = Redis
