@@ -24,7 +24,7 @@
     "@orpc/zod": "^1.14.3",
     "@t3-oss/env-core": "^0.13.11",
     "hono": "^4.12.18",
-    "stripe": "^22.1.1",
+    "stripe": "^22.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
