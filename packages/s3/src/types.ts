@@ -46,6 +46,12 @@ export interface SignedUploadUrlOptions extends SignedUrlOptions {
   contentType?: string
   metadata?: PutObjectCommandInput["Metadata"]
   acl?: PutObjectCommandInput["ACL"]
+  /**
+   * When set, the byte length is signed into the URL so the storage backend
+   * rejects any upload whose body doesn't match exactly — a server-enforced
+   * size cap (R2 doesn't support the presigned-POST `content-length-range`).
+   */
+  contentLength?: number
 }
 
 export interface SignedDownloadUrlOptions extends SignedUrlOptions {

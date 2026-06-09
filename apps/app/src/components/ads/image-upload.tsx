@@ -49,17 +49,12 @@ export const ImageUpload = ({
         contentLength: file.size,
       })
 
-      // Presigned POST: every field from the signature must be in the form,
-      // and the file must come last (S3 requirement).
-      const form = new FormData()
-      for (const [name, value] of Object.entries(presigned.fields)) {
-        form.append(name, value)
-      }
-      form.append("file", file)
-
+      // Presigned PUT: send the file as the raw body with the signed headers.
+      // The browser sets Content-Length from the body, which the URL also signs.
       const uploadResponse = await fetch(presigned.uploadUrl, {
-        method: "POST",
-        body: form,
+        method: "PUT",
+        headers: presigned.headers,
+        body: file,
       })
 
       if (!uploadResponse.ok) {

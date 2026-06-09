@@ -149,11 +149,19 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
       Key: key,
       CacheControl: options.cacheControl,
       ContentType: options.contentType,
+      ContentLength: options.contentLength,
       Metadata: options.metadata,
       ACL: options.acl,
     })
 
-    return getSignedUrl(client, command, { expiresIn })
+    // Sign content-length so the backend rejects a body that doesn't match the
+    // declared size; without it in the signed set a client could PUT a larger file.
+    const signableHeaders =
+      options.contentLength != null
+        ? new Set(["host", "content-type", "content-length"])
+        : undefined
+
+    return getSignedUrl(client, command, { expiresIn, signableHeaders })
   }
 
   async function getSignedDownloadUrl(options: SignedDownloadUrlOptions) {
