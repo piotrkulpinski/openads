@@ -13,8 +13,7 @@ import { formatInterval, formatPrice } from "~/lib/currency"
 import { orpc } from "~/lib/orpc"
 import { parseTierFeature } from "~/lib/tier-features"
 
-// Responsive grid: one card per column when there's room, stacking only when
-// the iframe is too narrow to fit them side by side.
+// Horizontal cards that stack only when the iframe gets too narrow.
 const gridClassName = "grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))]"
 
 const defaultValues = {
@@ -38,8 +37,7 @@ function TierSelector() {
   const { theme } = Route.useSearch()
   const [pendingTierPriceId, setPendingTierPriceId] = useState<string | null>(null)
 
-  // Apply the requested theme to the iframe document. `auto` (or unset) leaves
-  // it to the visitor's OS preference via the `prefers-color-scheme` media query.
+  // `auto`/unset falls back to the visitor's OS preference (see styles.css).
   useEffect(() => {
     const root = document.documentElement
     root.dataset.theme = theme
@@ -62,7 +60,6 @@ function TierSelector() {
     }),
   )
 
-  // No email gate — Stripe Checkout collects the email on its hosted page.
   const handleSubscribe = (tierPriceId: string) => {
     setPendingTierPriceId(tierPriceId)
     checkout.mutate({ tierPriceId })
