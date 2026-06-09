@@ -256,7 +256,9 @@ const createFromCheckout = publicProcedure
       )
       const metadata = stripeSubscription.metadata ?? session.metadata
       const tierPriceId = metadata?.tierPriceId
-      const customerEmail = session.customer_email
+      // Stripe collects the email on its hosted page (we no longer pre-fill
+      // `customer_email`), so it lands in `customer_details.email`.
+      const customerEmail = session.customer_details?.email ?? session.customer_email
 
       if (!workspaceId || !tierPriceId || !customerEmail) {
         throw new ORPCError("BAD_REQUEST", { message: "Missing checkout metadata." })

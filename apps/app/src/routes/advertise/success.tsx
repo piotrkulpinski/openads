@@ -54,7 +54,7 @@ function AdvertiseSuccess() {
   }
 
   return (
-    <div className="mx-auto max-w-xl px-6 py-10">
+    <div className="mx-auto w-full max-w-xl px-6 py-10">
       <div className="mb-8 grid gap-3 text-center">
         <h1 className="font-semibold text-2xl">Set up your ad</h1>
         <p className="text-muted-foreground text-sm">

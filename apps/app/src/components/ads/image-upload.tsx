@@ -83,7 +83,11 @@ export const ImageUpload = ({
       {value ? (
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <img src={value} alt="" className="size-12 shrink-0 rounded border object-cover" />
-          <span className="min-w-0 flex-1 truncate text-muted-foreground text-xs">{value}</span>
+          {/* Show the file name, not the full CDN URL — a long URL is ugly and,
+              as an unbreakable string, forces the form wider than its container. */}
+          <span className="min-w-0 flex-1 truncate text-muted-foreground text-xs" title={value}>
+            {value.split("/").pop() || value}
+          </span>
           <Button
             type="button"
             variant="ghost"
