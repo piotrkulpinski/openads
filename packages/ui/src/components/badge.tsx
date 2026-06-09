@@ -35,7 +35,7 @@ const badgeVariants = cva({
 type BadgeProps = Omit<ComponentProps<"span">, "prefix"> &
   VariantProps<typeof badgeVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
+     * If set to `true`, the badge will be rendered as a child within the component.
      * This child component must be a valid React component.
      */
     asChild?: boolean

@@ -13,6 +13,8 @@ export type RouterAppContext = {
   queryClient: typeof queryClient
 }
 
+const isEmbedPath = (pathname: string) => pathname === "/embed" || pathname.startsWith("/embed/")
+
 // Only `/embed` is intended to be framed. Other routes must refuse to render
 // inside a frame to prevent clickjacking on authenticated actions. CSP
 // `frame-ancestors` requires a response header, which a static SPA can't set,
@@ -21,7 +23,7 @@ function useFrameBuster() {
   const { pathname } = useLocation()
   useEffect(() => {
     if (typeof window === "undefined") return
-    if (pathname === "/embed" || pathname.startsWith("/embed/")) return
+    if (isEmbedPath(pathname)) return
     if (window.top === window.self) return
     try {
       // Same-origin parent or unrestricted sandbox — we can take over the top.
@@ -51,12 +53,7 @@ function RootComponent() {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   beforeLoad: async ({ context: { orpc, queryClient }, location: { pathname, searchStr } }) => {
-    if (
-      pathname === "/login" ||
-      pathname === "/embed" ||
-      pathname.startsWith("/embed/") ||
-      pathname.startsWith("/advertise/")
-    ) {
+    if (pathname === "/login" || isEmbedPath(pathname) || pathname.startsWith("/advertise/")) {
       return
     }
 

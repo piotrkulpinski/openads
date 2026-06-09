@@ -39,10 +39,6 @@ function WorkspaceLayoutPending() {
 function WorkspaceLayout() {
   const { workspace } = Route.useRouteContext()
 
-  if (!workspace) {
-    return <WorkspaceLayoutPending />
-  }
-
   return (
     <WorkspaceContext value={workspace}>
       <div className="flex items-stretch size-full">

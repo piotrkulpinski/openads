@@ -9,8 +9,8 @@ const sectionVariants = cva({
 type SectionProps = ComponentProps<"div"> &
   VariantProps<typeof sectionVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * If set to `true`, the section will be rendered as its child element via Slot.
+     * This child must be a valid React element.
      */
     asChild?: boolean
   }

@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { admin, lastLoginMethod } from "better-auth/plugins"
 
-export interface AuthConfig {
+export type AuthConfig = {
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
   APP_URL: string

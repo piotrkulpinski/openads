@@ -1,17 +1,14 @@
 import Stripe from "stripe"
 
-export interface StripeConfig {
+export type StripeConfig = {
   STRIPE_SECRET_KEY: string
   STRIPE_PLATFORM_FEE_PERCENT: number
 }
 
-export function createStripeClient(config: StripeConfig) {
+export const createStripeClient = (config: StripeConfig) => {
   return new Stripe(config.STRIPE_SECRET_KEY, {
     apiVersion: "2026-05-27.dahlia",
   })
 }
 
 export type StripeClient = ReturnType<typeof createStripeClient>
-
-// Re-export Stripe types for convenience
-export * from "stripe"

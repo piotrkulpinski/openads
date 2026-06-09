@@ -1,9 +1,11 @@
 import { createEnv } from "@t3-oss/env-core"
 import { z } from "zod"
 
-const booleanString = z
-  .enum(["true", "false", "1", "0"])
-  .transform(value => value === "true" || value === "1")
+const booleanString = z.stringbool({
+  truthy: ["true", "1"],
+  falsy: ["false", "0"],
+  case: "sensitive",
+})
 
 const numberFromString = z.preprocess(value => {
   if (typeof value === "number") return value

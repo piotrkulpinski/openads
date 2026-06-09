@@ -19,7 +19,7 @@ export type LogContext = Record<string, unknown> & {
   err?: unknown
 }
 
-export interface Logger {
+export type Logger = {
   trace(message: string, context?: LogContext): void
   debug(message: string, context?: LogContext): void
   info(message: string, context?: LogContext): void
@@ -37,7 +37,7 @@ export interface Logger {
  * Wire format for entries shipped from the browser to the server.
  * Validated by the API route before being re-emitted server-side.
  */
-export interface RemoteLogEntry {
+export type RemoteLogEntry = {
   level: LogLevel
   message: string
   time: number
@@ -51,7 +51,7 @@ export interface RemoteLogEntry {
   }
 }
 
-export interface SerializedError {
+export type SerializedError = {
   name: string
   message: string
   stack?: string

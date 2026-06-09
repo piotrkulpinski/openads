@@ -7,13 +7,7 @@ import { MemberInvite, type MemberInviteProps } from "./templates/member-invite"
 
 export { createEmailClient, type EmailClient } from "./client"
 export { renderTemplate, type RenderResult } from "./render"
-export type {
-  EmailClientConfig,
-  EmailRecipient,
-  SendEmailInput,
-  SendTemplateInput,
-  UpsertContactInput,
-} from "./types"
+export type { EmailClientConfig, EmailRecipient, SendEmailInput, UpsertContactInput } from "./types"
 export type {
   AdApprovedProps,
   AdChangesRequestedProps,

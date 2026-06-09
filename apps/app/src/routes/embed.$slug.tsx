@@ -1,9 +1,10 @@
 import { Button } from "@openads/ui/button"
+import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
 import { ArrowRightIcon, CheckIcon, LayersIcon, XIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
@@ -35,7 +36,6 @@ export const Route = createFileRoute("/embed/$slug")({
 function TierSelector() {
   const { slug } = Route.useParams()
   const { theme } = Route.useSearch()
-  const [pendingTierPriceId, setPendingTierPriceId] = useState<string | null>(null)
 
   // `auto`/unset falls back to the visitor's OS preference (see styles.css).
   useEffect(() => {
@@ -55,13 +55,11 @@ function TierSelector() {
       },
       onError: error => {
         toast.error(error.message)
-        setPendingTierPriceId(null)
       },
     }),
   )
 
   const handleSubscribe = (tierPriceId: string) => {
-    setPendingTierPriceId(tierPriceId)
     checkout.mutate({ tierPriceId })
   }
 
@@ -130,9 +128,8 @@ function TierSelector() {
                         const labelTone =
                           type === "negative" ? "text-muted-foreground line-through" : ""
                         return (
-                          // biome-ignore lint/suspicious/noArrayIndexKey: feature list is publisher-defined, stable per render
                           <li key={`${raw}-${fi}`} className="flex items-center gap-2 text-sm">
-                            <Icon className={`size-4 shrink-0 ${iconTone}`} />
+                            <Icon className={cx("size-4 shrink-0", iconTone)} />
                             <span className={labelTone}>{label}</span>
                           </li>
                         )
@@ -153,7 +150,9 @@ function TierSelector() {
                           className="w-full"
                           variant={pi === 0 ? "primary" : "secondary"}
                           onClick={() => handleSubscribe(price.id)}
-                          isPending={pendingTierPriceId === price.id && checkout.isPending}
+                          isPending={
+                            checkout.isPending && checkout.variables?.tierPriceId === price.id
+                          }
                           suffix={pi === 0 ? <ArrowRightIcon /> : undefined}
                         >
                           {pi === 0

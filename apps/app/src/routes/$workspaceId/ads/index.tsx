@@ -1,3 +1,4 @@
+import { AdStatus } from "@openads/db/client"
 import { Skeleton } from "@openads/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@openads/ui/tabs"
 import { useQuery } from "@tanstack/react-query"
@@ -10,11 +11,9 @@ import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderTitle } from "~/components/ui/header"
 import { orpc } from "~/lib/orpc"
 
-const statusValues = ["Pending", "Approved", "Rejected"] as const
-
 export const Route = createFileRoute("/$workspaceId/ads/")({
   validateSearch: z.object({
-    status: z.enum(statusValues).optional(),
+    status: z.enum(AdStatus).optional(),
   }),
 
   component: AdsIndexPage,
@@ -38,7 +37,7 @@ function AdsIndexPage() {
         onValueChange={value =>
           navigate({
             search: {
-              status: value === "all" ? undefined : (value as (typeof statusValues)[number]),
+              status: value === "all" ? undefined : (value as AdStatus),
             },
           })
         }

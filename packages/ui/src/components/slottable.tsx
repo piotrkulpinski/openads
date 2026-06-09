@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { cloneElement, forwardRef, isValidElement } from "react"
+import { cloneElement, isValidElement } from "react"
 
 export type SlottableProps = {
   asChild?: boolean
@@ -7,9 +7,7 @@ export type SlottableProps = {
   children: (child: ReactNode) => ReactNode
 }
 
-export const Slottable = forwardRef<HTMLElement, SlottableProps>((props, ref) => {
-  const { asChild, child, children, ...rest } = props
-
+export const Slottable = ({ asChild, child, children }: SlottableProps) => {
   if (!asChild) {
     return children(child)
   }
@@ -18,8 +16,9 @@ export const Slottable = forwardRef<HTMLElement, SlottableProps>((props, ref) =>
     return null
   }
 
-  // @ts-expect-error
-  return cloneElement(child, { ref, ...rest }, children(child.props?.children))
-})
-
-Slottable.displayName = "Slottable"
+  return cloneElement(
+    child,
+    undefined,
+    children((child.props as { children?: ReactNode }).children),
+  )
+}

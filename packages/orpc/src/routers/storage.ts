@@ -12,7 +12,7 @@ const uploadImageInput = z.object({
   metadata: z.record(z.string(), z.string()).optional(),
 })
 
-function generateObjectKey(fileName: string) {
+const generateObjectKey = (fileName: string) => {
   const extension = fileName.split(".").pop()?.toLowerCase() || "png"
   const baseName = slugify(fileName.replace(/\.[^.]+$/, "")).slice(0, 40) || "file"
 

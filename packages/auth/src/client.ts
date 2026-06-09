@@ -1,7 +1,7 @@
 import { adminClient, lastLoginMethodClient } from "better-auth/client/plugins"
 import { createAuthClient as createBetterAuthClient } from "better-auth/react"
 
-export interface AuthClientConfig {
+export type AuthClientConfig = {
   baseURL: string
   credentials?: RequestCredentials
 }

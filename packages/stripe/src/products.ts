@@ -4,7 +4,7 @@ import type { StripeClient } from "./index"
 // Mirrors the Prisma BillingInterval enum without depending on the db package.
 export type LocalBillingInterval = "Day" | "Week" | "Month" | "Year"
 
-function toStripeInterval(b: LocalBillingInterval): Stripe.Price.Recurring["interval"] {
+const toStripeInterval = (b: LocalBillingInterval): Stripe.Price.Recurring["interval"] => {
   switch (b) {
     case "Day":
       return "day"
@@ -17,13 +17,13 @@ function toStripeInterval(b: LocalBillingInterval): Stripe.Price.Recurring["inte
   }
 }
 
-export interface TierMetadata extends Record<string, string> {
+export type TierMetadata = Record<string, string> & {
   workspaceId: string
   tierId: string
   weight: string
 }
 
-export interface TierPriceMetadata extends Record<string, string> {
+export type TierPriceMetadata = Record<string, string> & {
   workspaceId: string
   tierId: string
   tierPriceId: string
@@ -31,7 +31,7 @@ export interface TierPriceMetadata extends Record<string, string> {
   intervalCount: string
 }
 
-export interface ProductCreateProps {
+export type ProductCreateProps = {
   connectedAccountId: string
   name: string
   description?: string
@@ -39,10 +39,10 @@ export interface ProductCreateProps {
   features?: string[]
 }
 
-export async function createTierProduct(
+export const createTierProduct = async (
   stripe: StripeClient,
   props: ProductCreateProps,
-): Promise<Stripe.Product> {
+): Promise<Stripe.Product> => {
   return stripe.products.create(
     {
       name: props.name,
@@ -54,7 +54,7 @@ export async function createTierProduct(
   )
 }
 
-export interface ProductUpdateProps {
+export type ProductUpdateProps = {
   name?: string
   description?: string
   active?: boolean
@@ -62,17 +62,17 @@ export interface ProductUpdateProps {
   features?: string[]
 }
 
-export async function updateTierProduct(
+export const updateTierProduct = async (
   stripe: StripeClient,
   connectedAccountId: string,
   productId: string,
   props: ProductUpdateProps,
-): Promise<Stripe.Product> {
+): Promise<Stripe.Product> => {
   return stripe.products.update(
     productId,
     {
       name: props.name,
-      description: props.description ?? undefined,
+      description: props.description,
       active: props.active,
       metadata: props.metadata as Record<string, string> | undefined,
       marketing_features: props.features?.map(name => ({ name })),
@@ -81,15 +81,15 @@ export async function updateTierProduct(
   )
 }
 
-export async function archiveTierProduct(
+export const archiveTierProduct = async (
   stripe: StripeClient,
   connectedAccountId: string,
   productId: string,
-): Promise<Stripe.Product> {
+): Promise<Stripe.Product> => {
   return stripe.products.update(productId, { active: false }, { stripeAccount: connectedAccountId })
 }
 
-export interface TierPriceCreateProps {
+export type TierPriceCreateProps = {
   connectedAccountId: string
   productId: string
   unitAmount: number
@@ -99,10 +99,10 @@ export interface TierPriceCreateProps {
   metadata?: TierPriceMetadata
 }
 
-export async function createTierPrice(
+export const createTierPrice = async (
   stripe: StripeClient,
   props: TierPriceCreateProps,
-): Promise<Stripe.Price> {
+): Promise<Stripe.Price> => {
   return stripe.prices.create(
     {
       product: props.productId,
@@ -118,10 +118,10 @@ export async function createTierPrice(
   )
 }
 
-export async function archivePrice(
+export const archivePrice = async (
   stripe: StripeClient,
   connectedAccountId: string,
   priceId: string,
-): Promise<Stripe.Price> {
+): Promise<Stripe.Price> => {
   return stripe.prices.update(priceId, { active: false }, { stripeAccount: connectedAccountId })
 }

@@ -6,7 +6,7 @@ export const loggerMiddleware = createMiddleware(async (c, next) => {
   await next()
   const duration = Math.round(performance.now() - start)
 
-  const path = c.req.path.replace(/\?.*/, "")
+  const path = c.req.path
   const status = c.res.status
   const message = `${c.req.method} ${status} ${path} ${duration}ms`
 

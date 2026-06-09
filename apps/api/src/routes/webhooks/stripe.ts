@@ -9,7 +9,7 @@ import { Hono } from "hono"
 import type Stripe from "stripe"
 import { env } from "~/env"
 import { logger } from "~/services/logger"
-import { stripe } from "../../services/stripe"
+import { stripe } from "~/services/stripe"
 
 export const stripeWebhookRoute = new Hono()
 
@@ -40,7 +40,7 @@ stripeWebhookRoute.post("/", async c => {
   try {
     switch (event.type) {
       case "account.updated": {
-        await handleConnectAccountUpdate(event.data.object as Stripe.Account, event.account)
+        await handleConnectAccountUpdate(event.data.object, event.account)
         break
       }
 
@@ -53,12 +53,12 @@ stripeWebhookRoute.post("/", async c => {
       case "customer.subscription.updated":
       case "customer.subscription.resumed":
       case "customer.subscription.paused": {
-        await upsertSubscription(event.data.object as Stripe.Subscription, event.account)
+        await upsertSubscription(event.data.object, event.account)
         break
       }
 
       case "customer.subscription.deleted": {
-        await markSubscriptionCanceled(event.data.object as Stripe.Subscription, event.account)
+        await markSubscriptionCanceled(event.data.object, event.account)
         break
       }
     }
@@ -70,15 +70,9 @@ stripeWebhookRoute.post("/", async c => {
   }
 })
 
-async function handleConnectAccountUpdate(account: Stripe.Account, connectedAccountId?: string) {
-  const workspace = await db.workspace.findFirst({
+const handleConnectAccountUpdate = async (account: Stripe.Account, connectedAccountId?: string) => {
+  await db.workspace.updateMany({
     where: { stripeConnectId: connectedAccountId ?? account.id },
-  })
-
-  if (!workspace) return
-
-  await db.workspace.update({
-    where: { id: workspace.id },
     data: {
       stripeConnectStatus: account.charges_enabled ? "active" : "pending",
       stripeConnectEnabled: account.charges_enabled,
@@ -91,7 +85,7 @@ async function handleConnectAccountUpdate(account: Stripe.Account, connectedAcco
   })
 }
 
-async function handleConnectAccountDeauthorized(connectedAccountId?: string) {
+const handleConnectAccountDeauthorized = async (connectedAccountId?: string) => {
   if (!connectedAccountId) {
     logger.warn("stripe account deauthorized event missing connected account")
     return
@@ -108,10 +102,10 @@ async function handleConnectAccountDeauthorized(connectedAccountId?: string) {
   })
 }
 
-async function upsertSubscription(
+const upsertSubscription = async (
   stripeSubscription: Stripe.Subscription,
   connectedAccountId?: string,
-) {
+) => {
   if (!connectedAccountId) {
     logger.warn("stripe subscription event missing connected account", {
       stripeSubscriptionId: stripeSubscription.id,
@@ -163,33 +157,33 @@ async function upsertSubscription(
     return
   }
 
+  const periodItem = stripeSubscription.items.data[0]
+  const data = {
+    status: mapStripeSubscriptionStatus(stripeSubscription.status),
+    cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+    currentPeriodStart: toDate(periodItem?.current_period_start),
+    currentPeriodEnd: toDate(periodItem?.current_period_end),
+  }
+
   await db.subscription.upsert({
     where: { stripeSubscriptionId: stripeSubscription.id },
     create: {
+      ...data,
       stripeSubscriptionId: stripeSubscription.id,
       stripeCustomerId: customerId,
-      status: mapStripeSubscriptionStatus(stripeSubscription.status),
-      cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-      currentPeriodStart: toDate(stripeSubscription.items.data[0]?.current_period_start),
-      currentPeriodEnd: toDate(stripeSubscription.items.data[0]?.current_period_end),
       workspaceId: meta.workspaceId,
       tierId: meta.tierId,
       tierPriceId: meta.tierPriceId,
       advertiserId: advertiser.id,
     },
-    update: {
-      status: mapStripeSubscriptionStatus(stripeSubscription.status),
-      cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-      currentPeriodStart: toDate(stripeSubscription.items.data[0]?.current_period_start),
-      currentPeriodEnd: toDate(stripeSubscription.items.data[0]?.current_period_end),
-    },
+    update: data,
   })
 }
 
-async function markSubscriptionCanceled(
+const markSubscriptionCanceled = async (
   stripeSubscription: Stripe.Subscription,
   connectedAccountId?: string,
-) {
+) => {
   if (!connectedAccountId) {
     logger.warn("stripe subscription deletion event missing connected account", {
       stripeSubscriptionId: stripeSubscription.id,
@@ -209,10 +203,10 @@ async function markSubscriptionCanceled(
   })
 }
 
-async function resolveCustomerEmail(
+const resolveCustomerEmail = async (
   customer: string | Stripe.Customer | Stripe.DeletedCustomer,
   connectedAccountId: string,
-): Promise<string | null> {
+): Promise<string | null> => {
   if (typeof customer === "string") {
     const fetched = await stripe.customers.retrieve(
       customer,
@@ -226,13 +220,13 @@ async function resolveCustomerEmail(
   return customer.email ?? null
 }
 
-async function findOrCreateAdvertiser({
+const findOrCreateAdvertiser = async ({
   workspaceId,
   email,
 }: {
   workspaceId: string
   email: string
-}) {
+}) => {
   const existing = await db.advertiser.findFirst({
     where: { workspaceId, email },
   })

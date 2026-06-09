@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto"
 import { Prisma } from "@openads/db/client"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { authProcedure, workspaceMw } from "../index"
+import { authProcedure, type Context, workspaceMw } from "../index"
 
 const STRIPE_OAUTH_STATE_TTL_SECONDS = 60 * 10
 
@@ -28,10 +28,7 @@ const hasDirectStripeData = (data: Prisma.JsonValue | null) => {
   return (data as Record<string, unknown>).integrationMode === "direct"
 }
 
-const resetWorkspaceStripeObjects = async (
-  db: typeof import("@openads/db").db,
-  workspaceId: string,
-) => {
+const resetWorkspaceStripeObjects = async (db: Context["db"], workspaceId: string) => {
   const tiers = await db.tier.findMany({
     where: { workspaceId },
     select: { id: true },
@@ -61,8 +58,9 @@ export const stripeRouter = {
         await redis.set(
           getOAuthStateKey(state),
           JSON.stringify({ userId: user.id, workspaceId: workspace.id }),
+          "EX",
+          STRIPE_OAUTH_STATE_TTL_SECONDS,
         )
-        await redis.expire(getOAuthStateKey(state), STRIPE_OAUTH_STATE_TTL_SECONDS)
 
         const url = new URL("https://connect.stripe.com/oauth/authorize")
         url.searchParams.set("response_type", "code")

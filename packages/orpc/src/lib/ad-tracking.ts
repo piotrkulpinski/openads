@@ -44,56 +44,35 @@ const isRateLimited = async ({
   return count > limit
 }
 
-export const recordAdImpression = async ({
-  db,
-  redis,
-  clientIp,
-  adId,
-}: RecordAdEventProps): Promise<RecordAdEventResult> => {
+const recordAdEvent = async (
+  { db, redis, clientIp, adId }: RecordAdEventProps,
+  event: "impression" | "click",
+  limit: number,
+): Promise<RecordAdEventResult> => {
   const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
   if (!ad) return { success: false }
 
-  const limited = await isRateLimited({
-    redis,
-    clientIp,
-    adId,
-    event: "impression",
-    limit: IMPRESSION_LIMIT_PER_MINUTE,
-  })
+  const limited = await isRateLimited({ redis, clientIp, adId, event, limit })
   if (limited) return { success: false }
 
+  const date = getTodayBucket()
   await db.adStat.upsert({
-    where: { adId_date: { adId, date: getTodayBucket() } },
-    create: { adId, date: getTodayBucket(), impressions: 1, clicks: 0 },
-    update: { impressions: { increment: 1 } },
+    where: { adId_date: { adId, date } },
+    create: {
+      adId,
+      date,
+      impressions: event === "impression" ? 1 : 0,
+      clicks: event === "click" ? 1 : 0,
+    },
+    update:
+      event === "impression" ? { impressions: { increment: 1 } } : { clicks: { increment: 1 } },
   })
 
   return { success: true }
 }
 
-export const recordAdClick = async ({
-  db,
-  redis,
-  clientIp,
-  adId,
-}: RecordAdEventProps): Promise<RecordAdEventResult> => {
-  const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
-  if (!ad) return { success: false }
+export const recordAdImpression = (props: RecordAdEventProps) =>
+  recordAdEvent(props, "impression", IMPRESSION_LIMIT_PER_MINUTE)
 
-  const limited = await isRateLimited({
-    redis,
-    clientIp,
-    adId,
-    event: "click",
-    limit: CLICK_LIMIT_PER_MINUTE,
-  })
-  if (limited) return { success: false }
-
-  await db.adStat.upsert({
-    where: { adId_date: { adId, date: getTodayBucket() } },
-    create: { adId, date: getTodayBucket(), impressions: 0, clicks: 1 },
-    update: { clicks: { increment: 1 } },
-  })
-
-  return { success: true }
-}
+export const recordAdClick = (props: RecordAdEventProps) =>
+  recordAdEvent(props, "click", CLICK_LIMIT_PER_MINUTE)

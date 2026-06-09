@@ -100,13 +100,12 @@ const mergeRequestOptions = (
 }
 
 const readJson = async <T>(response: Response): Promise<T> => {
-  const body = await response.json().catch(() => null)
-
   if (!response.ok) {
+    const body = await response.json().catch(() => null)
     throw new OpenAdsApiError(response.status, body)
   }
 
-  return body as T
+  return (await response.json()) as T
 }
 
 export const createOpenAdsClient = ({

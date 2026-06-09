@@ -8,7 +8,7 @@ type LaterButtonProps = ComponentProps<"button"> & {
   slug?: string
 }
 
-export function OnboardingLaterButton({ children, step, slug, ...props }: LaterButtonProps) {
+export const OnboardingLaterButton = ({ children, step, slug, ...props }: LaterButtonProps) => {
   const { continueTo, isPending } = useOnboardingProgress()
 
   return (

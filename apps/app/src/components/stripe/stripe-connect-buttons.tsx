@@ -17,6 +17,7 @@ export const StripeConnectButtons = ({
   className,
   workspace,
   onSuccess,
+  ...props
 }: StripeConnectButtonsProps) => {
   const connectAccount = useMutation(
     orpc.stripe.connect.create.mutationOptions({
@@ -52,7 +53,7 @@ export const StripeConnectButtons = ({
   )
 
   return (
-    <div className={className}>
+    <div className={className} {...props}>
       {!workspace.stripeConnectId ? (
         <Button
           size="lg"

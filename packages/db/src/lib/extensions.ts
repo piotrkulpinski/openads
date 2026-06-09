@@ -2,7 +2,7 @@ import { Prisma } from "../generated/prisma/client"
 import { WorkspaceMemberRole } from "../generated/prisma/enums"
 import { generateId } from "./utils"
 
-type RecordData = Record<string, any>
+type RecordData = Record<string, unknown>
 
 const allowedRoles = [WorkspaceMemberRole.Owner, WorkspaceMemberRole.Manager]
 

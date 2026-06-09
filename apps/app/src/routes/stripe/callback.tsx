@@ -2,7 +2,7 @@ import { Button } from "@openads/ui/button"
 import { useMutation } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { Loader2Icon } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { orpc } from "~/lib/orpc"
@@ -22,7 +22,6 @@ function StripeCallbackPage() {
   const navigate = useNavigate()
   const search = Route.useSearch()
   const hasSubmitted = useRef(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const completeConnection = useMutation(
     orpc.stripe.connect.callback.mutationOptions({
@@ -30,28 +29,23 @@ function StripeCallbackPage() {
         toast.success("Stripe connected")
         navigate({ to: "/$workspaceId/settings/general", params: { workspaceId } })
       },
-      onError: error => {
-        setErrorMessage(error.message)
-      },
     }),
   )
 
+  const searchError = search.error
+    ? (search.error_description ?? "Stripe connection was cancelled.")
+    : !search.code || !search.state
+      ? "Missing Stripe connection details."
+      : null
+
+  const errorMessage = searchError ?? completeConnection.error?.message ?? null
+
   useEffect(() => {
-    if (hasSubmitted.current) return
+    if (hasSubmitted.current || searchError || !search.code || !search.state) return
     hasSubmitted.current = true
 
-    if (search.error) {
-      setErrorMessage(search.error_description ?? "Stripe connection was cancelled.")
-      return
-    }
-
-    if (!search.code || !search.state) {
-      setErrorMessage("Missing Stripe connection details.")
-      return
-    }
-
     completeConnection.mutate({ code: search.code, state: search.state })
-  }, [completeConnection, search])
+  }, [completeConnection, search, searchError])
 
   return (
     <div className="grid h-screen place-items-center px-6">

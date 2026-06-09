@@ -10,17 +10,13 @@ export function WaitlistForm() {
     e.preventDefault()
 
     const form = e.currentTarget
-    const email = new FormData(form).get("email") as string
+    const email = String(new FormData(form).get("email") ?? "")
 
     setStatus("loading")
     setMessage("")
 
     try {
       const result = await subscribe({ data: { email } })
-
-      if (!result?.message) {
-        throw new Error("Something went wrong. Please try again.")
-      }
 
       setStatus("success")
       setMessage(result.message)

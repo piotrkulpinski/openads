@@ -2,7 +2,7 @@ import { cx } from "@openads/ui/cva"
 import type { ReactNode } from "react"
 import { H2 } from "~/components/heading"
 
-interface SectionHeadingProps {
+type SectionHeadingProps = {
   children: ReactNode
   subtitle?: string
   className?: string

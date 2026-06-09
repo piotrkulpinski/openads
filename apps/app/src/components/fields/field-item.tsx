@@ -10,7 +10,7 @@ import {
 import { Stack } from "@openads/ui/stack"
 import { useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { MoreVerticalIcon, Trash2 } from "lucide-react"
+import { MoreVerticalIcon, Trash2Icon } from "lucide-react"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
@@ -75,7 +75,7 @@ export const FieldItem = ({ workspaceId, field, className, ...props }: FieldItem
             onConfirm={() => mutate({ id: field.id, workspaceId })}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
-              <Trash2 />
+              <Trash2Icon />
               Delete
             </DropdownMenuItem>
           </ConfirmModal>

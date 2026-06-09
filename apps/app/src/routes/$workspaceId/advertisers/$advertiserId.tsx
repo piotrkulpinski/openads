@@ -1,9 +1,4 @@
-import {
-  formatDate as formatUtilityDate,
-  formatDateRange,
-  formatNumber,
-  getInitials,
-} from "@dirstack/utils"
+import { formatDate, formatDateRange, formatNumber, getInitials } from "@dirstack/utils"
 import { Avatar, AvatarFallback } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
@@ -26,7 +21,7 @@ type AdvertiserAd = Advertiser["ads"][number]
 
 const formatNullableDate = (date: Date | null) => {
   if (!date) return "Not set"
-  return formatUtilityDate(date, "medium", "en-US")
+  return formatDate(date, "medium", "en-US")
 }
 
 const formatPeriod = (start: Date | null, end: Date | null) => {
@@ -155,7 +150,7 @@ const AdvertiserDetailPage = () => {
                 <HeaderTitle>{advertiser.name}</HeaderTitle>
                 <p className="truncate text-muted-foreground text-sm">
                   {advertiser.email ?? "No email"} · First seen{" "}
-                  {formatUtilityDate(advertiser.createdAt, "medium", "en-US")}
+                  {formatDate(advertiser.createdAt, "medium", "en-US")}
                 </p>
               </div>
             </div>

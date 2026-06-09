@@ -23,7 +23,7 @@ export const workspaceRouter = {
 
   create: authProcedure
     .input(workspaceSchema)
-    .handler(async ({ context: { db, user }, input: { ...data } }) => {
+    .handler(async ({ context: { db, user }, input: data }) => {
       const workspace = await db.workspace.create({
         data: {
           ...data,

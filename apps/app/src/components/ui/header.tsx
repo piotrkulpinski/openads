@@ -37,8 +37,8 @@ const headerVariants = cva({
 type HeaderProps = ComponentProps<"div"> &
   VariantProps<typeof headerVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * If set to `true`, the header will be rendered as its child element via Slot.
+     * This child must be a valid React element.
      */
     asChild?: boolean
   }

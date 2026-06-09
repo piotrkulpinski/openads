@@ -14,7 +14,7 @@ type AuthUser = NonNullable<Session>["user"]
  * Context type provided to every procedure. The API layer fills this in via
  * `apps/api/src/context.ts` for both the RPC and OpenAPI handlers.
  */
-export interface Context {
+export type Context = {
   auth: Session | null
   clientIp: string | null
   db: typeof db
@@ -102,6 +102,18 @@ export const authProcedure = publicProcedure.use(({ context, next }) => {
   return next({ context: { user: context.auth.user } })
 })
 
+const findMemberWorkspace = async (context: Context & { user: AuthUser }, workspaceId: string) => {
+  const workspace = await context.db.workspace.findFirst({
+    where: { AND: [{ id: workspaceId }, context.db.workspace.belongsTo(context.user.id)] },
+  })
+
+  if (!workspace) {
+    throw new ORPCError("FORBIDDEN")
+  }
+
+  return workspace
+}
+
 /**
  * Standalone middleware that resolves `workspaceId` from the procedure's input,
  * verifies the user is a member, and stamps `workspace` onto the context.
@@ -116,15 +128,7 @@ export const authProcedure = publicProcedure.use(({ context, next }) => {
 export const workspaceMw = os
   .$context<Context & { user: AuthUser }>()
   .middleware(async ({ context, next }, input: { workspaceId: string }) => {
-    const workspace = await context.db.workspace.findFirst({
-      where: {
-        AND: [{ id: input.workspaceId }, context.db.workspace.belongsTo(context.user.id)],
-      },
-    })
-
-    if (!workspace) {
-      throw new ORPCError("FORBIDDEN")
-    }
+    const workspace = await findMemberWorkspace(context, input.workspaceId)
 
     return next({ context: { workspace } })
   })
@@ -162,15 +166,7 @@ export const connectEnabledMw = os
 export const adMw = os
   .$context<Context & { user: AuthUser }>()
   .middleware(async ({ context, next }, input: { workspaceId: string; adId: string }) => {
-    const workspace = await context.db.workspace.findFirst({
-      where: {
-        AND: [{ id: input.workspaceId }, context.db.workspace.belongsTo(context.user.id)],
-      },
-    })
-
-    if (!workspace) {
-      throw new ORPCError("FORBIDDEN")
-    }
+    const workspace = await findMemberWorkspace(context, input.workspaceId)
 
     const ad = await context.db.ad.findFirst({
       where: { id: input.adId, subscription: { workspaceId: workspace.id } },

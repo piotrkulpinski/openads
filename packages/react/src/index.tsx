@@ -62,9 +62,11 @@ export const OpenAdsProvider = ({
   fetch,
   request,
 }: OpenAdsProviderProps) => {
+  const requestKey = JSON.stringify(request)
+
   const client = useMemo(() => {
     return createOpenAdsClient({ workspaceSlug, apiUrl, fetch, request })
-  }, [apiUrl, fetch, request, workspaceSlug])
+  }, [apiUrl, fetch, requestKey, workspaceSlug])
 
   return <OpenAdsContext.Provider value={client}>{children}</OpenAdsContext.Provider>
 }
@@ -81,37 +83,36 @@ export const useOpenAdsClient = (): OpenAdsClient => {
 
 const getError = (value: unknown): Error => {
   if (value instanceof Error) return value
-  return new Error("OpenAds request failed.")
+  return new Error("OpenAds request failed.", { cause: value })
 }
 
-export const useOpenAdsAd = ({
-  enabled = true,
-  weightGte,
-  excludeIds,
-  request,
-}: OpenAdsAdOptions = {}): OpenAdsQueryState<OpenAdsAd | null> => {
-  const client = useOpenAdsClient()
-  const [data, setData] = useState<OpenAdsAd | null>(null)
+const useOpenAdsQuery = <TData,>(
+  enabled: boolean,
+  initialData: TData,
+  getData: () => Promise<TData>,
+): OpenAdsQueryState<TData> => {
+  const [data, setData] = useState(initialData)
   const [isLoading, setIsLoading] = useState(enabled)
   const [error, setError] = useState<Error | null>(null)
-  const excludeKey = excludeIds?.join(",") ?? ""
+  const latestRequestId = useRef(0)
 
   const refetch = useCallback(async () => {
+    const requestId = ++latestRequestId.current
     setIsLoading(true)
     setError(null)
 
     try {
-      const nextData = await client.getAd({ weightGte, excludeIds, request })
-      setData(nextData)
+      const nextData = await getData()
+      if (requestId === latestRequestId.current) setData(nextData)
       return nextData
     } catch (caught) {
       const nextError = getError(caught)
-      setError(nextError)
+      if (requestId === latestRequestId.current) setError(nextError)
       throw nextError
     } finally {
-      setIsLoading(false)
+      if (requestId === latestRequestId.current) setIsLoading(false)
     }
-  }, [client, excludeKey, request, weightGte])
+  }, [getData])
 
   useEffect(() => {
     if (!enabled) {
@@ -123,6 +124,25 @@ export const useOpenAdsAd = ({
   }, [enabled, refetch])
 
   return { data, isLoading, error, refetch }
+}
+
+export const useOpenAdsAd = ({
+  enabled = true,
+  weightGte,
+  excludeIds,
+  request,
+}: OpenAdsAdOptions = {}): OpenAdsQueryState<OpenAdsAd | null> => {
+  const client = useOpenAdsClient()
+  const requestRef = useRef(request)
+  requestRef.current = request
+  const excludeKey = excludeIds?.join(",") ?? ""
+
+  const getData = useCallback(
+    () => client.getAd({ weightGte, excludeIds, request: requestRef.current }),
+    [client, excludeKey, weightGte],
+  )
+
+  return useOpenAdsQuery<OpenAdsAd | null>(enabled, null, getData)
 }
 
 export const useOpenAdsAds = ({
@@ -133,38 +153,16 @@ export const useOpenAdsAds = ({
   request,
 }: OpenAdsAdsOptions = {}): OpenAdsQueryState<Array<OpenAdsAd>> => {
   const client = useOpenAdsClient()
-  const [data, setData] = useState<Array<OpenAdsAd>>([])
-  const [isLoading, setIsLoading] = useState(enabled)
-  const [error, setError] = useState<Error | null>(null)
+  const requestRef = useRef(request)
+  requestRef.current = request
   const excludeKey = excludeIds?.join(",") ?? ""
 
-  const refetch = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+  const getData = useCallback(
+    () => client.getAds({ weightGte, excludeIds, count, request: requestRef.current }),
+    [client, count, excludeKey, weightGte],
+  )
 
-    try {
-      const nextData = await client.getAds({ weightGte, excludeIds, count, request })
-      setData(nextData)
-      return nextData
-    } catch (caught) {
-      const nextError = getError(caught)
-      setError(nextError)
-      throw nextError
-    } finally {
-      setIsLoading(false)
-    }
-  }, [client, count, excludeKey, request, weightGte])
-
-  useEffect(() => {
-    if (!enabled) {
-      setIsLoading(false)
-      return
-    }
-
-    refetch().catch(() => {})
-  }, [enabled, refetch])
-
-  return { data, isLoading, error, refetch }
+  return useOpenAdsQuery<Array<OpenAdsAd>>(enabled, [], getData)
 }
 
 export const useOpenAdsTracking = (

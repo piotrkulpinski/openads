@@ -27,7 +27,7 @@ export const fieldRouter = {
   create: authProcedure
     .input(fieldSchema.extend({ workspaceId: z.string() }))
     .use(workspaceMw)
-    .handler(async ({ context: { db }, input: { ...data } }) => {
+    .handler(async ({ context: { db }, input: data }) => {
       return await db.field.create({
         data,
       })
@@ -66,7 +66,7 @@ export const fieldRouter = {
     )
     .use(workspaceMw)
     .handler(async ({ context: { db, workspace }, input: { fields } }) => {
-      await Promise.all(
+      await db.$transaction(
         fields.map(({ id, order }) =>
           db.field.update({
             where: { id, workspaceId: workspace.id },

@@ -36,7 +36,7 @@ export const TierPriceList = ({ workspaceId, tier, className, ...props }: TierPr
   )
 
   return (
-    <Card className={cx("", className)} {...props}>
+    <Card className={className} {...props}>
       <Card.Section>
         <Header>
           <HeaderTitle size="h4">Prices</HeaderTitle>

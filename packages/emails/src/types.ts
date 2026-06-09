@@ -2,13 +2,13 @@ import type { EmailAddress } from "autosendjs"
 
 export type EmailRecipient = EmailAddress | EmailAddress[]
 
-export interface EmailClientConfig {
+export type EmailClientConfig = {
   apiKey: string
   from: EmailAddress
   maxRetries?: number
 }
 
-export interface SendEmailInput {
+export type SendEmailInput = {
   to: EmailRecipient
   subject: string
   html: string
@@ -19,16 +19,7 @@ export interface SendEmailInput {
   from?: EmailAddress
 }
 
-export interface SendTemplateInput {
-  to: EmailRecipient
-  templateId: string
-  subject?: string
-  dynamicData?: Record<string, string | number>
-  replyTo?: EmailAddress
-  from?: EmailAddress
-}
-
-export interface UpsertContactInput {
+export type UpsertContactInput = {
   email: string
   firstName?: string
   lastName?: string

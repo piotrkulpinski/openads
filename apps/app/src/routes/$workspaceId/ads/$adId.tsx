@@ -37,11 +37,11 @@ function AdReviewPage() {
   const adQuery = useQuery(
     orpc.ad.getById.queryOptions({ input: { workspaceId, adId }, initialData: initial }),
   )
-  const ad = (adQuery.data ?? initial) as Ad
+  const ad = adQuery.data ?? initial
 
   const [note, setNote] = useState("")
 
-  const onMutate = (action: string) => async () => {
+  const onDecided = (action: string) => async () => {
     toast.success(`Ad ${action}`)
     await queryClient.invalidateQueries({
       queryKey: orpc.ad.getById.key({ input: { workspaceId, adId } }),
@@ -53,19 +53,19 @@ function AdReviewPage() {
 
   const approve = useMutation(
     orpc.ad.approve.mutationOptions({
-      onSuccess: onMutate("approved"),
+      onSuccess: onDecided("approved"),
       onError: e => toast.error(e.message),
     }),
   )
   const reject = useMutation(
     orpc.ad.reject.mutationOptions({
-      onSuccess: onMutate("rejected"),
+      onSuccess: onDecided("rejected"),
       onError: e => toast.error(e.message),
     }),
   )
   const requestChanges = useMutation(
     orpc.ad.requestChanges.mutationOptions({
-      onSuccess: onMutate("changes requested"),
+      onSuccess: onDecided("changes requested"),
       onError: e => toast.error(e.message),
     }),
   )

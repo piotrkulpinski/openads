@@ -11,7 +11,7 @@ export const userRouter = {
 
   update: authProcedure
     .input(userSchema)
-    .handler(async ({ context: { db, user }, input: { ...data } }) => {
+    .handler(async ({ context: { db, user }, input: data }) => {
       return db.user.update({
         where: { id: user.id },
         data,
