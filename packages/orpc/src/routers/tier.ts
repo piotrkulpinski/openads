@@ -290,7 +290,9 @@ export const tierRouter = {
       .input(
         z.object({
           tierPriceId: z.string(),
-          email: z.email(),
+          // Optional: Stripe Checkout collects the email on its hosted page, so
+          // the embed doesn't gate the subscribe button on it. Pre-fills when present.
+          email: z.email().optional(),
         }),
       )
       .handler(async ({ context: { db, stripe, env }, input: { tierPriceId, email } }) => {
