@@ -14,9 +14,11 @@ const uploadImageInput = z.object({
 
 function generateObjectKey(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase() || "png"
-  const baseName = slugify(fileName.replace(/\.[^.]+$/, "")) || "file"
+  const baseName = slugify(fileName.replace(/\.[^.]+$/, "")).slice(0, 40) || "file"
 
-  return `${baseName}-${Date.now()}-${randomUUID()}.${extension}`
+  // A short random suffix is plenty for uniqueness within the workspace prefix —
+  // a timestamp + full UUID just made the public asset URLs needlessly long.
+  return `${baseName}-${randomUUID().slice(0, 8)}.${extension}`
 }
 
 // SVG is intentionally excluded — it can execute JS when rendered via <img>
@@ -117,7 +119,10 @@ export const storageRouter = {
             })
           }
 
-          const objectKey = `workspaces/${workspaceId}/uploads/${sessionId}/${generateObjectKey(fileName)}`
+          // Scoped to the workspace; the random key guarantees uniqueness. We don't
+          // fold the (long) Stripe session id into the path — uploads only happen
+          // after a completed checkout, so there are no orphans to group by session.
+          const objectKey = `workspaces/${workspaceId}/uploads/${generateObjectKey(fileName)}`
 
           // Presigned PUT — R2 doesn't implement presigned POST (returns 501).
           // The signed content-length pins the exact byte count, so the 2 MB cap

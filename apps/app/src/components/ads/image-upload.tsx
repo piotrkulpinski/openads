@@ -81,10 +81,16 @@ export const ImageUpload = ({
       />
 
       {value ? (
-        <div className="flex flex-1 items-center gap-3">
-          <img src={value} alt="" className="size-12 rounded border object-cover" />
-          <span className="flex-1 truncate text-muted-foreground text-xs">{value}</span>
-          <Button type="button" variant="ghost" prefix={<TrashIcon />} onClick={handleClear}>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <img src={value} alt="" className="size-12 shrink-0 rounded border object-cover" />
+          <span className="min-w-0 flex-1 truncate text-muted-foreground text-xs">{value}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            className="shrink-0"
+            prefix={<TrashIcon />}
+            onClick={handleClear}
+          >
             Remove
           </Button>
         </div>
