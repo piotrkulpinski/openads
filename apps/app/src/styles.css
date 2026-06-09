@@ -119,13 +119,9 @@
 }
 
 /*
- * Dark palette. Applied in two ways so the embed's `?theme=` control works:
- *   - `auto` / unset → follows the visitor's OS via `prefers-color-scheme`
- *     (scoped out when a theme is forced, so the media query can't override).
- *   - `[data-theme="dark"]` → forced dark regardless of OS.
- *   - `[data-theme="light"]` → forced light (matches neither block → :root light).
- * The token list is intentionally duplicated; CSS can't share a declaration
- * block across an at-rule and a plain selector.
+ * Dark palette. `auto`/unset follows the OS; `[data-theme="dark"|"light"]`
+ * forces a theme (the embed's `?theme=` control). The token list is duplicated
+ * because CSS can't share a declaration block across an at-rule and a selector.
  */
 @layer base {
   @media (prefers-color-scheme: dark) {

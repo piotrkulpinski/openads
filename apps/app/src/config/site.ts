@@ -2,11 +2,7 @@ import { env } from "~/env"
 
 export const siteConfig = {
   url: env.VITE_BASE_URL,
-
-  // OpenAds project marketing site — used for "Powered by OpenAds" attribution
-  // (the project's own landing page, not the self-hoster's dashboard URL).
-  webUrl: "https://openads.co",
-
+  webUrl: env.VITE_WEB_URL,
   name: "OpenAds",
   tagline: "Self-serve subscription advertising for publishers.",
   description:
