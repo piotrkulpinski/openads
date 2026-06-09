@@ -119,27 +119,20 @@ export const storageRouter = {
 
           const objectKey = `workspaces/${workspaceId}/uploads/${sessionId}/${generateObjectKey(fileName)}`
 
-          // Presigned POST (not PUT) so the size cap is enforced server-side
-          // at S3 via `content-length-range`.
-          const presigned = await s3.createSignedPost({
+          // Presigned PUT — R2 doesn't implement presigned POST (returns 501).
+          // The signed content-length pins the exact byte count, so the 2 MB cap
+          // is enforced by the storage backend, not just the check above.
+          const uploadUrl = await s3.getSignedUploadUrl({
             key: objectKey,
+            contentType,
+            contentLength,
             expiresInSeconds: ADVERTISER_UPLOAD_TTL_SECONDS,
-            contentLengthRange: { max: MAX_ADVERTISER_UPLOAD_BYTES },
-            // S3 requires the form to echo every signed field with the exact
-            // value, so these are returned to the client alongside `conditions`.
-            fields: {
-              "Content-Type": contentType,
-              "Cache-Control": "public, max-age=31536000, immutable",
-            },
-            conditions: [
-              ["eq", "$Content-Type", contentType],
-              ["eq", "$Cache-Control", "public, max-age=31536000, immutable"],
-            ],
           })
 
           return {
-            uploadUrl: presigned.url,
-            fields: presigned.fields,
+            uploadUrl,
+            // The client must send these exact headers on the PUT — they're signed.
+            headers: { "Content-Type": contentType },
             publicUrl: s3.getPublicUrl({ key: objectKey }),
             key: objectKey,
           }
