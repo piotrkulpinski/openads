@@ -1,5 +1,5 @@
-import { cva, cx, type VariantProps } from "@openads/ui/cva"
-import type { HTMLAttributes } from "react"
+import { cva, type VariantProps } from "@openads/ui/cva"
+import type { ComponentProps } from "react"
 
 const headingVariants = cva({
   base: "font-semibold tracking-tight text-balance",
@@ -17,12 +17,11 @@ const headingVariants = cva({
   },
 })
 
-export type HeadingProps = Omit<HTMLAttributes<HTMLHeadingElement>, "size"> &
-  VariantProps<typeof headingVariants>
+export type HeadingProps = ComponentProps<"h2"> & VariantProps<typeof headingVariants>
 
 export const Heading = ({ className, size = "h2", ...props }: HeadingProps) => {
   const Comp = size ?? "h2"
-  return <Comp className={cx(headingVariants({ size, className }))} {...props} />
+  return <Comp className={headingVariants({ size, className })} {...props} />
 }
 
 export const H1 = (props: HeadingProps) => <Heading size="h1" {...props} />

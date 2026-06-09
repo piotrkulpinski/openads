@@ -2,7 +2,7 @@
 import type { ReactNode } from "react"
 import { Body, Container, Head, Html, Preview, Tailwind } from "react-email"
 
-interface LayoutProps {
+type LayoutProps = {
   preview: string
   children: ReactNode
 }

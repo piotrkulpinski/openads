@@ -1,10 +1,5 @@
 import { Autosend } from "autosendjs"
-import type {
-  EmailClientConfig,
-  SendEmailInput,
-  SendTemplateInput,
-  UpsertContactInput,
-} from "./types"
+import type { EmailClientConfig, SendEmailInput, UpsertContactInput } from "./types"
 
 export function createEmailClient(config: EmailClientConfig) {
   const autosend = new Autosend(config.apiKey, {
@@ -24,17 +19,6 @@ export function createEmailClient(config: EmailClientConfig) {
     })
   }
 
-  async function sendTemplate(input: SendTemplateInput) {
-    return autosend.emails.send({
-      from: input.from ?? config.from,
-      to: input.to,
-      subject: input.subject ?? "",
-      templateId: input.templateId,
-      dynamicData: input.dynamicData,
-      replyTo: input.replyTo,
-    })
-  }
-
   async function upsertContact(input: UpsertContactInput) {
     return autosend.contacts.upsert(input)
   }
@@ -42,7 +26,6 @@ export function createEmailClient(config: EmailClientConfig) {
   return {
     autosend,
     send,
-    sendTemplate,
     upsertContact,
   }
 }

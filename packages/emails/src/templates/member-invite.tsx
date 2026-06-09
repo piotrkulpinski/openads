@@ -2,7 +2,7 @@
 import { Button, Heading, Hr, Link, Section, Text } from "react-email"
 import { Layout } from "./_layout"
 
-export interface MemberInviteProps {
+export type MemberInviteProps = {
   workspaceName: string
   inviteUrl: string
   inviterName?: string

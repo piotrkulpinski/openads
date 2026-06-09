@@ -1,5 +1,5 @@
 import { BillingInterval } from "@openads/db/client"
-import { tierPriceSchema, tierSchema } from "@openads/db/schema"
+import { tierSchema } from "@openads/db/schema"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
@@ -18,6 +18,7 @@ import { z } from "zod"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
 import { CurrencySelect } from "~/components/tiers/currency-select"
+import { intervalLabels, tierPriceFormSchema } from "~/components/tiers/tier-price-form"
 import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
 import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
@@ -25,28 +26,13 @@ import { wholeToCents } from "~/lib/currency"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 import type { router } from "~/main"
 
-// In-form representation of an initial price row. The visible field is `amountWhole`
-// (integer whole units); we convert to cents at submit time so the wire / DB / Stripe
-// always receive minor units.
-const initialPriceFormSchema = z.object({
-  interval: z.enum(BillingInterval).default(BillingInterval.Month),
-  intervalCount: z.number().int().positive().default(1),
-  amountWhole: z.number().int().nonnegative(),
-  currency: tierPriceSchema.shape.currency,
-})
-
 const tierFormSchema = tierSchema.extend({
-  initialPrices: z.array(initialPriceFormSchema).default([]),
+  initialPrices: z.array(tierPriceFormSchema).default([]),
 })
 
 type TierFormValues = z.infer<typeof tierFormSchema>
 
-const intervalLabels: Record<BillingInterval, string> = {
-  [BillingInterval.Day]: "Per day",
-  [BillingInterval.Week]: "Per week",
-  [BillingInterval.Month]: "Per month",
-  [BillingInterval.Year]: "Per year",
-}
+const MAX_FEATURES = 15
 
 type TierFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
@@ -105,8 +91,6 @@ export const TierForm = ({
       { shouldDirty: true },
     )
   }
-
-  const MAX_FEATURES = 15
 
   const afterSuccess = async () => {
     if (nextUrl) navigate(nextUrl)
@@ -274,7 +258,7 @@ export const TierForm = ({
             <div className="grid gap-2">
               {features.map((_, index) => (
                 <FormField
-                  // biome-ignore lint/suspicious/noArrayIndexKey: feature list isn't reordered
+                  // Index keys are fine here: the feature list is never reordered.
                   key={index}
                   control={form.control}
                   name={`features.${index}`}

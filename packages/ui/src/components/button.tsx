@@ -84,7 +84,7 @@ const Button = ({
 
   return (
     <Comp
-      disabled={disabled ?? isPending}
+      disabled={disabled || isPending}
       className={cx(boxVariants({ hover, focus }), buttonVariants({ variant, size, className }))}
       {...props}
     >

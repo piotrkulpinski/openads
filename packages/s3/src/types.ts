@@ -1,13 +1,8 @@
-import type {
-  DeleteObjectCommandInput,
-  GetObjectCommandInput,
-  PutObjectCommandInput,
-} from "@aws-sdk/client-s3"
-import type { Conditions } from "@aws-sdk/s3-presigned-post/dist-types/types"
+import type { DeleteObjectCommandInput, PutObjectCommandInput } from "@aws-sdk/client-s3"
 
 export type S3ObjectBody = PutObjectCommandInput["Body"]
 
-export interface S3BucketClientConfig {
+export type S3BucketClientConfig = {
   region: string
   bucket: string
   accessKeyId: string
@@ -18,7 +13,7 @@ export interface S3BucketClientConfig {
   signedUrlTtlSeconds?: number
 }
 
-export interface UploadObjectOptions {
+export type UploadObjectOptions = {
   key: string
   body: S3ObjectBody
   cacheControl?: string
@@ -27,21 +22,21 @@ export interface UploadObjectOptions {
   acl?: PutObjectCommandInput["ACL"]
 }
 
-export interface DeleteObjectOptions {
+export type DeleteObjectOptions = {
   key: string
   versionId?: DeleteObjectCommandInput["VersionId"]
 }
 
-export interface DeletePrefixOptions {
+export type DeletePrefixOptions = {
   prefix: string
 }
 
-export interface SignedUrlOptions {
+export type SignedUrlOptions = {
   key: string
   expiresInSeconds?: number
 }
 
-export interface SignedUploadUrlOptions extends SignedUrlOptions {
+export type SignedUploadUrlOptions = SignedUrlOptions & {
   cacheControl?: string
   contentType?: string
   metadata?: PutObjectCommandInput["Metadata"]
@@ -54,28 +49,11 @@ export interface SignedUploadUrlOptions extends SignedUrlOptions {
   contentLength?: number
 }
 
-export interface SignedDownloadUrlOptions extends SignedUrlOptions {
-  responseContentDisposition?: GetObjectCommandInput["ResponseContentDisposition"]
-  responseContentType?: GetObjectCommandInput["ResponseContentType"]
-}
-
-export interface PresignedPostOptions {
+export type PublicUrlOptions = {
   key: string
-  expiresInSeconds?: number
-  conditions?: Array<Conditions>
-  fields?: Record<string, string>
-  contentLengthRange?: {
-    min?: number
-    max: number
-  }
 }
 
-export interface PublicUrlOptions {
-  key: string
-  baseUrlOverride?: string
-}
-
-export interface UploadResult {
+export type UploadResult = {
   key: string
   url: string
 }

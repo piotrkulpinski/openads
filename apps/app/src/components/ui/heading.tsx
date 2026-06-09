@@ -24,14 +24,13 @@ const headingVariants = cva({
 export type HeadingProps = Omit<HTMLAttributes<HTMLHeadingElement>, "size"> &
   VariantProps<typeof headingVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * Render as a different element type (h1–h6, span, ...).
      */
     as?: ElementType
 
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * If set to `true`, the heading will be rendered as its child element via Slot.
+     * This child must be a valid React element.
      */
     asChild?: boolean
   }

@@ -2,7 +2,7 @@
 import { Heading, Hr, Text } from "react-email"
 import { Layout } from "./_layout"
 
-export interface AdRejectedProps {
+export type AdRejectedProps = {
   workspaceName: string
   adName: string
   rejectionNote?: string

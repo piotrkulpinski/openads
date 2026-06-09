@@ -1,6 +1,6 @@
 import type { S3BucketClient } from "./client"
 
-interface FetchAndUploadFaviconProps {
+type FetchAndUploadFaviconProps = {
   websiteUrl: string
   key: string
   cacheControl?: string

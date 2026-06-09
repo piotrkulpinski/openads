@@ -16,12 +16,12 @@ import { showRoutes } from "hono/dev"
 import { createContext } from "~/context"
 import { env } from "~/env"
 import { corsMiddleware } from "~/middleware/cors"
+import { loggerMiddleware } from "~/middleware/logger"
 import { onError as honoOnError } from "~/middleware/on-error"
 import { logRoute } from "~/routes/log"
 import { stripeWebhookRoute } from "~/routes/webhooks/stripe"
 import { auth } from "~/services/auth"
 import { logger } from "~/services/logger"
-import { loggerMiddleware } from "./middleware/logger"
 
 const app = new Hono({
   strict: false,
@@ -93,7 +93,7 @@ const adsCurrentPath = /^\/v1\/workspaces\/[^/]+\/ads\/current$/
 // procedures themselves). Consumed by `@openads/sdk` and any third-party API
 // integrators.
 app.use("/v1/*", async (c, next) => {
-  const context = await createContext({ headers: c.req.raw.headers })
+  const context = await createContext({ headers: c.req.raw.headers, withAuth: false })
   const { matched, response } = await restHandler.handle(c.req.raw, {
     prefix: "/v1",
     context,
@@ -109,7 +109,7 @@ app.use("/v1/*", async (c, next) => {
   // can't hammer the API.
   if (
     c.req.method === "GET" &&
-    adsCurrentPath.test(new URL(c.req.url).pathname) &&
+    adsCurrentPath.test(c.req.path) &&
     response.status >= 200 &&
     response.status < 300
   ) {

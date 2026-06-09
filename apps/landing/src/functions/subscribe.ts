@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
-import { emails, waitlistListId } from "~/lib/emails"
+import { env } from "~/env"
+import { emails } from "~/lib/emails"
 
 export const subscribe = createServerFn({ method: "POST" })
   .inputValidator((data: { email: string }) => {
@@ -14,7 +15,7 @@ export const subscribe = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const result = await emails.upsertContact({
       email: data.email,
-      listIds: [waitlistListId],
+      listIds: [env.AUTOSEND_WAITLIST_LIST_ID],
     })
 
     if (!result.success) {

@@ -1,21 +1,16 @@
 import {
-  type _Object,
   DeleteObjectCommand,
   DeleteObjectsCommand,
-  GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3"
-import { createPresignedPost } from "@aws-sdk/s3-presigned-post"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import type {
   DeleteObjectOptions,
   DeletePrefixOptions,
-  PresignedPostOptions,
   PublicUrlOptions,
   S3BucketClientConfig,
-  SignedDownloadUrlOptions,
   SignedUploadUrlOptions,
   UploadObjectOptions,
   UploadResult,
@@ -38,8 +33,7 @@ function ensureTrailingSlash(value: string) {
   return value.endsWith("/") ? value : `${value}/`
 }
 
-function resolvePublicUrl(config: S3BucketClientConfig, override?: string) {
-  if (override) return ensureTrailingSlash(override)
+function resolvePublicUrl(config: S3BucketClientConfig) {
   if (config.publicUrl) return ensureTrailingSlash(config.publicUrl)
 
   if (config.endpoint) {
@@ -66,6 +60,7 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
   })
 
   const defaultSignedUrlTtl = config.signedUrlTtlSeconds ?? DEFAULT_SIGNED_URL_TTL_SECONDS
+  const basePublicUrl = resolvePublicUrl(config)
 
   async function uploadObject(options: UploadObjectOptions): Promise<UploadResult> {
     const key = trimLeadingSlash(options.key)
@@ -114,8 +109,9 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
         }),
       )
 
-      const contents = (listResponse.Contents ?? []) as _Object[]
-      const objects = contents.flatMap(entry => (entry.Key ? [{ Key: entry.Key }] : []))
+      const objects = (listResponse.Contents ?? []).flatMap(entry =>
+        entry.Key ? [{ Key: entry.Key }] : [],
+      )
 
       if (objects.length > 0) {
         await client.send(
@@ -134,10 +130,7 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
   }
 
   function getPublicUrl(options: PublicUrlOptions) {
-    const key = trimLeadingSlash(options.key)
-    const url = resolvePublicUrl(config, options.baseUrlOverride)
-
-    return `${url}${encodeKeyForUrl(key)}`
+    return `${basePublicUrl}${encodeKeyForUrl(trimLeadingSlash(options.key))}`
   }
 
   async function getSignedUploadUrl(options: SignedUploadUrlOptions) {
@@ -164,43 +157,6 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
     return getSignedUrl(client, command, { expiresIn, signableHeaders })
   }
 
-  async function getSignedDownloadUrl(options: SignedDownloadUrlOptions) {
-    const key = trimLeadingSlash(options.key)
-    const expiresIn = options.expiresInSeconds ?? defaultSignedUrlTtl
-
-    const command = new GetObjectCommand({
-      Bucket: config.bucket,
-      Key: key,
-      ResponseContentDisposition: options.responseContentDisposition,
-      ResponseContentType: options.responseContentType,
-    })
-
-    return getSignedUrl(client, command, { expiresIn })
-  }
-
-  async function createSignedPost(options: PresignedPostOptions) {
-    const key = trimLeadingSlash(options.key)
-    const expiresIn = options.expiresInSeconds ?? defaultSignedUrlTtl
-
-    const conditions = options.conditions ? [...options.conditions] : []
-
-    if (options.contentLengthRange) {
-      const { min = 0, max } = options.contentLengthRange
-      if (typeof max !== "number") {
-        throw new Error("contentLengthRange.max must be provided for presigned posts.")
-      }
-      conditions.push(["content-length-range", min, max])
-    }
-
-    return createPresignedPost(client, {
-      Bucket: config.bucket,
-      Key: key,
-      Fields: options.fields,
-      Expires: expiresIn,
-      Conditions: conditions.length > 0 ? conditions : undefined,
-    })
-  }
-
   return {
     client,
     uploadObject,
@@ -208,8 +164,6 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
     deletePrefix,
     getPublicUrl,
     getSignedUploadUrl,
-    getSignedDownloadUrl,
-    createSignedPost,
   }
 }
 

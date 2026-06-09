@@ -1,6 +1,6 @@
 "use client"
 
-import type { ComponentProps, ComponentType, CSSProperties, HTMLAttributes, ReactNode } from "react"
+import type { ComponentProps, ComponentType, CSSProperties, ReactNode } from "react"
 import { createContext, useContext, useId, useMemo } from "react"
 import * as RechartsPrimitive from "recharts"
 import { cx } from "../lib/cva"
@@ -39,8 +39,8 @@ const ChartContainer = ({
   className,
   children,
   config,
-  // ...props
-}: HTMLAttributes<"div"> & {
+  ...props
+}: ComponentProps<"div"> & {
   config: ChartConfig
   children: ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"]
 }) => {
@@ -55,7 +55,7 @@ const ChartContainer = ({
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className,
         )}
-        // {...props}
+        {...props}
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>{children}</RechartsPrimitive.ResponsiveContainer>
@@ -185,7 +185,7 @@ const ChartTooltipContent = ({
                     !hideIndicator && (
                       <div
                         className={cx(
-                          "shrink-0 rounded-[2px] border-(--color-boder) bg-(--color-bg)",
+                          "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
                           {
                             "h-2.5 w-2.5": indicator === "dot",
                             "w-1": indicator === "line",
@@ -215,7 +215,7 @@ const ChartTooltipContent = ({
                         {itemConfig?.label || item.name}
                       </span>
                     </div>
-                    {item.value && (
+                    {item.value != null && (
                       <span className="font-mono font-medium tabular-nums text-foreground">
                         {item.value.toLocaleString()}
                       </span>

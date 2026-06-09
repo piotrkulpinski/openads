@@ -36,13 +36,28 @@ type TooltipProps = ComponentProps<typeof TooltipPrimitive.Root> &
     tooltip: ReactNode
   }
 
-const TooltipBase = ({ children, delayDuration, tooltip, ...rest }: TooltipProps) => {
+const Tooltip = ({
+  children,
+  tooltip,
+  open,
+  defaultOpen,
+  onOpenChange,
+  delayDuration,
+  disableHoverableContent,
+  ...rest
+}: TooltipProps) => {
   if (!tooltip) {
     return children
   }
 
   return (
-    <TooltipRoot delayDuration={delayDuration}>
+    <TooltipRoot
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      delayDuration={delayDuration}
+      disableHoverableContent={disableHoverableContent}
+    >
       <TooltipTrigger asChild>{children}</TooltipTrigger>
 
       <TooltipPortal>
@@ -54,14 +69,5 @@ const TooltipBase = ({ children, delayDuration, tooltip, ...rest }: TooltipProps
     </TooltipRoot>
   )
 }
-
-const Tooltip = Object.assign(TooltipBase, {
-  Provider: TooltipProvider,
-  Root: TooltipRoot,
-  Trigger: TooltipTrigger,
-  Portal: TooltipPortal,
-  Content: TooltipContent,
-  Arrow: TooltipArrow,
-})
 
 export { Tooltip, TooltipRoot, TooltipTrigger, TooltipContent, TooltipProvider }

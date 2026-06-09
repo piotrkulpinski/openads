@@ -11,7 +11,7 @@
 import type { LogContext, Logger, LogLevel, RemoteLogEntry } from "./types"
 import { serializeError } from "./types"
 
-export interface BrowserLoggerOptions {
+export type BrowserLoggerOptions = {
   /**
    * Absolute URL of the remote `/log` endpoint.
    * Pass `null` to disable remote shipping (useful in tests).
@@ -74,7 +74,7 @@ const consoleMethodFor = (level: LogLevel): "log" | "info" | "warn" | "error" =>
   return "log"
 }
 
-interface InternalLoggerState {
+type InternalLoggerState = {
   buffer: RemoteLogEntry[]
   flushTimer: ReturnType<typeof setTimeout> | null
   installed: boolean
@@ -205,11 +205,11 @@ const buildLogger = (core: ReturnType<typeof createCore>, bindings: LogContext):
   flush: () => core.flush(false),
 })
 
-export interface BrowserLogger extends Logger {
+export type BrowserLogger = Logger & {
   /**
    * Forces an immediate flush of buffered entries.
    */
-  flush(): void
+  flush: () => void
 }
 
 export const createBrowserLogger = (opts: BrowserLoggerOptions): BrowserLogger => {

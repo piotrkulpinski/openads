@@ -13,8 +13,14 @@ import { stripe } from "~/services/stripe"
  * handlers. `headers` is the raw `Request.headers` instance; we mine it for
  * the session and the client IP.
  */
-export const createContext = async ({ headers }: { headers: Headers }): Promise<Context> => {
-  const auth = await betterAuth.api.getSession({ headers })
+export const createContext = async ({
+  headers,
+  withAuth = true,
+}: {
+  headers: Headers
+  withAuth?: boolean
+}): Promise<Context> => {
+  const auth = withAuth ? await betterAuth.api.getSession({ headers }) : null
 
   const clientIp =
     headers.get("cf-connecting-ip") ?? headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null

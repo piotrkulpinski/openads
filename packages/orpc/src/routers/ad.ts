@@ -1,4 +1,4 @@
-import { AdStatus, WorkspaceMemberRole } from "@openads/db/client"
+import { AdStatus, type Prisma, WorkspaceMemberRole } from "@openads/db/client"
 import {
   renderAdApproved,
   renderAdChangesRequested,
@@ -9,7 +9,7 @@ import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscription"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { adMw, authProcedure, publicProcedure, workspaceMw } from "../index"
+import { adMw, authProcedure, type Context, publicProcedure, workspaceMw } from "../index"
 import { findServingAds, servingAdSchema } from "../lib/ad-serving"
 import { recordAdClick, recordAdImpression } from "../lib/ad-tracking"
 
@@ -19,7 +19,7 @@ const createFromCheckoutInput = z.object({
   name: z.string().trim().min(2),
   websiteUrl: z.url(),
   meta: z
-    .array(z.object({ fieldId: z.string(), value: z.any() }))
+    .array(z.object({ fieldId: z.string(), value: z.unknown() }))
     .optional()
     .default([]),
 })
@@ -41,12 +41,7 @@ const getConnectedCheckoutSession = async ({
   stripe,
   workspaceId,
   sessionId,
-}: {
-  db: typeof import("@openads/db").db
-  stripe: import("@openads/stripe").StripeClient
-  workspaceId: string
-  sessionId: string
-}) => {
+}: Pick<Context, "db" | "stripe"> & { workspaceId: string; sessionId: string }) => {
   const workspace = await db.workspace.findUnique({
     where: { id: workspaceId },
     select: { id: true, stripeConnectId: true },
@@ -260,7 +255,7 @@ const createFromCheckout = publicProcedure
       // `customer_email`), so it lands in `customer_details.email`.
       const customerEmail = session.customer_details?.email ?? session.customer_email
 
-      if (!workspaceId || !tierPriceId || !customerEmail) {
+      if (!tierPriceId || !customerEmail) {
         throw new ORPCError("BAD_REQUEST", { message: "Missing checkout metadata." })
       }
 
@@ -369,7 +364,7 @@ const createFromCheckout = publicProcedure
                   data: filtered.map(m => ({
                     adId: ad.id,
                     fieldId: m.fieldId,
-                    value: m.value,
+                    value: m.value as Prisma.InputJsonValue,
                   })),
                 }),
               ]
@@ -400,17 +395,14 @@ const createFromCheckout = publicProcedure
           reviewUrl: `${env.APP_URL}/${workspace.id}/ads/${ad.id}`,
         })
 
+        const recipients = reviewers.flatMap(r =>
+          r.user.email ? [{ email: r.user.email, name: r.user.name }] : [],
+        )
+
         await Promise.all(
-          reviewers
-            .filter(r => r.user.email)
-            .map(r =>
-              emails.send({
-                to: { email: r.user.email!, name: r.user.name },
-                subject: `New ad pending review on ${workspace.name}`,
-                html,
-                text,
-              }),
-            ),
+          recipients.map(to =>
+            emails.send({ to, subject: `New ad pending review on ${workspace.name}`, html, text }),
+          ),
         )
       }
 

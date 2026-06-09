@@ -19,12 +19,10 @@ import { useZodForm } from "~/hooks/use-zod-form"
 import { logger } from "~/lib/logger"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
-type AvatarState = {
-  file: File | null
-  previewUrl: string | null
-  isDirty: boolean
-  isRemoved: boolean
-}
+type AvatarState =
+  | { kind: "unchanged" }
+  | { kind: "selected"; file: File; previewUrl: string }
+  | { kind: "removed" }
 
 type AccountProfileFormProps = ComponentProps<"div"> & {
   user: RouterOutputs["user"]["me"]
@@ -40,12 +38,10 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
     values: user,
   })
 
-  const [avatar, setAvatar] = useState<AvatarState>({
-    file: null,
-    previewUrl: user.image,
-    isDirty: false,
-    isRemoved: !user.image,
-  })
+  const [avatar, setAvatar] = useState<AvatarState>({ kind: "unchanged" })
+
+  const previewUrl =
+    avatar.kind === "selected" ? avatar.previewUrl : avatar.kind === "removed" ? null : user.image
 
   const uploadImage = useMutation(
     orpc.storage.uploadUserImage.mutationOptions({
@@ -75,12 +71,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
     }
 
     try {
-      setAvatar({
-        file,
-        previewUrl: await toBase64(file),
-        isDirty: true,
-        isRemoved: false,
-      })
+      setAvatar({ kind: "selected", file, previewUrl: await toBase64(file) })
     } catch (error) {
       logger.error("failed to read avatar file", { err: error })
       toast.error("Unable to read the selected file")
@@ -88,44 +79,45 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
   }
 
   const handleRemoveAvatar = () => {
-    setAvatar(() => ({
-      file: null,
-      previewUrl: null,
-      isDirty: true,
-      isRemoved: true,
-    }))
+    setAvatar({ kind: "removed" })
   }
 
   const onSubmit = async (values: z.infer<typeof schema>) => {
     try {
       let imagePayload: string | null | undefined
 
-      if (avatar.isRemoved && (user.image || avatar.isDirty)) {
-        imagePayload = null
-      } else if (avatar.isDirty && avatar.file && avatar.previewUrl) {
-        const uploadResult = await uploadImage.mutateAsync({
-          file: avatar.previewUrl,
-          fileName: avatar.file.name,
-          contentType: avatar.file.type,
-          cacheControl: "public, max-age=31536000",
-        })
+      switch (avatar.kind) {
+        case "removed": {
+          imagePayload = null
+          break
+        }
 
-        imagePayload = uploadResult.url
+        case "selected": {
+          const uploadResult = await uploadImage.mutateAsync({
+            file: avatar.previewUrl,
+            fileName: avatar.file.name,
+            contentType: avatar.file.type,
+            cacheControl: "public, max-age=31536000",
+          })
+
+          imagePayload = uploadResult.url
+          break
+        }
+
+        case "unchanged": {
+          imagePayload = undefined
+          break
+        }
       }
 
-      const updatedUser = await updateProfile.mutateAsync({
+      await updateProfile.mutateAsync({
         name: values.name,
         image: imagePayload,
       })
 
       form.reset({}, { keepValues: true })
 
-      setAvatar({
-        file: null,
-        previewUrl: updatedUser.image,
-        isDirty: false,
-        isRemoved: !updatedUser.image,
-      })
+      setAvatar({ kind: "unchanged" })
 
       toast.success("Profile updated")
 
@@ -153,7 +145,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
             <div className="grid gap-6 max-w-xl">
               <Stack size="lg" direction="column">
                 <Avatar className="size-14">
-                  <AvatarImage src={avatar.previewUrl ?? undefined} />
+                  <AvatarImage src={previewUrl ?? undefined} />
                   <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
 
@@ -178,7 +170,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
                     Change photo
                   </Button>
 
-                  {avatar.previewUrl && (
+                  {previewUrl && (
                     <Button
                       type="button"
                       size="sm"

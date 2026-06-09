@@ -2,7 +2,7 @@
 import { Button, Heading, Hr, Section, Text } from "react-email"
 import { Layout } from "./_layout"
 
-export interface AdPendingReviewProps {
+export type AdPendingReviewProps = {
   workspaceName: string
   advertiserName: string
   advertiserEmail: string

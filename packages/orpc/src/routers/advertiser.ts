@@ -169,10 +169,11 @@ export const advertiserRouter = {
         throw new ORPCError("NOT_FOUND")
       }
 
-      const subscriptions = advertiser.subscriptions.filter(subscription => subscription.ad)
-      const ads = subscriptions
-        .map(subscription => {
-          const ad = subscription.ad!
+      const ads = advertiser.subscriptions
+        .flatMap(subscription => {
+          const ad = subscription.ad
+          if (!ad) return []
+
           const stats = ad.stats.reduce(
             (total, row) => {
               return {
@@ -183,29 +184,31 @@ export const advertiserRouter = {
             { impressions: 0, clicks: 0 },
           )
 
-          return {
-            id: ad.id,
-            name: ad.name,
-            status: ad.status,
-            websiteUrl: ad.websiteUrl,
-            createdAt: ad.createdAt,
-            updatedAt: ad.updatedAt,
-            approvedAt: ad.approvedAt,
-            rejectedAt: ad.rejectedAt,
-            rejectionNote: ad.rejectionNote,
-            stats,
-            subscription: {
-              id: subscription.id,
-              status: subscription.status,
-              cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-              currentPeriodStart: subscription.currentPeriodStart,
-              currentPeriodEnd: subscription.currentPeriodEnd,
-              createdAt: subscription.createdAt,
-              updatedAt: subscription.updatedAt,
-              tier: subscription.tier,
-              tierPrice: subscription.tierPrice,
+          return [
+            {
+              id: ad.id,
+              name: ad.name,
+              status: ad.status,
+              websiteUrl: ad.websiteUrl,
+              createdAt: ad.createdAt,
+              updatedAt: ad.updatedAt,
+              approvedAt: ad.approvedAt,
+              rejectedAt: ad.rejectedAt,
+              rejectionNote: ad.rejectionNote,
+              stats,
+              subscription: {
+                id: subscription.id,
+                status: subscription.status,
+                cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+                currentPeriodStart: subscription.currentPeriodStart,
+                currentPeriodEnd: subscription.currentPeriodEnd,
+                createdAt: subscription.createdAt,
+                updatedAt: subscription.updatedAt,
+                tier: subscription.tier,
+                tierPrice: subscription.tierPrice,
+              },
             },
-          }
+          ]
         })
         .sort((first, second) => {
           return second.updatedAt.getTime() - first.updatedAt.getTime()

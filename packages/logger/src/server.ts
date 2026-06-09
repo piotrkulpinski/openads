@@ -2,9 +2,8 @@
  * Server-side logger backed by pino.
  *
  * Writes pretty-formatted output to stdout in development and structured
- * JSON to a daily-rotated log file. The file destination uses pino's
- * built-in async write (sonic-boom) so logging never blocks the event
- * loop.
+ * JSON to a log file. The file destination uses pino's built-in async
+ * write (sonic-boom) so logging never blocks the event loop.
  *
  * To swap in Sentry later, push `@sentry/pino-transport` into the
  * multistream array — every call site stays untouched.
@@ -17,7 +16,7 @@ import pretty from "pino-pretty"
 import type { Logger, LogContext, LogLevel } from "./types"
 import { serializeError } from "./types"
 
-export interface ServerLoggerOptions {
+export type ServerLoggerOptions = {
   /**
    * Service name used as the root binding (e.g. `"api"`, `"web"`).
    */

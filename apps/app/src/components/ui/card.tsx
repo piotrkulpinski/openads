@@ -65,8 +65,8 @@ const cardRowVariants = cva({
 export type CardProps = HTMLAttributes<HTMLDivElement> &
   VariantProps<typeof cardVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * If set to `true`, the card will be rendered as its child element via Slot.
+     * This child must be a valid React element.
      */
     asChild?: boolean
   }
@@ -81,8 +81,8 @@ const CardRoot = ({ asChild = false, className, ...props }: CardProps) => {
 export type CardPanelProps = ComponentProps<"div"> &
   VariantProps<typeof cardPanelVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
-     * This child component must be a valid React component.
+     * If set to `true`, the panel will be rendered as its child element via Slot.
+     * This child must be a valid React element.
      */
     asChild?: boolean
   }
@@ -139,4 +139,4 @@ const Card = Object.assign(CardRoot, {
   Row: CardRow,
 })
 
-export { CardRoot, CardPanel, CardSection, CardRow, Card }
+export { Card }

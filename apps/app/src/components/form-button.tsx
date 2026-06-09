@@ -2,17 +2,5 @@ import { Button } from "@openads/ui/button"
 import type { ComponentProps } from "react"
 
 export const FormButton = ({ isPending, ...props }: ComponentProps<typeof Button>) => {
-  // const { formState } = useFormContext()
-  // const { isSubmitted, isValid } = formState
-
-  return (
-    <Button
-      type="submit"
-      // size="lg"
-      isPending={isPending}
-      // disabled={isPending || (isSubmitted && !isValid)}
-      className="first:not-only:w-full"
-      {...props}
-    />
-  )
+  return <Button type="submit" isPending={isPending} className="first:not-only:w-full" {...props} />
 }

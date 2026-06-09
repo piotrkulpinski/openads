@@ -1,7 +1,7 @@
 import type Stripe from "stripe"
 import type { StripeClient } from "./index"
 
-export interface CreateCheckoutSessionProps {
+export type CreateCheckoutSessionProps = {
   connectedAccountId: string
   priceId: string
   /** Pre-fills Checkout; omit to let Stripe collect it. */
@@ -16,10 +16,10 @@ export interface CreateCheckoutSessionProps {
   }
 }
 
-export async function createSubscriptionCheckoutSession(
+export const createSubscriptionCheckoutSession = async (
   stripe: StripeClient,
   props: CreateCheckoutSessionProps,
-): Promise<Stripe.Checkout.Session> {
+): Promise<Stripe.Checkout.Session> => {
   return stripe.checkout.sessions.create(
     {
       mode: "subscription",

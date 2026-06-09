@@ -11,9 +11,9 @@ export type LocalSubscriptionStatus =
   | "IncompleteExpired"
   | "Paused"
 
-export function mapStripeSubscriptionStatus(
+export const mapStripeSubscriptionStatus = (
   status: Stripe.Subscription.Status,
-): LocalSubscriptionStatus {
+): LocalSubscriptionStatus => {
   switch (status) {
     case "active":
       return "Active"
@@ -31,27 +31,25 @@ export function mapStripeSubscriptionStatus(
       return "IncompleteExpired"
     case "paused":
       return "Paused"
-    default:
-      return "Incomplete"
   }
 }
 
-export interface SubscriptionMetadata {
+export type SubscriptionMetadata = {
   workspaceId: string
   tierId: string
   tierPriceId: string
 }
 
-export function readSubscriptionMetadata(
+export const readSubscriptionMetadata = (
   metadata: Stripe.Metadata | null | undefined,
-): SubscriptionMetadata | null {
+): SubscriptionMetadata | null => {
   if (!metadata) return null
   const { workspaceId, tierId, tierPriceId } = metadata
   if (!workspaceId || !tierId || !tierPriceId) return null
   return { workspaceId, tierId, tierPriceId }
 }
 
-export function toDate(timestamp: number | null | undefined): Date | null {
+export const toDate = (timestamp: number | null | undefined): Date | null => {
   if (!timestamp) return null
   return new Date(timestamp * 1000)
 }

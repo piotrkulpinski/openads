@@ -1,7 +1,7 @@
 import type { ReactElement } from "react"
 import { render as renderEmail } from "react-email"
 
-export interface RenderResult {
+export type RenderResult = {
   html: string
   text: string
 }

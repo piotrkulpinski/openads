@@ -5,13 +5,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
 import { CheckIcon, CopyIcon } from "lucide-react"
-import { useMemo } from "react"
 import { useState } from "react"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { env } from "~/env"
 
-interface EmbedSnippetProps {
+type EmbedSnippetProps = {
   slug: string
 }
 
@@ -26,7 +25,7 @@ const themeLabels: Record<Theme, string> = {
 
 const PREVIEW_HEIGHT = 640
 
-export function EmbedSnippet({ slug }: EmbedSnippetProps) {
+export const EmbedSnippet = ({ slug }: EmbedSnippetProps) => {
   const clipboard = useClipboard({ timeout: 2000 })
   const [theme, setTheme] = useState<Theme>("auto")
   const [copiedSnippet, setCopiedSnippet] = useState("")
@@ -34,22 +33,15 @@ export function EmbedSnippet({ slug }: EmbedSnippetProps) {
   const baseUrl = env.VITE_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")
   const apiUrl = env.VITE_API_URL
 
-  const url = useMemo(() => {
-    const params = new URLSearchParams({ theme })
-    return `${baseUrl}/embed/${slug}?${params.toString()}`
-  }, [baseUrl, slug, theme])
+  const url = `${baseUrl}/embed/${slug}?${new URLSearchParams({ theme })}`
 
-  const iframeSnippet = useMemo(() => {
-    if (!url) return ""
-    return `<iframe
+  const iframeSnippet = `<iframe
   src="${url}"
   style="border:0;width:100%;height:${PREVIEW_HEIGHT}px"
   loading="lazy"
 ></iframe>`
-  }, [url])
 
-  const scriptSnippet = useMemo(() => {
-    return `<div id="openads-advertise"></div>
+  const scriptSnippet = `<div id="openads-advertise"></div>
 <script>
   window.OpenAds = window.OpenAds || {
     q: [],
@@ -64,10 +56,8 @@ export function EmbedSnippet({ slug }: EmbedSnippetProps) {
   })
 </script>
 <script async src="${baseUrl}/embed.js"></script>`
-  }, [baseUrl, slug, theme])
 
-  const serverSnippet = useMemo(() => {
-    return `import { createOpenAdsClient } from "@openads/sdk"
+  const serverSnippet = `import { createOpenAdsClient } from "@openads/sdk"
 
 const openads = createOpenAdsClient({
   workspaceSlug: "${slug}",
@@ -88,10 +78,8 @@ export const AdSlot = async () => {
     </a>
   )
 }`
-  }, [apiUrl, slug])
 
-  const reactSnippet = useMemo(() => {
-    return `import { OpenAdsProvider, useOpenAdsAd, useOpenAdsTracking } from "@openads/react"
+  const reactSnippet = `import { OpenAdsProvider, useOpenAdsAd, useOpenAdsTracking } from "@openads/react"
 
 const AdSlot = () => {
   const { data: ad } = useOpenAdsAd({ weightGte: 2.5 })
@@ -111,7 +99,6 @@ export const Ads = () => (
     <AdSlot />
   </OpenAdsProvider>
 )`
-  }, [apiUrl, slug])
 
   const copySnippet = (id: string, value: string) => {
     setCopiedSnippet(id)

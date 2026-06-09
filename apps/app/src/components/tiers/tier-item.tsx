@@ -10,7 +10,7 @@ import {
 import { Stack } from "@openads/ui/stack"
 import { useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { MoreVerticalIcon, Trash2 } from "lucide-react"
+import { MoreVerticalIcon, Trash2Icon } from "lucide-react"
 import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
@@ -46,7 +46,7 @@ const renderPriceLine = (tier: Tier): string => {
     : `${headLabel} · weight ${tier.weight}`
 }
 
-const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => {
+export const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => {
   const { mutate, isPending } = useMutation(
     orpc.tier.delete.mutationOptions({
       onSuccess: () => {
@@ -99,7 +99,7 @@ const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => 
             onConfirm={() => mutate({ id: tier.id, workspaceId })}
           >
             <DropdownMenuItem onSelect={e => e.preventDefault()}>
-              <Trash2 />
+              <Trash2Icon />
               Archive
             </DropdownMenuItem>
           </ConfirmModal>
@@ -108,5 +108,3 @@ const TierItem = ({ workspaceId, tier, className, ...props }: TierItemProps) => 
     </div>
   )
 }
-
-export { TierItem }

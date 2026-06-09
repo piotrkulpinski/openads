@@ -22,7 +22,6 @@ type KbdProps = ComponentProps<"span"> &
     shift?: boolean
     alt?: boolean
     ctrl?: boolean
-    className?: string
   }
 
 export const Kbd = ({

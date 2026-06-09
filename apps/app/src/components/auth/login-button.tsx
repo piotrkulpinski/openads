@@ -1,6 +1,5 @@
 import { ucFirst } from "@dirstack/utils"
 import { Button, type ButtonProps } from "@openads/ui/button"
-import { LoaderIcon } from "lucide-react"
 import { siteConfig } from "~/config/site"
 import { authClient } from "~/lib/auth"
 
@@ -16,19 +15,14 @@ export const LoginButton = ({
   callbackURL = siteConfig.url,
   ...props
 }: LoginButtonProps) => {
-  // const wasLastUsed = authClient.isLastUsedLoginMethod(provider)
-  const isLoading = false
-
   return (
     <Button
       variant={variant}
-      prefix={isLoading ? <LoaderIcon className="animate-spin" /> : prefix}
+      prefix={prefix}
       onClick={() => authClient.signIn.social({ provider, callbackURL })}
-      disabled={isLoading}
       {...props}
     >
       Sign in with {ucFirst(provider)}
-      {/*{wasLastUsed && <Badge>Last Used</Badge>}*/}
     </Button>
   )
 }

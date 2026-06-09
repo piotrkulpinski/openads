@@ -2,7 +2,7 @@ import { IdentifySupportVisitor, Support } from "@cossistant/react"
 import { useQuery } from "@tanstack/react-query"
 import { orpc } from "~/lib/orpc"
 
-export function CossistantChat() {
+export const CossistantChat = () => {
   const { data: user } = useQuery(
     orpc.user.me.queryOptions({ staleTime: Number.POSITIVE_INFINITY }),
   )

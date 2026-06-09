@@ -1,28 +1,12 @@
-import { OpenPanelComponent, type TrackProperties, useOpenPanel } from "@openpanel/nextjs"
-import type { ReactElement } from "react"
+import { OpenPanelComponent } from "@openpanel/nextjs"
 
 const isProd = process.env.NODE_ENV === "production"
 
-const Provider = ({ clientId }: { clientId: string }): ReactElement => (
+export const Provider = ({ clientId }: { clientId: string }) => (
   <OpenPanelComponent
     clientId={clientId}
-    trackAttributes={true}
+    trackAttributes
     trackScreenViews={isProd}
     trackOutgoingLinks={isProd}
   />
 )
-
-const track = (options: { event: string } & TrackProperties) => {
-  const { track: openTrack } = useOpenPanel()
-
-  if (!isProd) {
-    console.log("Track", options)
-    return
-  }
-
-  const { event, ...rest } = options
-
-  openTrack(event, rest)
-}
-
-export { Provider, track }

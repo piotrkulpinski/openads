@@ -56,7 +56,7 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
   )
 }
 
-export function useWelcomeModal() {
+export const useWelcomeModal = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false)
 
   const WelcomeModalCallback = useCallback(

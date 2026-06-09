@@ -12,7 +12,7 @@ type AdStatsProps = {
   adId: string
 }
 
-export function AdStats({ workspaceId, adId }: AdStatsProps) {
+export const AdStats = ({ workspaceId, adId }: AdStatsProps) => {
   const statsQuery = useQuery(
     orpc.ad.getStats.queryOptions({ input: { workspaceId, adId, days: 30 } }),
   )

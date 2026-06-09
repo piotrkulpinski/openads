@@ -18,7 +18,7 @@ import { orpc, queryClient } from "~/lib/orpc"
 // Visible form schema uses whole units; the submit handler converts to cents.
 // Currency is borrowed from the canonical tierPriceSchema so the allow-list stays
 // in one place.
-const tierPriceFormSchema = z.object({
+export const tierPriceFormSchema = z.object({
   interval: z.enum(BillingInterval).default(BillingInterval.Month),
   intervalCount: z.number().int().positive().default(1),
   amountWhole: z.number().int().nonnegative(),
@@ -27,7 +27,7 @@ const tierPriceFormSchema = z.object({
 
 type TierPriceFormValues = z.infer<typeof tierPriceFormSchema>
 
-const intervalLabels: Record<BillingInterval, string> = {
+export const intervalLabels: Record<BillingInterval, string> = {
   [BillingInterval.Day]: "Per day",
   [BillingInterval.Week]: "Per week",
   [BillingInterval.Month]: "Per month",

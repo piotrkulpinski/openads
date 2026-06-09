@@ -3,7 +3,7 @@ import { CircleCheckIcon, CircleHelpIcon, CircleXIcon, LoaderIcon } from "lucide
 import type { ComponentProps } from "react"
 import { Toaster as Sonner } from "sonner"
 
-function Toaster({ className, ...props }: ComponentProps<typeof Sonner>) {
+export const Toaster = ({ className, ...props }: ComponentProps<typeof Sonner>) => {
   return (
     <Sonner
       className="pointer-events-auto"
@@ -34,5 +34,3 @@ function Toaster({ className, ...props }: ComponentProps<typeof Sonner>) {
     />
   )
 }
-
-export { Toaster }

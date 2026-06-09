@@ -34,13 +34,13 @@ const modalVariants = cva({
 export type ModalProps = HTMLAttributes<HTMLDivElement> &
   VariantProps<typeof modalVariants> & {
     /**
-     * If set to `true`, the button will be rendered as a child within the component.
+     * If set to `true`, the modal will be rendered as a child within the component.
      * This child component must be a valid React component.
      */
     asChild?: boolean
   }
 
-const Modal = ({ className, asChild = false, size = "md", fixed = true, ...props }: ModalProps) => {
+const Modal = ({ className, asChild = false, size, fixed, ...props }: ModalProps) => {
   const useAsChild = asChild && isValidElement(props.children)
   const Component = useAsChild ? Slot.Root : "div"
 

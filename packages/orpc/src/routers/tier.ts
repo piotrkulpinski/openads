@@ -92,7 +92,7 @@ export const tierRouter = {
 
         // One at a time so each local id can be stamped onto its Stripe Price
         // metadata. Partial failures roll back via the catch below.
-        const createdStripePriceIds: string[] = []
+        const createdStripePriceIds: Array<string> = []
         try {
           for (const price of initialPrices) {
             const tierPriceRow = await db.tierPrice.create({

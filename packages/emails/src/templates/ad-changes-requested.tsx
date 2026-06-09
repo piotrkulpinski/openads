@@ -2,7 +2,7 @@
 import { Heading, Hr, Text } from "react-email"
 import { Layout } from "./_layout"
 
-export interface AdChangesRequestedProps {
+export type AdChangesRequestedProps = {
   workspaceName: string
   adName: string
   changesNote: string

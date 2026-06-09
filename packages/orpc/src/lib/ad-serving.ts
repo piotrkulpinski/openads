@@ -25,7 +25,7 @@ export const servingAdSchema = z.object({
 export type ServingFieldValue = z.infer<typeof servingFieldSchema>
 export type ServingAd = z.infer<typeof servingAdSchema>
 
-interface FindServingAdProps {
+type FindServingAdProps = {
   db: typeof db
   workspaceId: string
   /** Optional minimum effective weight floor (e.g. 2.5 for premium placements). */
@@ -62,14 +62,14 @@ const getMetaRecord = (fields: Array<ServingFieldValue>): Record<string, unknown
  * e.g. ask for `weight >= 2.5` for premium banner positions, anything for
  * regular cards. OpenAds doesn't carry a placement concept itself.
  */
-export async function findServingAd({
+export const findServingAd = async ({
   db,
   workspaceId,
   weightGte,
   excludeIds = [],
   leastServedBoostMax = 1.2,
   fairnessWindowDays = 1,
-}: FindServingAdProps): Promise<ServingAd | null> {
+}: FindServingAdProps): Promise<ServingAd | null> => {
   const rows = await db.ad.findMany({
     where: {
       status: "Approved",

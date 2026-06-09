@@ -1,4 +1,4 @@
-export type TierFeatureType = "positive" | "neutral" | "negative"
+type TierFeatureType = "positive" | "neutral" | "negative"
 
 const PREFIXES: Record<TierFeatureType, string> = {
   positive: "✓ ",
@@ -6,13 +6,8 @@ const PREFIXES: Record<TierFeatureType, string> = {
   negative: "✗ ",
 }
 
-export interface ParsedTierFeature {
-  type: TierFeatureType
-  label: string
-}
-
-export function parseTierFeature(raw: string): ParsedTierFeature {
-  for (const type of ["positive", "neutral", "negative"] as TierFeatureType[]) {
+export const parseTierFeature = (raw: string): { type: TierFeatureType; label: string } => {
+  for (const type of ["positive", "neutral", "negative"] as const) {
     const prefix = PREFIXES[type]
     if (raw.startsWith(prefix)) {
       return { type, label: raw.slice(prefix.length) }
@@ -20,5 +15,3 @@ export function parseTierFeature(raw: string): ParsedTierFeature {
   }
   return { type: "neutral", label: raw }
 }
-
-export const TIER_FEATURE_PREFIXES = PREFIXES

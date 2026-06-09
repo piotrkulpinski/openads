@@ -1,9 +1,10 @@
 import { PrismaPg } from "@prisma/adapter-pg"
+import { env } from "./env"
 import { Prisma, PrismaClient } from "./generated/prisma/client"
 import { customIdExtension, modelFilterExtension } from "./lib/extensions"
 
 const prismaClientSingleton = () => {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+  const adapter = new PrismaPg({ connectionString: env.DATABASE_URL })
   return new PrismaClient({ adapter }).$extends(customIdExtension).$extends(modelFilterExtension)
 }
 

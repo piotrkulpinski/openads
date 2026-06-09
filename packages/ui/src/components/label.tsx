@@ -17,13 +17,7 @@ const labelVariants = cva({
 type LabelProps = ComponentProps<typeof LabelPrimitive.Root> & VariantProps<typeof labelVariants>
 
 const Label = ({ className, isRequired, ...props }: LabelProps) => {
-  return (
-    <LabelPrimitive.Root
-      className={cx(labelVariants({ isRequired, className }))}
-      aria-label="Label"
-      {...props}
-    />
-  )
+  return <LabelPrimitive.Root className={cx(labelVariants({ isRequired, className }))} {...props} />
 }
 
 export { Label }
