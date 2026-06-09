@@ -9,15 +9,14 @@ import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient } from "~/lib/orpc"
 
 export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
   const workspace = useWorkspace()
   const navigate = useNavigate()
   const router = useRouter()
-  const handleError = useMutationErrorHandler()
 
   const form = useZodForm(workspaceSchema, {
     values: workspace,
@@ -41,7 +40,7 @@ export const GeneralForm = ({ ...props }: ComponentProps<"div">) => {
         router.invalidate()
       },
 
-      onError: error => handleError({ error, form }),
+      onError: error => handleMutationError({ error, form }),
     }),
   )
 

@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect } from "react"
 import { z } from "zod"
-import { useWelcomeModal } from "~/components/modals/welcome-modal"
+import { WelcomeModal } from "~/components/modals/welcome-modal"
 import { H3 } from "~/components/ui/heading"
 
 export const Route = createFileRoute("/$workspaceId/")({
@@ -15,17 +14,15 @@ export const Route = createFileRoute("/$workspaceId/")({
 function DashboardPage() {
   const navigate = useNavigate({ from: Route.fullPath })
   const { onboarded } = Route.useSearch()
-  const { setShowWelcomeModal, WelcomeModal } = useWelcomeModal()
-
-  useEffect(() => {
-    if (onboarded) {
-      setShowWelcomeModal(true)
-    }
-  }, [onboarded, setShowWelcomeModal])
 
   return (
     <>
-      <WelcomeModal onClose={() => navigate({ search: {}, replace: true })} />
+      <WelcomeModal
+        open={!!onboarded}
+        onOpenChange={open => {
+          if (!open) navigate({ search: {}, replace: true })
+        }}
+      />
       <H3>Dashboard</H3>
     </>
   )

@@ -11,7 +11,7 @@
 
 import { mkdirSync } from "node:fs"
 import { dirname, isAbsolute, resolve } from "node:path"
-import pino, { type DestinationStream, type Logger as PinoLogger, type StreamEntry } from "pino"
+import pino, { type Logger as PinoLogger, type StreamEntry } from "pino"
 import pretty from "pino-pretty"
 import type { Logger, LogContext, LogLevel } from "./types"
 import { serializeError } from "./types"
@@ -59,7 +59,7 @@ const buildStreams = (opts: ServerLoggerOptions): StreamEntry[] => {
         translateTime: "SYS:HH:MM:ss.l",
         ignore: "pid,hostname",
         singleLine: false,
-      }) as unknown as DestinationStream,
+      }),
     })
   } else {
     // Always keep a stdout stream so container logs / `docker logs` still work.

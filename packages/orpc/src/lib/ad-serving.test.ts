@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import { findServingAd, findServingAds } from "./ad-serving"
 
-const adRow = {
+const goldAdRow = {
   id: "ad_gold",
   name: "Acme Gold",
   websiteUrl: "https://acme.test",
@@ -12,6 +12,14 @@ const adRow = {
       field: { id: "field_description", name: "description", type: "Textarea" },
     },
   ],
+}
+
+const silverAdRow = {
+  id: "ad_silver",
+  name: "Acme Silver",
+  websiteUrl: "https://silver.test",
+  subscription: { tier: { weight: 1 } },
+  meta: [],
 }
 
 type FindManyArgs = {
@@ -26,8 +34,9 @@ type FindManyArgs = {
   }
 }
 
-const createDb = (rows: Array<typeof adRow>) => {
+const createDb = (rows: Array<typeof goldAdRow | typeof silverAdRow>) => {
   const findManyCalls: Array<FindManyArgs> = []
+  const groupByCalls: Array<unknown> = []
 
   const db = {
     ad: {
@@ -38,16 +47,19 @@ const createDb = (rows: Array<typeof adRow>) => {
       },
     },
     adStat: {
-      groupBy: async () => [],
+      groupBy: async (args: unknown) => {
+        groupByCalls.push(args)
+        return []
+      },
     },
   }
 
-  return { db, findManyCalls }
+  return { db, findManyCalls, groupByCalls }
 }
 
 describe("findServingAd", () => {
   it("queries only approved ads with active subscriptions and placement filters", async () => {
-    const { db, findManyCalls } = createDb([adRow])
+    const { db, findManyCalls } = createDb([goldAdRow])
 
     const ad = await findServingAd({
       db: db as never,
@@ -89,6 +101,15 @@ describe("findServingAd", () => {
 
     await expect(findServingAd({ db: db as never, workspaceId: "ws_openads" })).resolves.toBeNull()
   })
+
+  it("skips the stats query when only one ad is eligible", async () => {
+    const { db, groupByCalls } = createDb([goldAdRow])
+
+    const ad = await findServingAd({ db: db as never, workspaceId: "ws_openads" })
+
+    expect(ad?.id).toBe("ad_gold")
+    expect(groupByCalls).toHaveLength(0)
+  })
 })
 
 describe("findServingAds", () => {
@@ -100,8 +121,8 @@ describe("findServingAds", () => {
     )
   })
 
-  it("threads selected ads through excludeIds during multi-ad rotation", async () => {
-    const { db, findManyCalls } = createDb([adRow])
+  it("fetches the pool and stats once, then samples without replacement", async () => {
+    const { db, findManyCalls, groupByCalls } = createDb([goldAdRow, silverAdRow])
 
     const ads = await findServingAds({
       db: db as never,
@@ -109,7 +130,36 @@ describe("findServingAds", () => {
       count: 2,
     })
 
+    expect(ads).toHaveLength(2)
+    expect(new Set(ads.map(ad => ad.id))).toEqual(new Set(["ad_gold", "ad_silver"]))
+    expect(findManyCalls).toHaveLength(1)
+    expect(groupByCalls).toHaveLength(1)
+  })
+
+  it("passes the initial excludeIds into the pool query", async () => {
+    const { db, findManyCalls } = createDb([goldAdRow, silverAdRow])
+
+    const ads = await findServingAds({
+      db: db as never,
+      workspaceId: "ws_openads",
+      excludeIds: ["ad_silver"],
+      count: 2,
+    })
+
+    expect(findManyCalls[0]?.where?.id?.notIn).toEqual(["ad_silver"])
+    expect(ads.map(ad => ad.id)).toEqual(["ad_gold"])
+  })
+
+  it("caps the result at the eligible pool size", async () => {
+    const { db, findManyCalls } = createDb([goldAdRow])
+
+    const ads = await findServingAds({
+      db: db as never,
+      workspaceId: "ws_openads",
+      count: 5,
+    })
+
     expect(ads).toHaveLength(1)
-    expect(findManyCalls[1]?.where?.id?.notIn).toEqual(["ad_gold"])
+    expect(findManyCalls).toHaveLength(1)
   })
 })

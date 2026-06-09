@@ -2,7 +2,6 @@ import Stripe from "stripe"
 
 export type StripeConfig = {
   STRIPE_SECRET_KEY: string
-  STRIPE_PLATFORM_FEE_PERCENT: number
 }
 
 export const createStripeClient = (config: StripeConfig) => {

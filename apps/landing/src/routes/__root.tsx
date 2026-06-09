@@ -36,7 +36,7 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: PropsWithChildren) {
   return (
-    <html lang="en" id="waitlist">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>

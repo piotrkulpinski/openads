@@ -54,22 +54,17 @@ const getMetaRecord = (fields: Array<ServingFieldValue>): Record<string, unknown
 }
 
 /**
- * Picks an ad to serve for a workspace.
+ * Fetches the eligible ad pool for a workspace.
  * Filters: workspace matches, ad approved, subscription active or trialing.
- * Selection: weight × least-served boost, weighted random.
- *
- * Publishers handle placement targeting on their side via `weightGte` —
- * e.g. ask for `weight >= 2.5` for premium banner positions, anything for
- * regular cards. OpenAds doesn't carry a placement concept itself.
  */
-export const findServingAd = async ({
+const fetchEligibleAds = async ({
   db,
   workspaceId,
   weightGte,
   excludeIds = [],
-  leastServedBoostMax = 1.2,
-  fairnessWindowDays = 1,
-}: FindServingAdProps): Promise<ServingAd | null> => {
+}: Pick<FindServingAdProps, "db" | "workspaceId" | "weightGte" | "excludeIds">): Promise<
+  Array<ServingAd>
+> => {
   const rows = await db.ad.findMany({
     where: {
       status: "Approved",
@@ -96,7 +91,7 @@ export const findServingAd = async ({
     },
   })
 
-  const ads: Array<ServingAd> = rows.map(row => {
+  return rows.map(row => {
     const fields = row.meta.map(item => ({
       id: item.field.id,
       name: item.field.name,
@@ -114,13 +109,21 @@ export const findServingAd = async ({
       fields,
     }
   })
+}
 
-  if (ads.length === 0) return null
-  if (ads.length === 1) return ads[0] ?? null
-
-  // Aggregate impressions across the last N UTC days. `AdStat.date` is the
-  // UTC midnight of a day bucket; subtracting (N - 1) days from today's
-  // bucket gives the inclusive lower bound.
+/**
+ * Aggregates impressions per ad across the last N UTC days. `AdStat.date` is
+ * the UTC midnight of a day bucket; subtracting (N - 1) days from today's
+ * bucket gives the inclusive lower bound.
+ */
+const fetchImpressionsByAd = async ({
+  db,
+  adIds,
+  fairnessWindowDays,
+}: Pick<FindServingAdProps, "db"> & {
+  adIds: Array<string>
+  fairnessWindowDays: number
+}): Promise<Map<string, number>> => {
   const since = new Date()
   since.setUTCHours(0, 0, 0, 0)
   since.setUTCDate(since.getUTCDate() - Math.max(0, fairnessWindowDays - 1))
@@ -128,13 +131,26 @@ export const findServingAd = async ({
   const stats = await db.adStat.groupBy({
     by: ["adId"],
     where: {
-      adId: { in: ads.map(ad => ad.id) },
+      adId: { in: adIds },
       date: { gte: since },
     },
     _sum: { impressions: true },
   })
 
-  const impressionsByAd = new Map<string, number>(stats.map(s => [s.adId, s._sum.impressions ?? 0]))
+  return new Map<string, number>(stats.map(s => [s.adId, s._sum.impressions ?? 0]))
+}
+
+/**
+ * Weighted random pick: weight × least-served boost, recomputed over the given
+ * pool so the boost always reflects the candidates actually in contention.
+ */
+const pickWeightedAd = (
+  ads: Array<ServingAd>,
+  impressionsByAd: Map<string, number>,
+  leastServedBoostMax: number,
+): ServingAd | null => {
+  if (ads.length === 0) return null
+  if (ads.length === 1) return ads[0] ?? null
 
   const counts = ads.map(ad => impressionsByAd.get(ad.id) ?? 0)
   const min = Math.min(...counts)
@@ -162,25 +178,71 @@ export const findServingAd = async ({
   return weighted[0]?.ad ?? null
 }
 
-export const findServingAds = async ({
-  count = 1,
+/**
+ * Picks an ad to serve for a workspace.
+ * Filters: workspace matches, ad approved, subscription active or trialing.
+ * Selection: weight × least-served boost, weighted random.
+ *
+ * Publishers handle placement targeting on their side via `weightGte` —
+ * e.g. ask for `weight >= 2.5` for premium banner positions, anything for
+ * regular cards. OpenAds doesn't carry a placement concept itself.
+ */
+export const findServingAd = async ({
+  db,
+  workspaceId,
+  weightGte,
   excludeIds = [],
-  ...props
+  leastServedBoostMax = 1.2,
+  fairnessWindowDays = 1,
+}: FindServingAdProps): Promise<ServingAd | null> => {
+  const ads = await fetchEligibleAds({ db, workspaceId, weightGte, excludeIds })
+
+  if (ads.length === 0) return null
+  if (ads.length === 1) return ads[0] ?? null
+
+  const impressionsByAd = await fetchImpressionsByAd({
+    db,
+    adIds: ads.map(ad => ad.id),
+    fairnessWindowDays,
+  })
+
+  return pickWeightedAd(ads, impressionsByAd, leastServedBoostMax)
+}
+
+/**
+ * Picks up to `count` distinct ads. Fetches the eligible pool and impression
+ * stats once, then samples without replacement in memory — the least-served
+ * boost is recomputed from the remaining pool on every pick, so the
+ * distribution matches drawing one ad at a time.
+ */
+export const findServingAds = async ({
+  db,
+  workspaceId,
+  weightGte,
+  excludeIds = [],
+  leastServedBoostMax = 1.2,
+  fairnessWindowDays = 1,
+  count = 1,
 }: FindServingAdsProps): Promise<Array<ServingAd>> => {
-  const ads: Array<ServingAd> = []
-  const selectedIds = new Set(excludeIds)
   const limit = Math.max(1, Math.min(count, 20))
+  const pool = await fetchEligibleAds({ db, workspaceId, weightGte, excludeIds })
 
-  for (let index = 0; index < limit; index += 1) {
-    const ad = await findServingAd({
-      ...props,
-      excludeIds: Array.from(selectedIds),
-    })
+  if (pool.length === 0) return []
 
+  const impressionsByAd =
+    pool.length > 1
+      ? await fetchImpressionsByAd({ db, adIds: pool.map(ad => ad.id), fairnessWindowDays })
+      : new Map<string, number>()
+
+  const ads: Array<ServingAd> = []
+  let remaining = pool
+
+  while (ads.length < limit && remaining.length > 0) {
+    const ad = pickWeightedAd(remaining, impressionsByAd, leastServedBoostMax)
     if (!ad) break
 
     ads.push(ad)
-    selectedIds.add(ad.id)
+    remaining = remaining.filter(candidate => candidate.id !== ad.id)
   }
 
   return ads

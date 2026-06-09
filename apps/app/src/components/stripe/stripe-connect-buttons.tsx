@@ -1,3 +1,4 @@
+import { StripeConnectStatus } from "@openads/db/client"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { useMutation } from "@tanstack/react-query"
@@ -71,12 +72,12 @@ export const StripeConnectButtons = ({
           <p
             className={cx(
               "text-sm",
-              workspace.stripeConnectStatus === "pending"
+              workspace.stripeConnectStatus === StripeConnectStatus.Pending
                 ? "text-yellow-500"
                 : "text-muted-foreground",
             )}
           >
-            {workspace.stripeConnectStatus === "pending"
+            {workspace.stripeConnectStatus === StripeConnectStatus.Pending
               ? "Please finish connecting Stripe before advertisers can pay you."
               : "Your Stripe account is connected. Advertisers will pay through this account."}
           </p>

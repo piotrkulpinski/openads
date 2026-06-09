@@ -20,6 +20,7 @@ export {
   BillingInterval,
   FieldType,
   Prisma,
+  StripeConnectStatus,
   SubscriptionStatus,
   WorkspaceMemberRole,
 } from "./generated/prisma/browser"

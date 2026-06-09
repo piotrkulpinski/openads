@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { Prisma } from "@openads/db/client"
+import { Prisma, StripeConnectStatus } from "@openads/db/client"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
 import { authProcedure, type Context, workspaceMw } from "../index"
@@ -124,7 +124,9 @@ export const stripeRouter = {
           where: { id: workspace.id },
           data: {
             stripeConnectId: account.id,
-            stripeConnectStatus: account.charges_enabled ? "active" : "pending",
+            stripeConnectStatus: account.charges_enabled
+              ? StripeConnectStatus.Active
+              : StripeConnectStatus.Pending,
             stripeConnectEnabled: account.charges_enabled,
             stripeConnectData: {
               integrationMode: "direct",

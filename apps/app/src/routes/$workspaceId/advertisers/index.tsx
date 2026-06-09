@@ -1,4 +1,5 @@
 import { formatDate, getInitials } from "@dirstack/utils"
+import { useDebouncedCallback } from "@mantine/hooks"
 import { Avatar, AvatarFallback } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
@@ -8,6 +9,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { SearchIcon, UsersIcon, XIcon } from "lucide-react"
 import { type ComponentProps, useState } from "react"
+import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
@@ -121,14 +123,23 @@ const AdvertiserRow = ({ workspaceId, advertiser, className, ...props }: Adverti
 
 const AdvertisersIndexPage = () => {
   const { workspaceId } = Route.useParams()
-  const [search, setSearch] = useState("")
-  const query = search.trim()
+  const { query } = Route.useSearch()
+  const navigate = Route.useNavigate()
+  const [search, setSearch] = useState(query ?? "")
+
+  const navigateDebounced = useDebouncedCallback((value: string) => {
+    const trimmed = value.trim()
+    navigate({ search: { query: trimmed.length > 0 ? trimmed : undefined }, replace: true })
+  }, 300)
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+    navigateDebounced(value)
+  }
+
   const advertisersQuery = useQuery(
     orpc.advertiser.getAll.queryOptions({
-      input: {
-        workspaceId,
-        query: query.length > 0 ? query : undefined,
-      },
+      input: { workspaceId, query },
     }),
   )
 
@@ -138,7 +149,7 @@ const AdvertisersIndexPage = () => {
         <HeaderTitle>Advertisers</HeaderTitle>
 
         <HeaderActions>
-          <AdvertiserSearch value={search} onChange={setSearch} />
+          <AdvertiserSearch value={search} onChange={handleSearchChange} />
         </HeaderActions>
       </Header>
 
@@ -172,5 +183,9 @@ const AdvertisersIndexPage = () => {
 }
 
 export const Route = createFileRoute("/$workspaceId/advertisers/")({
+  validateSearch: z.object({
+    query: z.string().optional(),
+  }),
+
   component: AdvertisersIndexPage,
 })

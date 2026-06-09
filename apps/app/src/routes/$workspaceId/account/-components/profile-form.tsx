@@ -14,8 +14,8 @@ import { z } from "zod"
 import { FormButton } from "~/components/form-button"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { logger } from "~/lib/logger"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
@@ -30,7 +30,6 @@ type AccountProfileFormProps = ComponentProps<"div"> & {
 
 export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) => {
   const router = useRouter()
-  const handleError = useMutationErrorHandler()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const schema = userSchema.pick({ name: true })
 
@@ -54,7 +53,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
   const updateProfile = useMutation(
     orpc.user.update.mutationOptions({
-      onError: error => handleError({ error, form }),
+      onError: error => handleMutationError({ error, form }),
     }),
   )
 

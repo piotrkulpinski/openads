@@ -27,7 +27,6 @@ model Ad {
 
   // Indexes
   @@index([status])
-  @@index([subscriptionId])
 }
 
 model AdStat {
@@ -42,6 +41,5 @@ model AdStat {
 
   // Indexes
   @@unique([adId, date])
-  @@index([adId])
   @@index([date])
 }

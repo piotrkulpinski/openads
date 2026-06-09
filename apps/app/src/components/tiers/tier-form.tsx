@@ -20,9 +20,9 @@ import { FormButton } from "~/components/form-button"
 import { CurrencySelect } from "~/components/tiers/currency-select"
 import { intervalLabels, tierPriceFormSchema } from "~/components/tiers/tier-price-form"
 import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 import type { router } from "~/main"
 
@@ -51,7 +51,6 @@ export const TierForm = ({
   ...props
 }: TierFormProps) => {
   const navigate = useNavigate()
-  const handleError = useMutationErrorHandler()
   const isEditing = !!tier?.id
 
   const form = useZodForm(tierFormSchema, {
@@ -107,7 +106,7 @@ export const TierForm = ({
   }
 
   const onError = (error: unknown) => {
-    handleError({ error, form })
+    handleMutationError({ error, form })
   }
 
   const createTier = useMutation(

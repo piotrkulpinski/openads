@@ -23,6 +23,5 @@ model TierPrice {
 
   // Indexes
   @@index([tierId, isActive])
-  @@index([tierId])
   @@index([stripePriceId])
 }

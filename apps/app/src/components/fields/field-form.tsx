@@ -12,8 +12,8 @@ import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 import type { router } from "~/main"
 
@@ -47,7 +47,6 @@ export const FieldForm = ({
   ...props
 }: FieldFormProps) => {
   const navigate = useNavigate()
-  const handleError = useMutationErrorHandler()
   const isEditing = !!field?.id
 
   const form = useZodForm(fieldSchema, {
@@ -70,7 +69,7 @@ export const FieldForm = ({
   }
 
   const onError = (error: unknown) => {
-    handleError({ error, form })
+    handleMutationError({ error, form })
   }
 
   const createField = useMutation(orpc.field.create.mutationOptions({ onSuccess, onError }))

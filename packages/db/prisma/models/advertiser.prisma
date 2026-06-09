@@ -11,5 +11,6 @@ model Advertiser {
   subscriptions Subscription[]
 
   // Indexes
+  @@unique([workspaceId, email])
   @@index([workspaceId])
 }

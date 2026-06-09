@@ -9,6 +9,6 @@ const globalForRedis = globalThis as typeof globalThis & {
 }
 
 export const redis: RedisClient =
-  globalForRedis.redisGlobal ?? createRedisClient({ REDIS_URL: env.REDIS_URL })
+  globalForRedis.redisGlobal ?? createRedisClient({ url: env.REDIS_URL })
 
 if (env.NODE_ENV === "development") globalForRedis.redisGlobal = redis
