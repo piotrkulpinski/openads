@@ -1,18 +1,21 @@
 import { Button } from "@openads/ui/button"
-import { Input } from "@openads/ui/input"
 import { Skeleton } from "@openads/ui/skeleton"
-import { Stack } from "@openads/ui/stack"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { createFileRoute, stripSearchParams } from "@tanstack/react-router"
-import { CheckIcon, LayersIcon, XIcon } from "lucide-react"
-import { useState } from "react"
+import { ArrowRightIcon, CheckIcon, LayersIcon, XIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
 import { Logo } from "~/components/ui/logo"
+import { siteConfig } from "~/config/site"
 import { formatInterval, formatPrice } from "~/lib/currency"
 import { orpc } from "~/lib/orpc"
 import { parseTierFeature } from "~/lib/tier-features"
+
+// Responsive grid: one card per column when there's room, stacking only when
+// the iframe is too narrow to fit them side by side.
+const gridClassName = "grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))]"
 
 const defaultValues = {
   theme: "auto",
@@ -32,8 +35,18 @@ export const Route = createFileRoute("/embed/$slug")({
 
 function TierSelector() {
   const { slug } = Route.useParams()
-  const [email, setEmail] = useState("")
+  const { theme } = Route.useSearch()
   const [pendingTierPriceId, setPendingTierPriceId] = useState<string | null>(null)
+
+  // Apply the requested theme to the iframe document. `auto` (or unset) leaves
+  // it to the visitor's OS preference via the `prefers-color-scheme` media query.
+  useEffect(() => {
+    const root = document.documentElement
+    root.dataset.theme = theme
+    return () => {
+      delete root.dataset.theme
+    }
+  }, [theme])
 
   const tiersQuery = useQuery(orpc.tier.public.listForWorkspace.queryOptions({ input: { slug } }))
 
@@ -49,115 +62,128 @@ function TierSelector() {
     }),
   )
 
+  // No email gate — Stripe Checkout collects the email on its hosted page.
   const handleSubscribe = (tierPriceId: string) => {
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Enter a valid email to continue.")
-      return
-    }
     setPendingTierPriceId(tierPriceId)
-    checkout.mutate({ tierPriceId, email })
+    checkout.mutate({ tierPriceId })
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10">
-      <div className="mb-8 grid gap-3 text-center">
+    <div className="mx-auto w-full max-w-5xl px-6 py-10">
+      <div className="mb-10 grid gap-3 text-center">
         <h1 className="font-semibold text-2xl">Advertise on this site</h1>
-        <p className="text-muted-foreground text-sm">
-          Pick a tier and billing interval below — payment runs through Stripe and your ad goes live
-          after a quick review.
+        <p className="mx-auto max-w-xl text-muted-foreground text-sm">
+          Pick a plan below — payment runs through Stripe and your ad goes live after a quick
+          review.
         </p>
       </div>
 
-      <Input
-        type="email"
-        placeholder="you@company.com"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        autoComplete="email"
-        className="mb-6"
-      />
-
       <QueryCell
         query={tiersQuery}
-        pending={() =>
-          [...Array(3)].map((_, i) => <Skeleton key={i} className="mb-3 h-24 rounded-lg" />)
-        }
+        pending={() => (
+          <div className={gridClassName}>
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-80 rounded-xl" />
+            ))}
+          </div>
+        )}
         error={() => <p className="text-center text-red-500 text-sm">Could not load tiers.</p>}
         empty={() => (
-          <div className="grid place-items-center gap-2 rounded-lg border border-dashed p-12 text-center text-muted-foreground text-sm">
+          <div className="grid place-items-center gap-2 rounded-xl border border-dashed p-12 text-center text-muted-foreground text-sm">
             <LayersIcon />
             <p>No tiers available yet.</p>
           </div>
         )}
         success={({ data }) => (
-          <div className="flex flex-col gap-4">
-            {data.map(tier => (
-              <div key={tier.id} className="rounded-lg border p-4">
-                <div className="mb-3">
-                  <h2 className="font-medium">{tier.name}</h2>
-                  {tier.description && (
-                    <p className="mt-1 text-muted-foreground text-sm">{tier.description}</p>
+          <div className={gridClassName}>
+            {data.map((tier, i) => {
+              const headlinePrice = tier.prices[0]
+              return (
+                <div
+                  key={tier.id}
+                  className="flex animate-slide-up-and-fade flex-col rounded-xl border bg-card p-6 transition-colors hover:border-ring"
+                  style={{ animationDelay: `${i * 60}ms`, animationFillMode: "backwards" }}
+                >
+                  <h2 className="font-medium text-muted-foreground text-sm uppercase tracking-wide">
+                    {tier.name}
+                  </h2>
+
+                  {headlinePrice && (
+                    <p className="mt-3 flex items-baseline gap-1">
+                      <span className="font-semibold text-3xl tracking-tight">
+                        {formatPrice(headlinePrice.amount, headlinePrice.currency)}
+                      </span>
+                      <span className="text-muted-foreground text-sm">
+                        / {formatInterval(headlinePrice)}
+                      </span>
+                    </p>
                   )}
-                </div>
 
-                {tier.features.length > 0 && (
-                  <ul className="mb-3 grid gap-1.5">
-                    {tier.features.map((raw, i) => {
-                      const { type, label } = parseTierFeature(raw)
-                      const Icon = type === "negative" ? XIcon : CheckIcon
-                      const iconTone =
-                        type === "positive" ? "text-green-600" : "text-muted-foreground"
-                      const labelTone =
-                        type === "negative" ? "text-muted-foreground line-through" : ""
-                      return (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: feature list is publisher-defined, stable per render
-                        <li key={`${raw}-${i}`} className="flex items-center gap-2 text-sm">
-                          <Icon className={`size-3.5 shrink-0 ${iconTone}`} />
-                          <span className={labelTone}>{label}</span>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                )}
+                  {tier.description && (
+                    <p className="mt-2 text-muted-foreground text-sm">{tier.description}</p>
+                  )}
 
-                {tier.prices.length === 0 ? (
-                  <p className="text-muted-foreground text-sm italic">
-                    No prices available for this tier.
-                  </p>
-                ) : (
-                  <Stack direction="column" size="sm">
-                    {tier.prices.map(price => (
-                      <div
-                        key={price.id}
-                        className="flex items-center justify-between rounded-md border bg-background px-3 py-2"
-                      >
-                        <span className="font-medium text-sm">
-                          {formatPrice(price.amount, price.currency)} / {formatInterval(price)}
-                        </span>
+                  {tier.features.length > 0 && (
+                    <ul className="mt-5 grid gap-2">
+                      {tier.features.map((raw, fi) => {
+                        const { type, label } = parseTierFeature(raw)
+                        const Icon = type === "negative" ? XIcon : CheckIcon
+                        const iconTone =
+                          type === "positive" ? "text-green-600" : "text-muted-foreground"
+                        const labelTone =
+                          type === "negative" ? "text-muted-foreground line-through" : ""
+                        return (
+                          // biome-ignore lint/suspicious/noArrayIndexKey: feature list is publisher-defined, stable per render
+                          <li key={`${raw}-${fi}`} className="flex items-center gap-2 text-sm">
+                            <Icon className={`size-4 shrink-0 ${iconTone}`} />
+                            <span className={labelTone}>{label}</span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+
+                  {/* Push the actions to the bottom so buttons align across cards. */}
+                  {tier.prices.length === 0 ? (
+                    <p className="mt-auto pt-6 text-muted-foreground text-sm italic">
+                      No price available for this tier.
+                    </p>
+                  ) : (
+                    <div className="mt-auto grid gap-2 pt-6">
+                      {tier.prices.map((price, pi) => (
                         <Button
-                          size="sm"
+                          key={price.id}
+                          className="w-full"
+                          variant={pi === 0 ? "primary" : "secondary"}
                           onClick={() => handleSubscribe(price.id)}
                           isPending={pendingTierPriceId === price.id && checkout.isPending}
-                          prefix={<CheckIcon />}
+                          suffix={pi === 0 ? <ArrowRightIcon /> : undefined}
                         >
-                          Subscribe
+                          {pi === 0
+                            ? "Subscribe"
+                            : `${formatPrice(price.amount, price.currency)} / ${formatInterval(price)}`}
                         </Button>
-                      </div>
-                    ))}
-                  </Stack>
-                )}
-              </div>
-            ))}
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       />
 
-      <Stack size="sm" className="mt-10 justify-center text-center opacity-80 hover:opacity-100">
-        <a href="/" className="flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="mt-10 flex justify-center">
+        <a
+          href={siteConfig.webUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 text-muted-foreground text-xs opacity-80 transition-opacity hover:opacity-100"
+        >
           <span>Powered by</span>
           <Logo className="h-4 w-auto" />
         </a>
-      </Stack>
+      </div>
     </div>
   )
 }

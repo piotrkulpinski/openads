@@ -4,7 +4,8 @@ import type { StripeClient } from "./index"
 export interface CreateCheckoutSessionProps {
   connectedAccountId: string
   priceId: string
-  customerEmail: string
+  /** Pre-fills the Stripe Checkout email field. Omit to let Stripe collect it. */
+  customerEmail?: string
   successUrl: string
   cancelUrl: string
   applicationFeePercent: number
