@@ -209,7 +209,6 @@ const getCheckoutInfo = publicProcedure
       tier: tierPrice.tier,
       tierPrice,
       fields,
-      customerEmail: session.customer_email ?? null,
       existingAd,
     }
   })
@@ -274,19 +273,15 @@ const createFromCheckout = publicProcedure
 
       const tier = tierPrice.tier
 
-      let advertiser = await db.advertiser.findFirst({
-        where: { workspaceId, email: customerEmail },
+      const advertiser = await db.advertiser.upsert({
+        where: { workspaceId_email: { workspaceId, email: customerEmail } },
+        update: {},
+        create: {
+          workspaceId,
+          email: customerEmail,
+          name: name.slice(0, 80),
+        },
       })
-
-      if (!advertiser) {
-        advertiser = await db.advertiser.create({
-          data: {
-            workspaceId,
-            email: customerEmail,
-            name: name.slice(0, 80),
-          },
-        })
-      }
 
       // Idempotent — the Stripe webhook may have already created this row.
       const subscription = await db.subscription.upsert({
@@ -347,30 +342,27 @@ const createFromCheckout = publicProcedure
       })
 
       // Transactional replace so concurrent reads never see an ad with zero
-      // meta rows between the delete and the recreate.
-      if (meta.length > 0) {
-        const validFieldIds = new Set(
-          (await db.field.findMany({ where: { workspaceId }, select: { id: true } })).map(
-            f => f.id,
-          ),
-        )
-        const filtered = meta.filter(m => validFieldIds.has(m.fieldId))
+      // meta rows between the delete and the recreate. Always runs — an empty
+      // resubmission must clear the old meta rows too.
+      const validFieldIds = new Set(
+        (await db.field.findMany({ where: { workspaceId }, select: { id: true } })).map(f => f.id),
+      )
+      const filtered = meta.filter(m => validFieldIds.has(m.fieldId))
 
-        await db.$transaction([
-          db.meta.deleteMany({ where: { adId: ad.id } }),
-          ...(filtered.length > 0
-            ? [
-                db.meta.createMany({
-                  data: filtered.map(m => ({
-                    adId: ad.id,
-                    fieldId: m.fieldId,
-                    value: m.value as Prisma.InputJsonValue,
-                  })),
-                }),
-              ]
-            : []),
-        ])
-      }
+      await db.$transaction([
+        db.meta.deleteMany({ where: { adId: ad.id } }),
+        ...(filtered.length > 0
+          ? [
+              db.meta.createMany({
+                data: filtered.map(m => ({
+                  adId: ad.id,
+                  fieldId: m.fieldId,
+                  value: m.value as Prisma.InputJsonValue,
+                })),
+              }),
+            ]
+          : []),
+      ])
 
       // Notify workspace owners and managers.
       const reviewers = await db.workspaceMember.findMany({

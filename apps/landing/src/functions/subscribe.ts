@@ -19,9 +19,6 @@ export const subscribe = createServerFn({ method: "POST" })
     })
 
     if (!result.success) {
-      if (import.meta.env.DEV) {
-        console.error("[waitlist] AutoSend error", result.error)
-      }
       throw new Error("Something went wrong. Please try again.")
     }
 

@@ -13,7 +13,7 @@ export type OpenAdsTierSelectorOptions = {
 export type OpenAdsTierSelector = {
   hostElement: HTMLDivElement
   iframe: HTMLIFrameElement
-  updateConfig: (options: Partial<OpenAdsTierSelectorOptions>) => void
+  updateConfig: (options: Partial<Omit<OpenAdsTierSelectorOptions, "container">>) => void
   destroy: () => void
 }
 
@@ -69,9 +69,10 @@ export const mountTierSelector = (options: OpenAdsTierSelectorOptions): OpenAdsT
   hostElement.appendChild(iframe)
   container.appendChild(hostElement)
 
-  const updateConfig = (nextOptions: Partial<OpenAdsTierSelectorOptions>) => {
+  const updateConfig = (nextOptions: Partial<Omit<OpenAdsTierSelectorOptions, "container">>) => {
     currentOptions = { ...currentOptions, ...nextOptions }
-    iframe.src = getIframeUrl(currentOptions)
+    const nextSrc = getIframeUrl(currentOptions)
+    if (iframe.src !== nextSrc) iframe.src = nextSrc
     iframe.style.height = getHeight(currentOptions.height)
   }
 

@@ -58,7 +58,7 @@ export type ProductUpdateProps = {
   name?: string
   description?: string
   active?: boolean
-  metadata?: Partial<TierMetadata>
+  metadata?: Stripe.MetadataParam
   features?: string[]
 }
 
@@ -74,7 +74,7 @@ export const updateTierProduct = async (
       name: props.name,
       description: props.description,
       active: props.active,
-      metadata: props.metadata as Record<string, string> | undefined,
+      metadata: props.metadata,
       marketing_features: props.features?.map(name => ({ name })),
     },
     { stripeAccount: connectedAccountId },

@@ -10,9 +10,9 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { FormButton } from "~/components/form-button"
 import { CurrencySelect } from "~/components/tiers/currency-select"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient } from "~/lib/orpc"
 
 // Visible form schema uses whole units; the submit handler converts to cents.
@@ -47,8 +47,6 @@ export const TierPriceForm = ({
   onSuccess: onSuccessCallback,
   ...props
 }: TierPriceFormProps) => {
-  const handleError = useMutationErrorHandler()
-
   const form = useZodForm(tierPriceFormSchema, {
     defaultValues: {
       interval: BillingInterval.Month,
@@ -69,7 +67,7 @@ export const TierPriceForm = ({
         onSuccessCallback?.()
       },
       onError: error => {
-        handleError({ error, form })
+        handleMutationError({ error, form })
       },
     }),
   )

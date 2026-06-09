@@ -6,29 +6,18 @@ import {
   DialogTitle,
 } from "@openads/ui/dialog"
 import { ArrowRightIcon } from "lucide-react"
-import type { Dispatch, SetStateAction } from "react"
-import { useCallback, useMemo, useState } from "react"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { LogoSymbol } from "~/components/ui/logo-symbol"
 import { siteConfig } from "~/config/site"
 
 type WelcomeModalProps = {
-  showWelcomeModal: boolean
-  setShowWelcomeModal: Dispatch<SetStateAction<boolean>>
-  onClose?: () => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: WelcomeModalProps) => {
-  const handleOpenChange = (open: boolean) => {
-    setShowWelcomeModal(open)
-
-    if (!open) {
-      onClose?.()
-    }
-  }
-
+export const WelcomeModal = ({ open, onOpenChange }: WelcomeModalProps) => {
   return (
-    <Dialog open={showWelcomeModal} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <div className="-m-6 mb-0 flex justify-center bg-primary-foreground border-b p-12 rounded-t-lg">
           <LogoSymbol className="size-12" />
@@ -53,28 +42,5 @@ const WelcomeModal = ({ showWelcomeModal, setShowWelcomeModal, onClose }: Welcom
         </Header>
       </DialogContent>
     </Dialog>
-  )
-}
-
-export const useWelcomeModal = () => {
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
-
-  const WelcomeModalCallback = useCallback(
-    ({ onClose }: Omit<WelcomeModalProps, "showWelcomeModal" | "setShowWelcomeModal">) => (
-      <WelcomeModal
-        showWelcomeModal={showWelcomeModal}
-        setShowWelcomeModal={setShowWelcomeModal}
-        onClose={onClose}
-      />
-    ),
-    [showWelcomeModal, setShowWelcomeModal],
-  )
-
-  return useMemo(
-    () => ({
-      setShowWelcomeModal,
-      WelcomeModal: WelcomeModalCallback,
-    }),
-    [setShowWelcomeModal, WelcomeModalCallback],
   )
 }

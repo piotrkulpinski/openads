@@ -18,5 +18,4 @@ model Tier {
 
   // Indexes
   @@index([workspaceId, isActive, order])
-  @@index([workspaceId])
 }

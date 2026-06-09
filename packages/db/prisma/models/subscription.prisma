@@ -33,7 +33,6 @@ model Subscription {
 
   // Indexes
   @@index([workspaceId, status])
-  @@index([workspaceId])
   @@index([tierId])
   @@index([tierPriceId])
   @@index([advertiserId])

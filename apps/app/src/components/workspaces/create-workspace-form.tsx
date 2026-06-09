@@ -12,8 +12,8 @@ import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
-import { useMutationErrorHandler } from "~/hooks/use-mutation-error-handler"
 import { useZodForm } from "~/hooks/use-zod-form"
+import { handleMutationError } from "~/lib/handle-mutation-error"
 import { getWebsiteFavicon } from "~/lib/helpers"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
@@ -30,8 +30,6 @@ export const CreateWorkspaceForm = ({
   onSuccess,
   ...props
 }: CreateWorkspaceFormProps) => {
-  const handleError = useMutationErrorHandler()
-
   const form = useZodForm(workspaceSchema, {
     defaultValues: {
       ...init(workspaceSchema),
@@ -53,7 +51,7 @@ export const CreateWorkspaceForm = ({
   const { mutate: createWorkspace, isPending } = useMutation(
     orpc.workspace.create.mutationOptions({
       onSuccess: onSuccessHandler,
-      onError: error => handleError({ error, form }),
+      onError: error => handleMutationError({ error, form }),
     }),
   )
 

@@ -1,5 +1,5 @@
 import { db } from "@openads/db"
-import { Prisma } from "@openads/db/client"
+import { Prisma, StripeConnectStatus } from "@openads/db/client"
 import {
   mapStripeSubscriptionStatus,
   readSubscriptionMetadata,
@@ -74,7 +74,9 @@ const handleConnectAccountUpdate = async (account: Stripe.Account, connectedAcco
   await db.workspace.updateMany({
     where: { stripeConnectId: connectedAccountId ?? account.id },
     data: {
-      stripeConnectStatus: account.charges_enabled ? "active" : "pending",
+      stripeConnectStatus: account.charges_enabled
+        ? StripeConnectStatus.Active
+        : StripeConnectStatus.Pending,
       stripeConnectEnabled: account.charges_enabled,
       stripeConnectData: {
         integrationMode: "direct",
@@ -227,13 +229,9 @@ const findOrCreateAdvertiser = async ({
   workspaceId: string
   email: string
 }) => {
-  const existing = await db.advertiser.findFirst({
-    where: { workspaceId, email },
-  })
-
-  if (existing) return existing
-
-  return await db.advertiser.create({
-    data: { workspaceId, email, name: email.split("@")[0] ?? email },
+  return await db.advertiser.upsert({
+    where: { workspaceId_email: { workspaceId, email } },
+    update: {},
+    create: { workspaceId, email, name: email.split("@")[0] ?? email },
   })
 }

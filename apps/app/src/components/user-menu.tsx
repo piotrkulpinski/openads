@@ -30,9 +30,9 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
   const workspace = useWorkspace()
   const { open: openSupport } = useSupport()
 
-  const { data: user, isFetching } = useQuery(orpc.user.me.queryOptions())
+  const { data: user } = useQuery(orpc.user.me.queryOptions())
 
-  if (!user || isFetching) {
+  if (!user) {
     return <NavButtonSkeleton />
   }
 

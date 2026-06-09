@@ -14,7 +14,7 @@ type QueueItem = { method: "init" | "updateConfig" | "destroy"; args: Array<unkn
 type OpenAdsGlobal = {
   q?: Array<QueueItem>
   init: (options?: Partial<OpenAdsTierSelectorOptions>) => OpenAdsTierSelector | undefined
-  updateConfig: (options?: Partial<OpenAdsTierSelectorOptions>) => void
+  updateConfig: (options?: Partial<Omit<OpenAdsTierSelectorOptions, "container">>) => void
   destroy: () => void
 }
 
@@ -33,26 +33,27 @@ declare global {
   const queue = Array.isArray(existing?.q) ? existing.q : []
 
   let widget: OpenAdsTierSelector | null = null
-  let pendingConfig: Partial<OpenAdsTierSelectorOptions> = {}
+  let pendingConfig: Partial<Omit<OpenAdsTierSelectorOptions, "container">> = {}
 
   const api: OpenAdsGlobal = {
-    q: [],
     init(options = {}) {
-      const merged = { ...pendingConfig, ...options }
+      const { slug, container, ...rest } = { ...pendingConfig, ...options }
 
-      if (!merged.slug) {
+      if (!slug) {
         throw new Error("OpenAds: slug is required.")
       }
-      if (!merged.container) {
+      if (!container) {
         throw new Error("OpenAds: container is required.")
       }
 
       // Pass the script-origin appUrl explicitly so mountTierSelector never
       // falls back to its packaged DEFAULT_APP_URL constant.
-      const resolved = {
-        ...merged,
-        appUrl: merged.appUrl || appUrl,
-      } as OpenAdsTierSelectorOptions
+      const resolved: OpenAdsTierSelectorOptions = {
+        ...rest,
+        slug,
+        container,
+        appUrl: rest.appUrl || appUrl,
+      }
 
       if (widget) {
         widget.updateConfig(resolved)

@@ -41,11 +41,12 @@ export function Hero() {
             className="max-w-xl text-lg/relaxed text-foreground/55 text-pretty animate-fade-up"
             style={{ animationDelay: "160ms" }}
           >
-            Define your ad zones, set your prices, embed a widget — and let advertisers purchase
+            Define your ad tiers, set your prices, embed a widget — and let advertisers purchase
             directly. No middlemen. No rev-share surprises.
           </p>
 
           <div
+            id="waitlist"
             className="w-full max-w-md pt-2 scroll-mt-24 animate-fade-up"
             style={{ animationDelay: "240ms" }}
           >

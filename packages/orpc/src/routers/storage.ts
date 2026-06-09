@@ -33,12 +33,32 @@ const ADVERTISER_UPLOAD_WINDOW_SECONDS = 60 * 60
 export const storageRouter = {
   uploadUserImage: authProcedure
     .input(uploadImageInput)
-    .handler(async ({ context: { s3, user }, input: { file, fileName, ...props } }) => {
-      const body = Buffer.from(file.split(",")[1]!, "base64")
-      const key = `users/${user.id}/${generateObjectKey(fileName)}`
+    .handler(
+      async ({ context: { s3, user }, input: { file, fileName, contentType, ...props } }) => {
+        // Same guardrails as the advertiser upload: derive the content type
+        // (explicit input wins over the data-URL prefix) and enforce the
+        // allowlist + size cap before anything touches storage.
+        const resolvedContentType = contentType || file.match(/^data:([^;,]+)[;,]/)?.[1]
 
-      return s3.uploadObject({ key, body, ...props })
-    }),
+        if (!resolvedContentType || !ALLOWED_IMAGE_TYPES.has(resolvedContentType)) {
+          throw new ORPCError("BAD_REQUEST", {
+            message: "Unsupported file type. Use PNG, JPEG, or WebP.",
+          })
+        }
+
+        const body = Buffer.from(file.split(",")[1]!, "base64")
+
+        if (body.byteLength > MAX_ADVERTISER_UPLOAD_BYTES) {
+          throw new ORPCError("BAD_REQUEST", {
+            message: "File is too large. Maximum upload size is 2 MB.",
+          })
+        }
+
+        const key = `users/${user.id}/${generateObjectKey(fileName)}`
+
+        return s3.uploadObject({ key, body, contentType: resolvedContentType, ...props })
+      },
+    ),
 
   deleteUser: authProcedure.handler(async ({ context: { s3, user } }) => {
     return await s3.deletePrefix({ prefix: `users/${user.id}` })

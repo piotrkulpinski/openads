@@ -104,16 +104,17 @@ describe("publicRouter ↔ @openads/sdk contract", () => {
     expect(firstCall?.where?.id?.notIn).toEqual(["ad_old", "ad_2"])
   })
 
-  it("serves multiple ads and threads excludeIds through rotation", async () => {
+  it("serves multiple ads from a single pool query without duplicates", async () => {
     const { context, findManyCalls } = createContext()
     const client = mountSdk(context)
 
     const ads = await client.getAds({ count: 3 })
 
-    // Only one ad in the fake dataset → second pass excludes it → list of 1.
+    // Only one ad in the fake dataset → sampling without replacement caps the
+    // list at 1, and the pool is fetched exactly once.
     expect(ads).toHaveLength(1)
     expect(ads[0]?.id).toBe("ad_live")
-    expect(findManyCalls.at(1)?.where?.id?.notIn).toContain("ad_live")
+    expect(findManyCalls).toHaveLength(1)
   })
 
   it("records impressions and clicks over the REST tracking endpoints", async () => {
