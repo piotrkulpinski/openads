@@ -27,10 +27,15 @@ const buildSchema = (fields: Field[]) => {
         schema = z.url()
         break
       case "Number":
-        schema = z.coerce.number()
+        // Treat a cleared input ("") as absent so coercion never turns it into 0
+        schema = z.preprocess(
+          v => (v === "" ? undefined : v),
+          z.coerce.number({ error: `${field.name} is required` }),
+        )
         break
       case "Switch":
-        schema = z.boolean()
+        // Radix Switch only writes a value on interaction — default so untouched switches validate
+        schema = z.boolean().default(false)
         break
       default:
         schema = z.string()
