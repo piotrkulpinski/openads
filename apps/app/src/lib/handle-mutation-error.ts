@@ -25,8 +25,7 @@ export const handleMutationError = <T extends FieldValues>({
 
   if (!fieldErrors || isEmptyObject(fieldErrors)) {
     toast.error(message)
-    // Non-field errors leave no reliable target for inline form feedback.
-    form.reset()
+    form.clearErrors()
 
     return
   }
