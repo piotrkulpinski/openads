@@ -6,7 +6,7 @@ import { Heading, type HeadingProps } from "~/components/ui/heading"
 import { Prose } from "~/components/ui/prose"
 
 const headerVariants = cva({
-  base: "@container/header flex flex-wrap items-center w-full min-w-0",
+  base: "flex flex-wrap items-center w-full min-w-0",
 
   variants: {
     alignment: {

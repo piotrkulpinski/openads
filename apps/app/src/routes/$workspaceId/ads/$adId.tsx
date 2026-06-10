@@ -89,7 +89,7 @@ function AdReviewPage() {
       </Header>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <Stack direction="column" size="md">
+        <Stack direction="column" size="md" className="items-stretch">
           <Card>
             <Card.Section>
               <H4>Creative</H4>
@@ -99,7 +99,7 @@ function AdReviewPage() {
                     href={ad.websiteUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-blue-600 underline"
+                    className="break-all text-blue-600 underline"
                   >
                     {ad.websiteUrl}
                   </a>

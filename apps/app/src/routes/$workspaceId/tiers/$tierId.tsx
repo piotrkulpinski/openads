@@ -25,7 +25,7 @@ function TiersEditPage() {
   const { tier } = Route.useLoaderData()
 
   return (
-    <Stack direction="column" size="lg">
+    <Stack direction="column" size="lg" className="items-stretch">
       <H3>Edit Tier</H3>
 
       <TierForm

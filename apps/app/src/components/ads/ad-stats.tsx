@@ -27,7 +27,7 @@ export const AdStats = ({ workspaceId, adId }: AdStatsProps) => {
           pending={() => <Skeleton className="mt-4 h-32" />}
           error={() => <p className="mt-4 text-muted-foreground text-sm">Could not load stats.</p>}
           success={({ data }) => (
-            <Stack direction="column" size="md" className="mt-4">
+            <Stack direction="column" size="md" className="mt-4 items-stretch">
               <div className="grid grid-cols-2 gap-4">
                 <Tile
                   label="Impressions"
