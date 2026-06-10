@@ -20,12 +20,14 @@ const prefixes = {
 } as const
 
 /**
- * Generates a unique ID, prefixed by model name when recognized.
+ * Generates a prefixed unique ID for recognized models. Models absent from the
+ * map (e.g. WorkspaceMember with its composite primary key) get no generated
+ * id, so callers must not inject one.
  */
 export const generateId = (prefix?: string) => {
   if (prefix && isKeyInObject(prefix, prefixes)) {
     return `${prefixes[prefix]}_${nanoid()}`
   }
 
-  return nanoid()
+  return undefined
 }
