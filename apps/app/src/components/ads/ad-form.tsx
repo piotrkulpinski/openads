@@ -5,11 +5,11 @@ import { Switch } from "@openads/ui/switch"
 import { Textarea } from "@openads/ui/textarea"
 import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
-import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { ImageUpload } from "~/components/ads/image-upload"
 import { FormButton } from "~/components/form-button"
+import { useZodForm } from "~/hooks/use-zod-form"
 import { orpc, type RouterOutputs } from "~/lib/orpc"
 
 type CheckoutInfo = RouterOutputs["ad"]["checkout"]["getCheckoutInfo"]
@@ -41,7 +41,7 @@ const buildSchema = (fields: Field[]) => {
       schema = schema.optional().or(z.literal(""))
     }
 
-    if (field.isRequired && field.type !== "Switch") {
+    if (field.isRequired && (field.type === "Text" || field.type === "Textarea")) {
       schema = (schema as z.ZodString).min(1, { message: `${field.name} is required` })
     }
 
@@ -78,12 +78,12 @@ export const AdForm = ({
     ? Object.fromEntries(existing.meta.map(m => [m.fieldId, m.value as string | number | boolean]))
     : {}
 
-  const form = useForm<FormValues>({
+  const form = useZodForm(schema, {
     defaultValues: {
       name: existing?.name ?? "",
       websiteUrl: existing?.websiteUrl ?? "",
       meta: initialMeta,
-    } as FormValues,
+    },
   })
 
   const submit = useMutation(
