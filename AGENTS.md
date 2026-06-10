@@ -107,6 +107,7 @@ The following are explicit deferrals. Don't build them without confirming a scop
 - **Format**: `bun run format` (oxfmt via @dirstack/kodeks)
 - **Test**: No tests yet; when added, use Vitest with `*.test.ts` files colocated with source
 - **Database**: `bun run db:generate`, `db:push`, `db:reset`, `db:studio`
+- **Seed**: `bun run db:seed` (`packages/db/prisma/seed.ts`) — rebuilds the "Acme Directory" dev workspace (slug `acme`, owned by every existing user) with data for every dashboard module: all field types, an archived tier, archived/grandfathered prices, subscriptions and ads in every status (incl. a long-content stress-test ad), custom field meta, and 30 days of stats. Idempotent — re-running wipes and recreates only that workspace. Stripe IDs are fakes, so actions that call Stripe (reject, price changes) fail against it.
 
 ## Code style guidelines
 
@@ -162,6 +163,7 @@ These are recurring integration pitfalls worth preserving for future contributor
   - `"jsx": "react-jsx"` in `packages/orpc/tsconfig.json`
   - `"types": ["node"]` in `packages/emails/tsconfig.json` and `packages/s3/tsconfig.json`
   - **Apply the pragma to every new email template.** Long-term fix is dropping `hono/jsx` from apps/api (we don't render Hono JSX).
+- **`@container` (container-type: inline-size) zeroes intrinsic width**: an element with `container-type: inline-size` contributes 0 to its parent's max-content size. Inside any shrink-to-fit context (e.g. `Stack direction="column"`, whose variant sets `items-start`), the parent collapses to its padding and text wraps one character per line. This broke the ad review page via `@container/section` on `Card.Section` (removed — it had no container-query consumers). Don't re-add `@container` to shared layout primitives unless something actually queries it, and give block-level children of column Stacks `items-stretch`/`w-full`.
 - **SSH push to GitHub timing out**: Common on restrictive networks. Workaround is SSH-over-443 (`Host github.com / Hostname ssh.github.com / Port 443 / User git` in `~/.ssh/config`) or temporarily switch to HTTPS remote.
 - **React Email v6**: imports come from `"react-email"` (single package), **not** `@react-email/components` (v5 legacy). Preview server is `@react-email/ui`, invoked via `email dev --dir src/templates` (the `--dir` flag is required because templates aren't in the default `./emails` folder).
 - **AutoSend** is the email provider (not Resend). Used by `apps/landing` for the waitlist and by `@openads/emails` for all transactional. Env vars: `AUTOSEND_API_KEY`, `AUTOSEND_FROM_EMAIL`, `AUTOSEND_FROM_NAME`, plus `AUTOSEND_WAITLIST_LIST_ID` in landing only.
