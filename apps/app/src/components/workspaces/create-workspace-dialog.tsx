@@ -8,7 +8,6 @@ import {
 } from "@openads/ui/dialog"
 import { useNavigate } from "@tanstack/react-router"
 import { type PropsWithChildren, useState } from "react"
-import { toast } from "sonner"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { CreateWorkspaceForm } from "~/components/workspaces/create-workspace-form"
 
@@ -36,7 +35,7 @@ export const CreateWorkspaceDialog = ({ children }: PropsWithChildren) => {
 
         <CreateWorkspaceForm
           onSuccess={({ id }) => {
-            toast.success("Workspace created successfully")
+            onOpenChange(false)
             navigate({ to: "/$workspaceId", params: { workspaceId: id } })
           }}
         >
