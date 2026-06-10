@@ -7,7 +7,7 @@ export type SlottableProps = {
   children: (child: ReactNode) => ReactNode
 }
 
-export const Slottable = ({ asChild, child, children }: SlottableProps) => {
+export const Slottable = ({ asChild, child, children, ...rest }: SlottableProps) => {
   if (!asChild) {
     return children(child)
   }
@@ -16,9 +16,9 @@ export const Slottable = ({ asChild, child, children }: SlottableProps) => {
     return null
   }
 
-  return cloneElement(
-    child,
-    undefined,
-    children((child.props as { children?: ReactNode }).children),
-  )
+  // In asChild mode this element is the direct child of a radix Slot, which
+  // passes the merged parent props (className, ref, handlers, ...) here in
+  // `rest` — they must be forwarded onto the cloned child or the consumer's
+  // element renders unstyled.
+  return cloneElement(child, rest, children((child.props as { children?: ReactNode }).children))
 }
