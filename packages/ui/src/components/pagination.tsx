@@ -15,9 +15,7 @@ const PaginationContent = ({ className, ...props }: ComponentProps<"ul">) => (
   <ul className={cx("flex flex-row items-center gap-1", className)} {...props} />
 )
 
-const PaginationItem = ({ className, ...props }: ComponentProps<"li">) => (
-  <li className={cx("", className)} {...props} />
-)
+const PaginationItem = (props: ComponentProps<"li">) => <li {...props} />
 
 type PaginationLinkProps = {
   isActive?: boolean

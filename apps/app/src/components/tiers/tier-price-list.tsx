@@ -20,7 +20,7 @@ type TierPriceListProps = ComponentProps<"div"> & {
   tier: TierWithPrices
 }
 
-export const TierPriceList = ({ workspaceId, tier, className, ...props }: TierPriceListProps) => {
+export const TierPriceList = ({ workspaceId, tier, ...props }: TierPriceListProps) => {
   const [isAdding, setIsAdding] = useState(false)
 
   const archivePrice = useMutation(
@@ -36,7 +36,7 @@ export const TierPriceList = ({ workspaceId, tier, className, ...props }: TierPr
   )
 
   return (
-    <Card className={className} {...props}>
+    <Card {...props}>
       <Card.Section>
         <Header>
           <HeaderTitle size="h4">Prices</HeaderTitle>

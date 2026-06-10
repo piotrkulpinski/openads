@@ -15,7 +15,6 @@ type StripeConnectButtonsProps = ComponentProps<"div"> & {
 }
 
 export const StripeConnectButtons = ({
-  className,
   workspace,
   onSuccess,
   ...props
@@ -54,7 +53,7 @@ export const StripeConnectButtons = ({
   )
 
   return (
-    <div className={className} {...props}>
+    <div {...props}>
       {!workspace.stripeConnectId ? (
         <Button
           size="lg"
