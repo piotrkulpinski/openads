@@ -5,9 +5,10 @@ import { Layout } from "./_layout"
 export type AdApprovedProps = {
   workspaceName: string
   adName: string
+  approvalNote?: string
 }
 
-export function AdApproved({ workspaceName, adName }: AdApprovedProps) {
+export function AdApproved({ workspaceName, adName, approvalNote }: AdApprovedProps) {
   return (
     <Layout preview={`Your ad on ${workspaceName} is now live`}>
       <Heading className="font-semibold text-2xl">Your ad is live</Heading>
@@ -16,6 +17,12 @@ export function AdApproved({ workspaceName, adName }: AdApprovedProps) {
         <strong>{adName}</strong> just went live on <strong>{workspaceName}</strong>. Thanks for
         advertising with us — your subscription will renew monthly until you cancel.
       </Text>
+
+      {approvalNote ? (
+        <Text className="rounded-md border border-neutral-200 bg-neutral-50 p-4 text-base text-neutral-700">
+          {approvalNote}
+        </Text>
+      ) : null}
 
       <Hr className="my-8 border-neutral-200" />
 
