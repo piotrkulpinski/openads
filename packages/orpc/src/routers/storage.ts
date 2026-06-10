@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
 import { slugify } from "@dirstack/utils"
+import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from "@openads/db/schema"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
 import { authProcedure, publicProcedure, workspaceMw } from "../index"
@@ -21,11 +22,7 @@ const generateObjectKey = (fileName: string) => {
   return `${baseName}-${randomUUID().slice(0, 8)}.${extension}`
 }
 
-// SVG is intentionally excluded — it can execute JS when rendered via <img>
-// from a same-origin asset host.
-const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"])
-
-const MAX_ADVERTISER_UPLOAD_BYTES = 2 * 1024 * 1024 // 2 MB
+const allowedImageTypes = new Set<string>(ALLOWED_IMAGE_TYPES)
 const ADVERTISER_UPLOAD_TTL_SECONDS = 60 * 5 // 5 minutes to PUT after issuing the URL
 const ADVERTISER_UPLOAD_RATE_LIMIT = 20 // uploads per hour per checkout session
 const ADVERTISER_UPLOAD_WINDOW_SECONDS = 60 * 60
@@ -40,7 +37,7 @@ export const storageRouter = {
         // allowlist + size cap before anything touches storage.
         const resolvedContentType = contentType || file.match(/^data:([^;,]+)[;,]/)?.[1]
 
-        if (!resolvedContentType || !ALLOWED_IMAGE_TYPES.has(resolvedContentType)) {
+        if (!resolvedContentType || !allowedImageTypes.has(resolvedContentType)) {
           throw new ORPCError("BAD_REQUEST", {
             message: "Unsupported file type. Use PNG, JPEG, or WebP.",
           })
@@ -48,7 +45,7 @@ export const storageRouter = {
 
         const body = Buffer.from(file.split(",")[1]!, "base64")
 
-        if (body.byteLength > MAX_ADVERTISER_UPLOAD_BYTES) {
+        if (body.byteLength > MAX_UPLOAD_BYTES) {
           throw new ORPCError("BAD_REQUEST", {
             message: "File is too large. Maximum upload size is 2 MB.",
           })
@@ -89,13 +86,13 @@ export const storageRouter = {
           context: { db, s3, stripe, redis },
           input: { workspaceId, sessionId, fileName, contentType, contentLength },
         }) => {
-          if (!ALLOWED_IMAGE_TYPES.has(contentType)) {
+          if (!allowedImageTypes.has(contentType)) {
             throw new ORPCError("BAD_REQUEST", {
               message: "Unsupported file type. Use PNG, JPEG, or WebP.",
             })
           }
 
-          if (contentLength > MAX_ADVERTISER_UPLOAD_BYTES) {
+          if (contentLength > MAX_UPLOAD_BYTES) {
             throw new ORPCError("BAD_REQUEST", {
               message: "File is too large. Maximum upload size is 2 MB.",
             })

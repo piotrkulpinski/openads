@@ -1,5 +1,5 @@
 import { getInitials, toBase64 } from "@dirstack/utils"
-import { fileSchema, userSchema } from "@openads/db/schema"
+import { ALLOWED_IMAGE_TYPES, fileSchema, userSchema } from "@openads/db/schema"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Button } from "@openads/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
@@ -116,13 +116,15 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
 
       form.reset({}, { keepValues: true })
 
-      setAvatar({ kind: "unchanged" })
-
       toast.success("Profile updated")
 
-      // Refresh both the user cache and route context so headers/menus update immediately.
+      // Refresh the user cache and route context before dropping the local preview —
+      // previewUrl falls back to `user.image` once avatar resets, so the loader data
+      // must already be fresh to avoid flashing the stale image.
       await queryClient.invalidateQueries({ queryKey: orpc.user.me.key() })
       await router.invalidate()
+
+      setAvatar({ kind: "unchanged" })
     } catch (error) {
       logger.error("profile update failed", { err: error })
     }
@@ -152,7 +154,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept={ALLOWED_IMAGE_TYPES.join(",")}
                     className="hidden"
                     onChange={handleFileChange}
                   />

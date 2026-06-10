@@ -133,13 +133,14 @@ export const useOpenAdsAd = ({
   request,
 }: OpenAdsAdOptions = {}): OpenAdsQueryState<OpenAdsAd | null> => {
   const client = useOpenAdsClient()
-  const requestRef = useRef(request)
-  requestRef.current = request
   const excludeKey = excludeIds?.join(",") ?? ""
+  // Same trick as excludeKey: key on content, not identity, so inline objects
+  // don't refetch every render but real request changes do.
+  const requestKey = JSON.stringify(request)
 
   const getData = useCallback(
-    () => client.getAd({ weightGte, excludeIds, request: requestRef.current }),
-    [client, excludeKey, weightGte],
+    () => client.getAd({ weightGte, excludeIds, request }),
+    [client, excludeKey, requestKey, weightGte],
   )
 
   return useOpenAdsQuery<OpenAdsAd | null>(enabled, null, getData)
@@ -153,13 +154,12 @@ export const useOpenAdsAds = ({
   request,
 }: OpenAdsAdsOptions = {}): OpenAdsQueryState<Array<OpenAdsAd>> => {
   const client = useOpenAdsClient()
-  const requestRef = useRef(request)
-  requestRef.current = request
   const excludeKey = excludeIds?.join(",") ?? ""
+  const requestKey = JSON.stringify(request)
 
   const getData = useCallback(
-    () => client.getAds({ weightGte, excludeIds, count, request: requestRef.current }),
-    [client, count, excludeKey, weightGte],
+    () => client.getAds({ weightGte, excludeIds, count, request }),
+    [client, count, excludeKey, requestKey, weightGte],
   )
 
   return useOpenAdsQuery<Array<OpenAdsAd>>(enabled, [], getData)

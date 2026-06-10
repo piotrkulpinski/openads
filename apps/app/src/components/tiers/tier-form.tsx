@@ -5,6 +5,7 @@ import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
+import { Label } from "@openads/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
@@ -235,7 +236,7 @@ export const TierForm = ({
 
         <div className="col-span-full grid gap-3 border-t pt-4">
           <div className="flex items-center justify-between">
-            <FormLabel className="text-base">Features</FormLabel>
+            <Label className="text-base">Features</Label>
             <Button
               type="button"
               variant="secondary"
@@ -288,7 +289,7 @@ export const TierForm = ({
         {!isEditing && (
           <div className="col-span-full grid gap-3 border-t pt-4">
             <div className="flex items-center justify-between">
-              <FormLabel className="text-base">Pricing</FormLabel>
+              <Label className="text-base">Pricing</Label>
               <Button
                 type="button"
                 variant="secondary"
