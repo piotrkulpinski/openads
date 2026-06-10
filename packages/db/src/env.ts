@@ -7,4 +7,8 @@ export const env = createEnv({
   },
 
   runtimeEnv: process.env,
+
+  // `bun test` runs without a database — queries never execute there, so an
+  // unset DATABASE_URL must not fail at import time.
+  skipValidation: process.env.NODE_ENV === "test",
 })
