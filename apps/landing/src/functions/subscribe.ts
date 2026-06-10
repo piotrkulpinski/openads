@@ -19,6 +19,9 @@ export const subscribe = createServerFn({ method: "POST" })
     })
 
     if (!result.success) {
+      // console is the logging mechanism on Cloudflare Workers — captured by the
+      // observability config in wrangler.jsonc. @openads/logger can't run here.
+      console.error("[waitlist] AutoSend error", result.error)
       throw new Error("Something went wrong. Please try again.")
     }
 

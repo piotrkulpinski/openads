@@ -23,6 +23,14 @@ export type OpenAdsAd = {
   fields: Array<OpenAdsFieldValue>
 }
 
+/**
+ * Extra `fetch` options merged into every request.
+ *
+ * Must be JSON-serializable — the React bindings memoize the client and hook
+ * fetches on `JSON.stringify(request)`. Pass plain objects and arrays only
+ * (e.g. `headers` as a plain record); `Headers` instances, `AbortSignal`,
+ * streams, and other non-serializable `RequestInit` values are not supported.
+ */
 export type OpenAdsRequestOptions = RequestInit & {
   /** Next.js `fetch` extension (App Router caching). Ignored by other runtimes. */
   next?: { revalidate?: number | false; tags?: Array<string> }

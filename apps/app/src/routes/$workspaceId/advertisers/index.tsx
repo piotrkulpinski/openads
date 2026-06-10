@@ -8,7 +8,7 @@ import { Stack } from "@openads/ui/stack"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { SearchIcon, UsersIcon, XIcon } from "lucide-react"
-import { type ComponentProps, useState } from "react"
+import { type ComponentProps, useRef, useState } from "react"
 import { z } from "zod"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
@@ -126,10 +126,21 @@ const AdvertisersIndexPage = () => {
   const { query } = Route.useSearch()
   const navigate = Route.useNavigate()
   const [search, setSearch] = useState(query ?? "")
+  const [lastQuery, setLastQuery] = useState(query)
+  const selfQuery = useRef(query)
+
+  // Sync the input when the URL changes externally (e.g. the sidebar link strips
+  // ?query= without remounting the route). Our own debounced navigate is skipped
+  // so keystrokes typed while it was in flight aren't clobbered.
+  if (query !== lastQuery) {
+    setLastQuery(query)
+    if (query !== selfQuery.current) setSearch(query ?? "")
+    selfQuery.current = query
+  }
 
   const navigateDebounced = useDebouncedCallback((value: string) => {
-    const trimmed = value.trim()
-    navigate({ search: { query: trimmed.length > 0 ? trimmed : undefined }, replace: true })
+    selfQuery.current = value.trim() || undefined
+    navigate({ search: { query: selfQuery.current }, replace: true })
   }, 300)
 
   const handleSearchChange = (value: string) => {
@@ -184,7 +195,11 @@ const AdvertisersIndexPage = () => {
 
 export const Route = createFileRoute("/$workspaceId/advertisers/")({
   validateSearch: z.object({
-    query: z.string().optional(),
+    query: z
+      .string()
+      .trim()
+      .optional()
+      .transform(value => value || undefined),
   }),
 
   component: AdvertisersIndexPage,

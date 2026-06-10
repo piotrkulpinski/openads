@@ -1,3 +1,4 @@
+import { ALLOWED_IMAGE_TYPES } from "@openads/db/schema"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { useMutation } from "@tanstack/react-query"
@@ -14,7 +15,7 @@ type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
   accept?: string
 }
 
-const DEFAULT_ACCEPT = "image/png,image/jpeg,image/webp"
+const DEFAULT_ACCEPT = ALLOWED_IMAGE_TYPES.join(",")
 
 export const ImageUpload = ({
   workspaceId,
