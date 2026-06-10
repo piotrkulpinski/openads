@@ -18,16 +18,12 @@ export const advertiserRouter = {
     .use(workspaceMw)
     .handler(async ({ context: { db, workspace }, input: { query } }) => {
       const search = query?.trim()
+      const subscriptionFilter = { workspaceId: workspace.id, ad: { isNot: null } }
 
       const advertisers = await db.advertiser.findMany({
         where: {
           workspaceId: workspace.id,
-          subscriptions: {
-            some: {
-              workspaceId: workspace.id,
-              ad: { isNot: null },
-            },
-          },
+          subscriptions: { some: subscriptionFilter },
           ...(search
             ? {
                 OR: [
@@ -47,72 +43,85 @@ export const advertiserRouter = {
         },
         orderBy: { updatedAt: "desc" },
         include: {
+          _count: {
+            select: { subscriptions: { where: subscriptionFilter } },
+          },
           subscriptions: {
-            where: {
-              workspaceId: workspace.id,
-              ad: { isNot: null },
-            },
+            where: subscriptionFilter,
+            orderBy: { ad: { updatedAt: "desc" } },
+            take: 1,
             include: {
               ad: true,
               tier: true,
-              tierPrice: true,
             },
           },
         },
       })
 
-      return advertisers
-        .map(advertiser => {
-          const subscriptions = advertiser.subscriptions.filter(subscription => subscription.ad)
-          const latestSubscription = [...subscriptions].sort((first, second) => {
-            const firstTime = first.ad?.updatedAt.getTime() ?? first.updatedAt.getTime()
-            const secondTime = second.ad?.updatedAt.getTime() ?? second.updatedAt.getTime()
-            return secondTime - firstTime
-          })[0]
-          const latestAd = latestSubscription?.ad ?? null
+      const advertiserIds = advertisers.map(advertiser => advertiser.id)
+      const activeStatuses = [SubscriptionStatus.Active, SubscriptionStatus.Trialing]
 
-          const activeAdCount = subscriptions.filter(subscription => {
-            return (
-              subscription.ad?.status === AdStatus.Approved &&
-              isActiveSubscriptionStatus(subscription.status)
-            )
-          }).length
+      const [activeSubscriptionCounts, activeAdCounts] = advertiserIds.length
+        ? await Promise.all([
+            db.subscription.groupBy({
+              by: ["advertiserId"],
+              where: {
+                ...subscriptionFilter,
+                advertiserId: { in: advertiserIds },
+                status: { in: activeStatuses },
+              },
+              _count: true,
+            }),
+            db.subscription.groupBy({
+              by: ["advertiserId"],
+              where: {
+                workspaceId: workspace.id,
+                advertiserId: { in: advertiserIds },
+                status: { in: activeStatuses },
+                ad: { is: { status: AdStatus.Approved } },
+              },
+              _count: true,
+            }),
+          ])
+        : [[], []]
 
-          const activeSubscriptionCount = subscriptions.filter(subscription => {
-            return isActiveSubscriptionStatus(subscription.status)
-          }).length
+      const activeSubscriptionCountById = new Map(
+        activeSubscriptionCounts.map(row => [row.advertiserId, row._count]),
+      )
+      const activeAdCountById = new Map(activeAdCounts.map(row => [row.advertiserId, row._count]))
 
-          return {
-            id: advertiser.id,
-            name: advertiser.name,
-            email: advertiser.email,
-            createdAt: advertiser.createdAt,
-            updatedAt: advertiser.updatedAt,
-            adCount: subscriptions.length,
-            activeAdCount,
-            activeSubscriptionCount,
-            latestActivityAt:
-              latestAd?.updatedAt ?? latestSubscription?.updatedAt ?? advertiser.updatedAt,
-            latestAd: latestAd
-              ? {
-                  id: latestAd.id,
-                  name: latestAd.name,
-                  status: latestAd.status,
-                  websiteUrl: latestAd.websiteUrl,
-                }
-              : null,
-            latestTier: latestSubscription
-              ? {
-                  id: latestSubscription.tier.id,
-                  name: latestSubscription.tier.name,
-                  weight: latestSubscription.tier.weight,
-                }
-              : null,
-          }
-        })
-        .sort((first, second) => {
-          return second.latestActivityAt.getTime() - first.latestActivityAt.getTime()
-        })
+      return advertisers.map(advertiser => {
+        const latestSubscription = advertiser.subscriptions[0]
+        const latestAd = latestSubscription?.ad ?? null
+
+        return {
+          id: advertiser.id,
+          name: advertiser.name,
+          email: advertiser.email,
+          createdAt: advertiser.createdAt,
+          updatedAt: advertiser.updatedAt,
+          adCount: advertiser._count.subscriptions,
+          activeAdCount: activeAdCountById.get(advertiser.id) ?? 0,
+          activeSubscriptionCount: activeSubscriptionCountById.get(advertiser.id) ?? 0,
+          latestActivityAt:
+            latestAd?.updatedAt ?? latestSubscription?.updatedAt ?? advertiser.updatedAt,
+          latestAd: latestAd
+            ? {
+                id: latestAd.id,
+                name: latestAd.name,
+                status: latestAd.status,
+                websiteUrl: latestAd.websiteUrl,
+              }
+            : null,
+          latestTier: latestSubscription
+            ? {
+                id: latestSubscription.tier.id,
+                name: latestSubscription.tier.name,
+                weight: latestSubscription.tier.weight,
+              }
+            : null,
+        }
+      })
     }),
 
   getById: authProcedure
