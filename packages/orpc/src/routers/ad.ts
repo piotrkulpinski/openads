@@ -465,7 +465,7 @@ export const adRouter = {
   approve: authProcedure
     .input(adIdentitySchema.extend({ note: z.string().trim().max(500).optional() }))
     .use(adMw)
-    .handler(async ({ context: { ad, db, emails, workspace } }) => {
+    .handler(async ({ context: { ad, db, emails, workspace }, input: { note } }) => {
       const updated = await db.ad.update({
         where: { id: ad.id },
         data: {
@@ -481,6 +481,7 @@ export const adRouter = {
         const { html, text } = await renderAdApproved({
           workspaceName: workspace.name,
           adName: ad.name,
+          approvalNote: note,
         })
 
         await emails.send({
