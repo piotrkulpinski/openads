@@ -1,4 +1,4 @@
-import { formatDate, getInitials } from "@dirstack/utils"
+import { formatDate, getInitials, isValidUrl } from "@dirstack/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
@@ -136,11 +136,13 @@ function AdReviewPage() {
             {ad.status}
           </Badge>
 
-          <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
-            <a href={ad.websiteUrl} target="_blank" rel="noreferrer">
-              Visit site
-            </a>
-          </Button>
+          {isValidUrl(ad.websiteUrl) && (
+            <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
+              <a href={ad.websiteUrl} target="_blank" rel="noreferrer">
+                Visit site
+              </a>
+            </Button>
+          )}
         </HeaderActions>
       </Header>
 
@@ -152,15 +154,19 @@ function AdReviewPage() {
 
               <dl className="divide-y divide-border/60">
                 <DetailRow label="Destination">
-                  <a
-                    href={ad.websiteUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group inline-flex max-w-full items-center gap-1 font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
-                  >
-                    <span className="truncate">{ad.websiteUrl}</span>
-                    <ArrowUpRightIcon className="shrink-0 text-muted-foreground" />
-                  </a>
+                  {isValidUrl(ad.websiteUrl) ? (
+                    <a
+                      href={ad.websiteUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="group inline-flex max-w-full items-center gap-1 font-medium underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    >
+                      <span className="truncate">{ad.websiteUrl}</span>
+                      <ArrowUpRightIcon className="shrink-0 text-muted-foreground" />
+                    </a>
+                  ) : (
+                    <span className="block truncate">{ad.websiteUrl}</span>
+                  )}
                 </DetailRow>
 
                 <DetailRow label="Tier">
@@ -363,7 +369,7 @@ const MetaValue = ({ meta, type, name }: MetaValueProps) => {
     return <span className="text-muted-foreground">—</span>
   }
 
-  if (type === "Image" && typeof value === "string") {
+  if (type === "Image" && typeof value === "string" && isValidUrl(value)) {
     return (
       <a
         href={value}
@@ -380,7 +386,7 @@ const MetaValue = ({ meta, type, name }: MetaValueProps) => {
     return <Badge variant="soft">{value ? "Yes" : "No"}</Badge>
   }
 
-  if (type === "Url" && typeof value === "string") {
+  if (type === "Url" && typeof value === "string" && isValidUrl(value)) {
     return (
       <a
         href={value}

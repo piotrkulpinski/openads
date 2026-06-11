@@ -1,4 +1,4 @@
-import { formatDate, formatNumber, getInitials } from "@dirstack/utils"
+import { formatDate, formatNumber, getInitials, isValidUrl } from "@dirstack/utils"
 import type { BillingInterval } from "@openads/db/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
@@ -140,7 +140,7 @@ function AdvertiserDetailPage() {
                   </Button>
                 )}
 
-                {advertiser.latestAd && (
+                {advertiser.latestAd && isValidUrl(advertiser.latestAd.websiteUrl) && (
                   <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
                     <a href={advertiser.latestAd.websiteUrl} target="_blank" rel="noreferrer">
                       Visit site
