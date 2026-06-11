@@ -17,7 +17,8 @@ const createFromCheckoutInput = z.object({
   workspaceId: z.string().min(1),
   sessionId: z.string().min(1),
   name: z.string().trim().min(2),
-  websiteUrl: z.url(),
+  // http(s) only — rendered as hrefs in the publisher dashboard
+  websiteUrl: z.url({ protocol: /^https?$/ }),
   meta: z
     .array(z.object({ fieldId: z.string(), value: z.unknown() }))
     .optional()
