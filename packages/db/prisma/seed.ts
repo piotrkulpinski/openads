@@ -80,6 +80,14 @@ const seed = async () => {
     })
   }
 
+  // Re-runs recreate the workspace under a new id, so repoint any default
+  // that is unset or left dangling by the wipe above.
+  const workspaceIds = (await db.workspace.findMany({ select: { id: true } })).map(w => w.id)
+  await db.user.updateMany({
+    where: { OR: [{ defaultWorkspaceId: null }, { defaultWorkspaceId: { notIn: workspaceIds } }] },
+    data: { defaultWorkspaceId: workspace.id },
+  })
+
   // ---------------------------------------------------------------- Fields
   const fieldData = [
     { type: "Text", name: "Tagline", placeholder: "One-liner shown on the card", isRequired: true },
@@ -250,7 +258,8 @@ const seed = async () => {
     {
       advertiser: { name: "ShadyVPN", email: "marketing@shadyvpn.example" },
       price: "Silver/Month/2900",
-      subscription: { status: "Active" },
+      // Rejecting an ad cancels its subscription — keep the pair consistent
+      subscription: { status: "Canceled" },
       ad: {
         name: "ShadyVPN",
         websiteUrl: "https://shadyvpn.example",
@@ -347,8 +356,13 @@ const seed = async () => {
   for (const item of adSeeds) {
     subSeq += 1
 
+    // Submission always predates the review decision, and the advertiser
+    // record is created at checkout time alongside the subscription.
+    const reviewedDaysAgo = item.ad.status === "Approved" ? (item.ad.approvedDaysAgo ?? 7) : 2
+    const submittedAt = new Date(Date.now() - (reviewedDaysAgo + 3) * DAY)
+
     const advertiser = await db.advertiser.create({
-      data: { ...item.advertiser, workspaceId: workspace.id },
+      data: { ...item.advertiser, createdAt: submittedAt, workspaceId: workspace.id },
     })
 
     const price = prices[item.price]
@@ -364,6 +378,7 @@ const seed = async () => {
         stripeCustomerId: `cus_seed${String(subSeq).padStart(4, "0")}`,
         status: item.subscription.status,
         cancelAtPeriodEnd: item.subscription.cancelAtPeriodEnd ?? false,
+        createdAt: submittedAt,
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
         workspaceId: workspace.id,
@@ -378,10 +393,9 @@ const seed = async () => {
         name: item.ad.name,
         websiteUrl: item.ad.websiteUrl,
         status: item.ad.status,
+        createdAt: submittedAt,
         approvedAt:
-          item.ad.status === "Approved"
-            ? new Date(Date.now() - (item.ad.approvedDaysAgo ?? 7) * DAY)
-            : null,
+          item.ad.status === "Approved" ? new Date(Date.now() - reviewedDaysAgo * DAY) : null,
         rejectedAt: item.ad.status === "Rejected" ? new Date(Date.now() - 2 * DAY) : null,
         rejectionNote: item.ad.rejectionNote,
         subscriptionId: subscription.id,
