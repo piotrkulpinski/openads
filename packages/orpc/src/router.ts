@@ -2,6 +2,7 @@ import type { InferRouterInputs, InferRouterOutputs, RouterClient } from "@orpc/
 import { adRouter, getCurrentAds, recordClick, recordImpression } from "./routers/ad"
 import { advertiserRouter } from "./routers/advertiser"
 import { authRouter } from "./routers/auth"
+import { dashboardRouter } from "./routers/dashboard"
 import { fieldRouter } from "./routers/field"
 import { onboardingRouter } from "./routers/onboarding"
 import { storageRouter } from "./routers/storage"
@@ -24,6 +25,7 @@ export const appRouter = {
   user: userRouter,
   onboarding: onboardingRouter,
   workspace: workspaceRouter,
+  dashboard: dashboardRouter,
   field: fieldRouter,
   tier: tierRouter,
   tierPrice: tierPriceRouter,
