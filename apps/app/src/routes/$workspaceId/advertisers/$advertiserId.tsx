@@ -1,34 +1,34 @@
-import { formatDate, formatDateRange, formatNumber, getInitials } from "@dirstack/utils"
-import { Avatar, AvatarFallback } from "@openads/ui/avatar"
+import { formatDate, formatNumber, getInitials } from "@dirstack/utils"
+import type { BillingInterval } from "@openads/db/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
-import { Stack } from "@openads/ui/stack"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
-import { ExternalLinkIcon } from "lucide-react"
+import { ArrowUpRightIcon, MailIcon } from "lucide-react"
 import type { ComponentProps } from "react"
+import { getServingState, ServingDot } from "~/components/ads/serving-state"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5 } from "~/components/ui/heading"
-import { formatTierPrice } from "~/lib/currency"
+import { formatPrice, formatTierPrice } from "~/lib/currency"
 import { orpc, type RouterOutputs } from "~/lib/orpc"
+
+export const Route = createFileRoute("/$workspaceId/advertisers/$advertiserId")({
+  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, advertiserId } }) => {
+    return await queryClient.fetchQuery(
+      orpc.advertiser.getById.queryOptions({ input: { workspaceId, advertiserId } }),
+    )
+  },
+
+  component: AdvertiserDetailPage,
+})
 
 type Advertiser = RouterOutputs["advertiser"]["getById"]
 type AdvertiserAd = Advertiser["ads"][number]
-
-const formatNullableDate = (date: Date | null) => {
-  if (!date) return "Not set"
-  return formatDate(date, "medium", "en-US")
-}
-
-const formatPeriod = (start: Date | null, end: Date | null) => {
-  if (!start && !end) return "No period"
-  if (!start || !end) return `${formatNullableDate(start)} - ${formatNullableDate(end)}`
-  return formatDateRange(start, end, "medium", "en-US")
-}
 
 const adStatusVariant: Record<AdvertiserAd["status"], "secondary" | "success" | "danger"> = {
   Pending: "secondary",
@@ -36,7 +36,7 @@ const adStatusVariant: Record<AdvertiserAd["status"], "secondary" | "success" | 
   Rejected: "danger",
 }
 
-const subscriptionStatusVariant: Record<
+const subscriptionVariant: Record<
   AdvertiserAd["subscription"]["status"],
   "secondary" | "success" | "warning" | "danger"
 > = {
@@ -50,75 +50,40 @@ const subscriptionStatusVariant: Record<
   Paused: "secondary",
 }
 
-type AdvertiserMetricProps = ComponentProps<"div"> & {
-  label: string
-  value: string | number
+const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
+  Day: 1 / 30,
+  Week: 7 / 30,
+  Month: 1,
+  Year: 12,
 }
 
-const AdvertiserMetric = ({ label, value, className, ...props }: AdvertiserMetricProps) => {
-  return (
-    <div className={cx("min-w-0 p-4", className)} {...props}>
-      <p className="text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
-      <p className="mt-1 truncate font-display text-2xl font-semibold">
-        {typeof value === "number" ? formatNumber(value, "standard") : value}
-      </p>
-    </div>
+/**
+ * Normalize the advertiser's paid subscriptions to a monthly figure — the
+ * number a publisher actually thinks in. Assumes one currency per workspace.
+ */
+const getMonthlyRevenue = (ads: AdvertiserAd[]) => {
+  const paid = ads.filter(
+    ad => ad.subscription.status === "Active" || ad.subscription.status === "Trialing",
   )
+  if (paid.length === 0) return null
+
+  const cents = paid.reduce((total, { subscription: { tierPrice } }) => {
+    const months = MONTHS_PER_INTERVAL[tierPrice.interval] * tierPrice.intervalCount
+    return total + tierPrice.amount / months
+  }, 0)
+
+  return formatPrice(Math.round(cents), paid[0]!.subscription.tierPrice.currency)
 }
 
-type AdvertiserAdRowProps = ComponentProps<"div"> & {
-  workspaceId: string
-  ad: AdvertiserAd
+const faviconUrl = (websiteUrl: string) => {
+  try {
+    return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(websiteUrl).hostname}`
+  } catch {
+    return undefined
+  }
 }
 
-const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdRowProps) => {
-  return (
-    <div
-      className={cx(
-        "relative grid gap-3 px-4 py-4 hover:bg-muted/50 lg:grid-cols-[1fr_13rem_12rem_10rem] lg:items-center",
-        className,
-      )}
-      {...props}
-    >
-      <Link to="/$workspaceId/ads/$adId" params={{ workspaceId, adId: ad.id }} className="min-w-0">
-        <Stack size="sm">
-          <H5 className="truncate">{ad.name}</H5>
-          <Badge variant={adStatusVariant[ad.status]}>{ad.status}</Badge>
-          <Badge variant={subscriptionStatusVariant[ad.subscription.status]}>
-            {ad.subscription.status}
-          </Badge>
-        </Stack>
-        <p className="mt-1 truncate text-muted-foreground text-sm">{ad.websiteUrl}</p>
-        <span className="absolute inset-0" />
-      </Link>
-
-      <div className="min-w-0 text-sm">
-        <p className="truncate font-medium">{ad.subscription.tier.name}</p>
-        <p className="truncate text-muted-foreground">
-          {formatTierPrice(ad.subscription.tierPrice)}
-        </p>
-      </div>
-
-      <div className="text-sm">
-        <p className="text-muted-foreground">Current period</p>
-        <p>{formatPeriod(ad.subscription.currentPeriodStart, ad.subscription.currentPeriodEnd)}</p>
-      </div>
-
-      <div className="flex gap-4 text-sm lg:justify-end">
-        <div>
-          <p className="font-medium">{formatNumber(ad.stats.impressions, "standard")}</p>
-          <p className="text-muted-foreground">Impressions</p>
-        </div>
-        <div>
-          <p className="font-medium">{formatNumber(ad.stats.clicks, "standard")}</p>
-          <p className="text-muted-foreground">Clicks</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const AdvertiserDetailPage = () => {
+function AdvertiserDetailPage() {
   const { workspaceId, advertiserId } = Route.useParams()
   const initial = Route.useLoaderData()
 
@@ -138,69 +103,194 @@ const AdvertiserDetailPage = () => {
           <CalloutText>Could not load advertiser.</CalloutText>
         </Callout>
       )}
-      success={({ data: advertiser }) => (
-        <>
-          <Header>
-            <div className="flex min-w-0 items-center gap-3">
-              <Avatar className="size-11">
-                <AvatarFallback>{getInitials(advertiser.name)}</AvatarFallback>
-              </Avatar>
+      success={({ data: advertiser }) => {
+        const { totals } = advertiser
+        const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : null
+        const monthlyRevenue = getMonthlyRevenue(advertiser.ads)
 
-              <div className="min-w-0">
-                <HeaderTitle>{advertiser.name}</HeaderTitle>
-                <p className="truncate text-muted-foreground text-sm">
-                  {advertiser.email ?? "No email"} · First seen{" "}
-                  {formatDate(advertiser.createdAt, "medium", "en-US")}
-                </p>
+        return (
+          <>
+            <Header>
+              <div className="flex min-w-0 items-center gap-3">
+                <Avatar className="size-11 rounded-md border">
+                  {advertiser.latestAd && (
+                    <AvatarImage
+                      src={faviconUrl(advertiser.latestAd.websiteUrl)}
+                      className="p-1.5"
+                    />
+                  )}
+                  <AvatarFallback className="rounded-none">
+                    {getInitials(advertiser.name)}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div className="min-w-0">
+                  <HeaderTitle className="truncate">{advertiser.name}</HeaderTitle>
+                  <p className="truncate text-muted-foreground text-sm">
+                    {advertiser.email ?? "No email"} · Customer since{" "}
+                    {formatDate(advertiser.createdAt, "medium", "en-US")}
+                  </p>
+                </div>
+              </div>
+
+              <HeaderActions>
+                {advertiser.email && (
+                  <Button variant="secondary" prefix={<MailIcon />} asChild>
+                    <a href={`mailto:${advertiser.email}`}>Email</a>
+                  </Button>
+                )}
+
+                {advertiser.latestAd && (
+                  <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
+                    <a href={advertiser.latestAd.websiteUrl} target="_blank" rel="noreferrer">
+                      Visit site
+                    </a>
+                  </Button>
+                )}
+              </HeaderActions>
+            </Header>
+
+            <div className="grid animate-slide-up-and-fade grid-cols-2 divide-y rounded-lg border [animation-fill-mode:backwards] sm:grid-cols-4 sm:divide-y-0 sm:divide-x lg:grid-cols-5">
+              <Metric
+                label="Monthly revenue"
+                value={monthlyRevenue ?? "—"}
+                hint={
+                  monthlyRevenue
+                    ? `across ${totals.activeSubscriptions} paid`
+                    : "no paid subscriptions"
+                }
+              />
+              <Metric
+                label="Live ads"
+                value={totals.activeAds}
+                hint={`of ${totals.ads} submitted`}
+              />
+              <Metric label="30d impressions" value={totals.impressions} />
+              <Metric label="30d clicks" value={totals.clicks} />
+              <Metric
+                label="30d CTR"
+                value={ctr === null ? "—" : `${ctr.toFixed(2)}%`}
+                className="col-span-2 border-t sm:col-span-1 sm:border-t-0"
+              />
+            </div>
+
+            <div className="mt-2 flex animate-slide-up-and-fade flex-col gap-3 [animation-delay:75ms] [animation-fill-mode:backwards]">
+              <div className="flex items-center gap-2">
+                <H5>Ads</H5>
+                <Badge variant="secondary">{advertiser.ads.length}</Badge>
+              </div>
+
+              <div className="flex flex-col divide-y rounded-lg border">
+                {advertiser.ads.map(ad => (
+                  <AdvertiserAdRow key={ad.id} workspaceId={workspaceId} ad={ad} />
+                ))}
               </div>
             </div>
-
-            {advertiser.latestAd && (
-              <HeaderActions>
-                <Button variant="secondary" prefix={<ExternalLinkIcon />} asChild>
-                  <a href={advertiser.latestAd.websiteUrl} target="_blank" rel="noreferrer">
-                    Visit site
-                  </a>
-                </Button>
-              </HeaderActions>
-            )}
-          </Header>
-
-          <div className="grid divide-y rounded-lg border sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-5">
-            <AdvertiserMetric label="Ads" value={advertiser.totals.ads} />
-            <AdvertiserMetric label="Live ads" value={advertiser.totals.activeAds} />
-            <AdvertiserMetric
-              label="Active subscriptions"
-              value={advertiser.totals.activeSubscriptions}
-            />
-            <AdvertiserMetric label="30d impressions" value={advertiser.totals.impressions} />
-            <AdvertiserMetric label="30d clicks" value={advertiser.totals.clicks} />
-          </div>
-
-          <div className="mt-6">
-            <Stack className="mb-3" size="sm">
-              <H5>Ads</H5>
-              <Badge variant="secondary">{advertiser.ads.length}</Badge>
-            </Stack>
-
-            <div className="flex flex-col divide-y rounded-lg border">
-              {advertiser.ads.map(ad => (
-                <AdvertiserAdRow key={ad.id} workspaceId={workspaceId} ad={ad} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )
+      }}
     />
   )
 }
 
-export const Route = createFileRoute("/$workspaceId/advertisers/$advertiserId")({
-  loader: async ({ context: { orpc, queryClient }, params: { workspaceId, advertiserId } }) => {
-    return await queryClient.fetchQuery(
-      orpc.advertiser.getById.queryOptions({ input: { workspaceId, advertiserId } }),
-    )
-  },
+type MetricProps = ComponentProps<"div"> & {
+  label: string
+  value: string | number
+  hint?: string
+}
 
-  component: AdvertiserDetailPage,
-})
+const Metric = ({ label, value, hint, className, ...props }: MetricProps) => {
+  return (
+    <div className={cx("min-w-0 p-4", className)} {...props}>
+      <p className="text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
+      <p className="mt-1 truncate font-display text-2xl font-semibold tabular-nums">
+        {typeof value === "number" ? formatNumber(value, "standard") : value}
+      </p>
+      {hint && <p className="truncate text-muted-foreground text-xs">{hint}</p>}
+    </div>
+  )
+}
+
+type AdvertiserAdRowProps = ComponentProps<"div"> & {
+  workspaceId: string
+  ad: AdvertiserAd
+}
+
+const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdRowProps) => {
+  const { subscription } = ad
+  const serving = getServingState(ad)
+  const paid = subscription.status === "Active" || subscription.status === "Trialing"
+
+  return (
+    <div
+      className={cx(
+        "relative grid gap-x-4 gap-y-2 px-4 py-3.5 hover:bg-muted/50 lg:grid-cols-[minmax(0,1fr)_11rem_10rem_11rem] lg:items-center",
+        className,
+      )}
+      {...props}
+    >
+      <Link
+        to="/$workspaceId/ads/$adId"
+        params={{ workspaceId, adId: ad.id }}
+        className="flex min-w-0 items-center gap-3"
+      >
+        <span className="relative shrink-0">
+          <Avatar className="size-9 rounded-md border">
+            <AvatarImage src={faviconUrl(ad.websiteUrl)} className="p-1" />
+            <AvatarFallback className="rounded-none text-xs">{getInitials(ad.name)}</AvatarFallback>
+          </Avatar>
+
+          {/* Presence-style serving indicator, anchored to the favicon */}
+          <span
+            className="-right-0.5 -bottom-0.5 absolute rounded-full bg-background p-0.5"
+            title={serving.detail}
+          >
+            <ServingDot state={serving} />
+          </span>
+        </span>
+
+        <span className="min-w-0">
+          <span className="flex items-center gap-2">
+            <H5 className="truncate">{ad.name}</H5>
+            <Badge variant={adStatusVariant[ad.status]}>{ad.status}</Badge>
+          </span>
+          <span className="block truncate text-muted-foreground text-sm">{ad.websiteUrl}</span>
+        </span>
+
+        <span className="absolute inset-0" />
+      </Link>
+
+      <div className="min-w-0 text-sm">
+        <p className="truncate font-medium">{subscription.tier.name}</p>
+        <p className="truncate text-muted-foreground tabular-nums">
+          {formatTierPrice(subscription.tierPrice)}
+        </p>
+      </div>
+
+      <div className="min-w-0 text-sm">
+        <p>
+          <Badge variant={subscriptionVariant[subscription.status]}>{subscription.status}</Badge>
+        </p>
+        {subscription.currentPeriodEnd && paid && (
+          <p className="mt-1 truncate text-muted-foreground tabular-nums">
+            {subscription.cancelAtPeriodEnd ? "Ends" : "Renews"}{" "}
+            {formatDate(subscription.currentPeriodEnd, "medium", "en-US")}
+          </p>
+        )}
+      </div>
+
+      <div className="flex gap-5 text-sm lg:justify-end lg:text-right">
+        <div>
+          <p className="font-medium tabular-nums">
+            {formatNumber(ad.stats.impressions, "standard")}
+          </p>
+          <p className="text-muted-foreground">Impressions</p>
+        </div>
+        <div>
+          <p className="font-medium tabular-nums">{formatNumber(ad.stats.clicks, "standard")}</p>
+          <p className="text-muted-foreground">Clicks</p>
+        </div>
+      </div>
+    </div>
+  )
+}
