@@ -1,4 +1,4 @@
-import { Button } from "@openads/ui/button"
+import { Button, type ButtonProps } from "@openads/ui/button"
 import {
   Dialog,
   DialogClose,
@@ -10,17 +10,18 @@ import {
 } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import type { ComponentProps, ReactNode } from "react"
-import { useState } from "react"
+import type { ReactNode } from "react"
 import { z } from "zod"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useZodForm } from "~/hooks/use-zod-form"
 
-type ConfirmModalProps = ComponentProps<typeof Button> & {
+type ConfirmModalProps = {
+  children: ReactNode
   label?: ReactNode
   title?: ReactNode
   description?: string
   cancelLabel?: ReactNode
+  variant?: ButtonProps["variant"]
   isPending?: boolean
   onConfirm: () => void
   confirmText?: string
@@ -37,14 +38,13 @@ export const ConfirmModal = ({
   onConfirm,
   confirmText = "",
 }: ConfirmModalProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-
   const form = useZodForm(z.object({ confirm: z.literal(confirmText) }), {
     defaultValues: { confirm: "" },
   })
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    // Reset on close so reopening requires re-typing the confirm text.
+    <Dialog onOpenChange={open => !open && form.reset()}>
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <Form {...form}>
