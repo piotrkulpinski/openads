@@ -1,10 +1,10 @@
 import type { ErrorHandler } from "hono"
-import type { ContentfulStatusCode } from "hono/utils/http-status"
+import { HTTPException } from "hono/http-exception"
 import { env } from "~/env"
 import { logger } from "~/services/logger"
 
 export const onError: ErrorHandler = (err, c) => {
-  const status = "status" in err && err.status !== 200 ? err.status : 500
+  const status = err instanceof HTTPException ? err.status : 500
 
   logger.error(`unhandled error on ${c.req.method} ${c.req.path}`, {
     err,
@@ -18,6 +18,6 @@ export const onError: ErrorHandler = (err, c) => {
       message: err.message,
       stack: env.NODE_ENV === "production" ? undefined : err.stack,
     },
-    status as ContentfulStatusCode,
+    status,
   )
 }
