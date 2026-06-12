@@ -11,6 +11,7 @@ import {
 } from "@openads/ui/dialog"
 import { Stack } from "@openads/ui/stack"
 import { InfoIcon } from "lucide-react"
+import { Fragment } from "react"
 
 // Three example tiers, chosen so the percentages land near the simple "this is what
 // weight does" intuition (Premium ~2x Standard, Promo ~half).
@@ -52,14 +53,14 @@ export const WeightInfoDialog = () => {
               Share of impressions
             </h3>
 
-            <div className="mt-4 grid grid-cols-[1fr_minmax(0,2fr)_auto] items-center gap-x-4 gap-y-3">
+            <div className="mt-4 grid grid-cols-[1fr_minmax(0,2fr)_auto] items-center gap-x-4 gap-y-3 text-sm">
               {exampleTiers.map(tier => {
                 const share = tier.weight / totalWeight
                 const widthPct = `${(share * 100).toFixed(1)}%`
                 const sharePct = `${Math.round(share * 100)}%`
 
                 return (
-                  <Stack key={tier.name} direction="row" size="sm" className="contents text-sm">
+                  <Fragment key={tier.name}>
                     <div className="flex items-baseline gap-2">
                       <span className="font-medium">{tier.name}</span>
                       <span className="font-mono text-muted-foreground text-xs tabular-nums">
@@ -77,7 +78,7 @@ export const WeightInfoDialog = () => {
                     <span className="font-mono text-muted-foreground text-xs tabular-nums">
                       {sharePct}
                     </span>
-                  </Stack>
+                  </Fragment>
                 )
               })}
             </div>

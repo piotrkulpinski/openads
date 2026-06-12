@@ -8,7 +8,7 @@ import { cx } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
-export type PerformanceRow = {
+type PerformanceRow = {
   date: Date
   impressions: number
   clicks: number

@@ -11,21 +11,17 @@ import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type StripeConnectButtonsProps = ComponentProps<"div"> & {
   workspace: NonNullable<RouterOutputs["workspace"]["getById"]>
-  onSuccess?: () => void
 }
 
-export const StripeConnectButtons = ({
-  workspace,
-  onSuccess,
-  ...props
-}: StripeConnectButtonsProps) => {
+export const StripeConnectButtons = ({ workspace, ...props }: StripeConnectButtonsProps) => {
+  const isConnectPending = workspace.stripeConnectStatus === StripeConnectStatus.Pending
+
   const connectAccount = useMutation(
     orpc.stripe.connect.create.mutationOptions({
       onSuccess: data => {
         queryClient.invalidateQueries({
           queryKey: orpc.workspace.getById.key({ input: { id: workspace.id } }),
         })
-        onSuccess?.()
         window.location.href = data.url
       },
 
@@ -42,12 +38,11 @@ export const StripeConnectButtons = ({
         queryClient.invalidateQueries({
           queryKey: orpc.workspace.getById.key({ input: { id: workspace.id } }),
         })
-        onSuccess?.()
       },
 
       onError: error => {
         logger.error("stripe.connect.delete failed", { err: error, workspaceId: workspace.id })
-        toast.error("Failed to disconnect with Stripe")
+        toast.error("Failed to disconnect from Stripe")
       },
     }),
   )
@@ -71,12 +66,10 @@ export const StripeConnectButtons = ({
           <p
             className={cx(
               "text-sm",
-              workspace.stripeConnectStatus === StripeConnectStatus.Pending
-                ? "text-yellow-500"
-                : "text-muted-foreground",
+              isConnectPending ? "text-yellow-500" : "text-muted-foreground",
             )}
           >
-            {workspace.stripeConnectStatus === StripeConnectStatus.Pending
+            {isConnectPending
               ? "Please finish connecting Stripe before advertisers can pay you."
               : "Your Stripe account is connected. Advertisers will pay through this account."}
           </p>
