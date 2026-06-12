@@ -42,7 +42,7 @@ const buttonAffixVariants = cva({
 
 export type ButtonProps = Omit<ComponentProps<"button">, "size" | "prefix"> &
   VariantProps<typeof buttonVariants> &
-  VariantProps<typeof boxVariants> & {
+  Pick<VariantProps<typeof boxVariants>, "hover" | "focus"> & {
     /**
      * If set to `true`, the button will be rendered as a child within the component.
      * This child component must be a valid React component.
