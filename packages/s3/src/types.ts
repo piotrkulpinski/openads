@@ -1,4 +1,4 @@
-import type { DeleteObjectCommandInput, PutObjectCommandInput } from "@aws-sdk/client-s3"
+import type { PutObjectCommandInput } from "@aws-sdk/client-s3"
 
 export type S3ObjectBody = PutObjectCommandInput["Body"]
 
@@ -20,11 +20,6 @@ export type UploadObjectOptions = {
   contentType?: string
   metadata?: PutObjectCommandInput["Metadata"]
   acl?: PutObjectCommandInput["ACL"]
-}
-
-export type DeleteObjectOptions = {
-  key: string
-  versionId?: DeleteObjectCommandInput["VersionId"]
 }
 
 export type DeletePrefixOptions = {
