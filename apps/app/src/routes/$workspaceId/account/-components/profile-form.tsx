@@ -96,7 +96,6 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
             file: avatar.previewUrl,
             fileName: avatar.file.name,
             contentType: avatar.file.type,
-            cacheControl: "public, max-age=31536000",
           })
 
           imagePayload = uploadResult.url

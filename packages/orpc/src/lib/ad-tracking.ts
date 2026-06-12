@@ -1,5 +1,6 @@
 import type { db } from "@openads/db"
 import type { RedisClient } from "@openads/redis"
+import { startOfUtcDay } from "./date"
 
 const TRACKING_WINDOW_SECONDS = 60
 const IMPRESSION_LIMIT_PER_MINUTE = 30
@@ -14,12 +15,6 @@ type RecordAdEventProps = {
 
 type RecordAdEventResult = {
   success: boolean
-}
-
-const getTodayBucket = (): Date => {
-  const today = new Date()
-  today.setUTCHours(0, 0, 0, 0)
-  return today
 }
 
 const isRateLimited = async ({
@@ -49,13 +44,17 @@ const recordAdEvent = async (
   event: "impression" | "click",
   limit: number,
 ): Promise<RecordAdEventResult> => {
-  const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
-  if (!ad) return { success: false }
-
+  // The cheap Redis gate runs first so a flood never costs a Postgres read
+  // per request. The existence check stays before the upsert — with
+  // relationMode="prisma" there are no DB-level FKs to stop orphan AdStat
+  // rows for fabricated adIds.
   const limited = await isRateLimited({ redis, clientIp, adId, event, limit })
   if (limited) return { success: false }
 
-  const date = getTodayBucket()
+  const ad = await db.ad.findUnique({ where: { id: adId }, select: { id: true } })
+  if (!ad) return { success: false }
+
+  const date = startOfUtcDay()
   await db.adStat.upsert({
     where: { adId_date: { adId, date } },
     create: {
