@@ -12,5 +12,4 @@ model Advertiser {
 
   // Indexes
   @@unique([workspaceId, email])
-  @@index([workspaceId])
 }

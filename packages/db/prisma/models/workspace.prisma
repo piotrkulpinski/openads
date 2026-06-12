@@ -24,9 +24,6 @@ model Workspace {
   tiers         Tier[]
   fields        Field[]
   subscriptions Subscription[]
-
-  // Indexes
-  @@index([stripeConnectId])
 }
 
 enum WorkspaceMemberRole {
