@@ -17,7 +17,6 @@ export const createS3BucketClientFromEnv = (): S3BucketClient =>
     signedUrlTtlSeconds: env.S3_SIGNED_URL_TTL,
   })
 export type {
-  DeleteObjectOptions,
   DeletePrefixOptions,
   PublicUrlOptions,
   S3BucketClientConfig,

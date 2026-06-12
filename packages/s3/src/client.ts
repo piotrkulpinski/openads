@@ -1,5 +1,4 @@
 import {
-  DeleteObjectCommand,
   DeleteObjectsCommand,
   ListObjectsV2Command,
   PutObjectCommand,
@@ -7,7 +6,6 @@ import {
 } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import type {
-  DeleteObjectOptions,
   DeletePrefixOptions,
   PublicUrlOptions,
   S3BucketClientConfig,
@@ -83,18 +81,6 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
     }
   }
 
-  async function deleteObject(options: DeleteObjectOptions) {
-    const key = trimLeadingSlash(options.key)
-
-    await client.send(
-      new DeleteObjectCommand({
-        Bucket: config.bucket,
-        Key: key,
-        VersionId: options.versionId,
-      }),
-    )
-  }
-
   async function deletePrefix(options: DeletePrefixOptions) {
     const prefix = ensureTrailingSlash(trimLeadingSlash(options.prefix))
 
@@ -160,7 +146,6 @@ export function createS3BucketClient(config: S3BucketClientConfig) {
   return {
     client,
     uploadObject,
-    deleteObject,
     deletePrefix,
     getPublicUrl,
     getSignedUploadUrl,
