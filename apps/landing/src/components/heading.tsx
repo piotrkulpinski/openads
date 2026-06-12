@@ -11,16 +11,12 @@ const headingVariants = cva({
       h3: "text-xl/snug",
     },
   },
-
-  defaultVariants: {
-    size: "h2",
-  },
 })
 
 export type HeadingProps = ComponentProps<"h2"> & VariantProps<typeof headingVariants>
 
 export const Heading = ({ className, size = "h2", ...props }: HeadingProps) => {
-  const Comp = size ?? "h2"
+  const Comp = size
   return <Comp className={headingVariants({ size, className })} {...props} />
 }
 
