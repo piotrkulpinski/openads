@@ -1,4 +1,5 @@
 import { formatDate, getInitials, isValidUrl } from "@dirstack/utils"
+import { isServingSubscription } from "@openads/db/lib/subscription"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
@@ -9,7 +10,7 @@ import { ArrowUpRightIcon, CheckIcon, MessageSquareIcon, XIcon } from "lucide-re
 import { type ReactNode, useState } from "react"
 import { toast } from "sonner"
 import { AdStats } from "~/components/ads/ad-stats"
-import { getServingState, isPaid, ServingDot } from "~/components/ads/serving-state"
+import { getServingState, ServingDot } from "~/components/ads/serving-state"
 import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
@@ -153,12 +154,13 @@ function AdReviewPage() {
                   <span className="flex flex-wrap items-center gap-2 tabular-nums">
                     {formatTierPrice(tierPrice)}
                     <SubscriptionStatusBadge status={subscription.status} />
-                    {subscription.currentPeriodEnd && isPaid(subscription.status) && (
-                      <span className="text-muted-foreground">
-                        {subscription.cancelAtPeriodEnd ? "ends" : "renews"}{" "}
-                        {formatDate(subscription.currentPeriodEnd, "medium", "en-US")}
-                      </span>
-                    )}
+                    {subscription.currentPeriodEnd &&
+                      isServingSubscription(subscription.status) && (
+                        <span className="text-muted-foreground">
+                          {subscription.cancelAtPeriodEnd ? "ends" : "renews"}{" "}
+                          {formatDate(subscription.currentPeriodEnd, "medium", "en-US")}
+                        </span>
+                      )}
                   </span>
                 </DetailRow>
 

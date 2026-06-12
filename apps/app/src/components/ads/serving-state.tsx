@@ -1,4 +1,5 @@
 import type { AdStatus, SubscriptionStatus } from "@openads/db/client"
+import { isServingSubscription } from "@openads/db/lib/subscription"
 import { cx } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
 
@@ -9,14 +10,12 @@ type ServingInput = {
 
 export type ServingState = ReturnType<typeof getServingState>
 
-export const isPaid = (status: SubscriptionStatus) => status === "Active" || status === "Trialing"
-
 /**
  * An ad serves only when the creative is approved AND the subscription is
  * paid up — surface that two-flag rule as a single, glanceable state.
  */
 export const getServingState = (ad: ServingInput) => {
-  const paid = isPaid(ad.subscription.status)
+  const paid = isServingSubscription(ad.subscription.status)
 
   if (ad.status === "Approved" && paid) {
     return {

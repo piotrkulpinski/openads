@@ -1,15 +1,8 @@
-import type { BillingInterval } from "@openads/db/client"
+import { isServingSubscription } from "@openads/db/lib/subscription"
 import { z } from "zod"
 import { authProcedure, workspaceMw } from "../index"
-
-const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
-  Day: 1 / 30,
-  Week: 7 / 30,
-  Month: 1,
-  Year: 12,
-}
-
-const isPaid = (status: string) => status === "Active" || status === "Trialing"
+import { startOfUtcDay } from "../lib/date"
+import { sumMonthlyCents } from "../lib/revenue"
 
 export const dashboardRouter = {
   /**
@@ -21,13 +14,12 @@ export const dashboardRouter = {
     .input(z.object({ workspaceId: z.string() }))
     .use(workspaceMw)
     .handler(async ({ context: { db, workspace } }) => {
-      const since = new Date()
-      since.setUTCHours(0, 0, 0, 0)
-      since.setUTCDate(since.getUTCDate() - 29)
+      const since = startOfUtcDay(29)
 
       const [subscriptions, statRows] = await Promise.all([
         db.subscription.findMany({
           where: { workspaceId: workspace.id, ad: { isNot: null } },
+          orderBy: { ad: { createdAt: "desc" } },
           include: { ad: true, tier: true, tierPrice: true, advertiser: true },
         }),
         db.adStat.groupBy({
@@ -41,11 +33,7 @@ export const dashboardRouter = {
         }),
       ])
 
-      const paid = subscriptions.filter(sub => isPaid(sub.status))
-      const monthlyCents = paid.reduce((total, { tierPrice }) => {
-        const months = MONTHS_PER_INTERVAL[tierPrice.interval] * tierPrice.intervalCount
-        return total + tierPrice.amount / months
-      }, 0)
+      const paid = subscriptions.filter(sub => isServingSubscription(sub.status))
 
       const ads = subscriptions.flatMap(({ ad, ...subscription }) => {
         if (!ad) return []
@@ -68,8 +56,6 @@ export const dashboardRouter = {
         ]
       })
 
-      const byNewest = [...ads].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-
       const series = statRows.map(row => ({
         date: row.date,
         impressions: row._sum.impressions ?? 0,
@@ -86,21 +72,22 @@ export const dashboardRouter = {
 
       return {
         revenue: {
-          monthlyCents: Math.round(monthlyCents),
+          monthlyCents: sumMonthlyCents(paid),
           currency: paid[0]?.tierPrice.currency ?? "usd",
           paidSubscriptions: paid.length,
         },
         counts: {
           ads: ads.length,
-          servingAds: ads.filter(ad => ad.status === "Approved" && isPaid(ad.subscription.status))
-            .length,
+          servingAds: ads.filter(
+            ad => ad.status === "Approved" && isServingSubscription(ad.subscription.status),
+          ).length,
           pastDueSubscriptions: subscriptions.filter(sub => sub.status === "PastDue").length,
           advertisers: new Set(subscriptions.map(sub => sub.advertiserId)).size,
         },
         series,
         totals,
-        pendingAds: byNewest.filter(ad => ad.status === "Pending"),
-        recentAds: byNewest.slice(0, 5),
+        pendingAds: ads.filter(ad => ad.status === "Pending"),
+        recentAds: ads.slice(0, 5),
       }
     }),
 }

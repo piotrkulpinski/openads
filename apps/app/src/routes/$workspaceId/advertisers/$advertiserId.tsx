@@ -1,5 +1,5 @@
 import { formatDate, formatNumber, getInitials, isValidUrl } from "@dirstack/utils"
-import type { BillingInterval } from "@openads/db/client"
+import { isServingSubscription } from "@openads/db/lib/subscription"
 import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
@@ -9,7 +9,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { ArrowUpRightIcon, MailIcon } from "lucide-react"
 import type { ComponentProps } from "react"
 import { AdAvatar } from "~/components/ads/ad-avatar"
-import { getServingState, isPaid } from "~/components/ads/serving-state"
+import { getServingState } from "~/components/ads/serving-state"
 import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
 import { QueryCell } from "~/components/query-cell"
 import { formatCtr, Metric } from "~/components/stats/metric"
@@ -32,29 +32,6 @@ export const Route = createFileRoute("/$workspaceId/advertisers/$advertiserId")(
 type Advertiser = RouterOutputs["advertiser"]["getById"]
 type AdvertiserAd = Advertiser["ads"][number]
 
-const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
-  Day: 1 / 30,
-  Week: 7 / 30,
-  Month: 1,
-  Year: 12,
-}
-
-/**
- * Normalize the advertiser's paid subscriptions to a monthly figure — the
- * number a publisher actually thinks in. Assumes one currency per workspace.
- */
-const getMonthlyRevenue = (ads: AdvertiserAd[]) => {
-  const paid = ads.filter(ad => isPaid(ad.subscription.status))
-  if (paid.length === 0) return null
-
-  const cents = paid.reduce((total, { subscription: { tierPrice } }) => {
-    const months = MONTHS_PER_INTERVAL[tierPrice.interval] * tierPrice.intervalCount
-    return total + tierPrice.amount / months
-  }, 0)
-
-  return formatPrice(Math.round(cents), paid[0]!.subscription.tierPrice.currency)
-}
-
 function AdvertiserDetailPage() {
   const { workspaceId, advertiserId } = Route.useParams()
   const initial = Route.useLoaderData()
@@ -76,7 +53,8 @@ function AdvertiserDetailPage() {
       )}
       success={({ data: advertiser }) => {
         const { totals } = advertiser
-        const monthlyRevenue = getMonthlyRevenue(advertiser.ads)
+        const monthlyRevenue =
+          totals.activeSubscriptions > 0 ? formatPrice(totals.monthlyCents, totals.currency) : null
 
         return (
           <>
@@ -171,7 +149,7 @@ type AdvertiserAdRowProps = ComponentProps<"div"> & {
 const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdRowProps) => {
   const { subscription } = ad
   const serving = getServingState(ad)
-  const paid = isPaid(subscription.status)
+  const paid = isServingSubscription(subscription.status)
 
   return (
     <div
