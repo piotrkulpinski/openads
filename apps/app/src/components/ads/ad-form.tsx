@@ -1,3 +1,4 @@
+import { adCreativeSchema } from "@openads/db/schema"
 import { cx } from "@openads/ui/cva"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
@@ -53,9 +54,7 @@ const buildSchema = (fields: Field[]) => {
     metaShape[field.id] = schema
   }
 
-  return z.object({
-    name: z.string().trim().min(2, { message: "Name is too short" }),
-    websiteUrl: z.url(),
+  return adCreativeSchema.extend({
     meta: z.object(metaShape).optional().default({}),
   })
 }
