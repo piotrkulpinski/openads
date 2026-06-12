@@ -15,12 +15,11 @@ import { FormButton } from "~/components/form-button"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
-import type { router } from "~/main"
 
 type FieldFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
   field?: RouterOutputs["field"]["getAll"][number]
-  nextUrl?: NavigateOptions<typeof router>
+  nextUrl?: NavigateOptions
   onSuccess?: (data: RouterOutputs["field"]["create"]) => void
 }
 
