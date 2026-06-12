@@ -7,7 +7,6 @@
  * is allowed), so this is effectively a private endpoint.
  */
 
-import type { LogLevel } from "@openads/logger"
 import { LOG_LEVELS } from "@openads/logger"
 import { Hono } from "hono"
 import { z } from "zod"
@@ -30,7 +29,7 @@ const serializedErrorSchema: z.ZodType<{
 })
 
 const entrySchema = z.object({
-  level: z.enum(LOG_LEVELS as readonly [LogLevel, ...LogLevel[]]),
+  level: z.enum(LOG_LEVELS),
   message: z.string().max(MAX_MESSAGE_LENGTH),
   time: z.number().int().nonnegative(),
   context: z.record(z.string(), z.unknown()).optional(),
