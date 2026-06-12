@@ -147,7 +147,7 @@ export const AccountProfileForm = ({ user, ...props }: AccountProfileFormProps) 
               <Stack size="lg" direction="column">
                 <Avatar className="size-14">
                   <AvatarImage src={previewUrl ?? undefined} />
-                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  <AvatarFallback>{getInitials(user.name, 3)}</AvatarFallback>
                 </Avatar>
 
                 <Stack size="sm">

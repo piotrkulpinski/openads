@@ -84,7 +84,7 @@ const AdvertiserRow = ({ workspaceId, advertiser, className, ...props }: Adverti
       >
         <div className="flex min-w-0 items-center gap-3">
           <Avatar className="size-9">
-            <AvatarFallback>{getInitials(advertiser.name)}</AvatarFallback>
+            <AvatarFallback>{getInitials(advertiser.name, 3)}</AvatarFallback>
           </Avatar>
 
           <div className="min-w-0">
