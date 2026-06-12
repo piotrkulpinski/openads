@@ -8,7 +8,7 @@ export type RenderResult = {
 
 export async function renderTemplate(node: ReactElement): Promise<RenderResult> {
   const [html, text] = await Promise.all([
-    renderEmail(node, { pretty: true }),
+    renderEmail(node),
     renderEmail(node, { plainText: true }),
   ])
 

@@ -1,9 +1,10 @@
 import { AdStatus, type Prisma, WorkspaceMemberRole } from "@openads/db/client"
 import {
-  renderAdApproved,
-  renderAdChangesRequested,
-  renderAdPendingReview,
-  renderAdRejected,
+  AdApproved,
+  AdChangesRequested,
+  AdPendingReview,
+  AdRejected,
+  renderTemplate,
 } from "@openads/emails"
 import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscription"
@@ -392,13 +393,15 @@ const createFromCheckout = publicProcedure
       })
 
       if (reviewers.length > 0) {
-        const { html, text } = await renderAdPendingReview({
-          workspaceName: workspace.name,
-          advertiserName: advertiser.name,
-          advertiserEmail: customerEmail,
-          tierName: tier.name,
-          reviewUrl: `${env.APP_URL}/${workspace.id}/ads/${ad.id}`,
-        })
+        const { html, text } = await renderTemplate(
+          AdPendingReview({
+            workspaceName: workspace.name,
+            advertiserName: advertiser.name,
+            advertiserEmail: customerEmail,
+            tierName: tier.name,
+            reviewUrl: `${env.APP_URL}/${workspace.id}/ads/${ad.id}`,
+          }),
+        )
 
         const recipients = reviewers.flatMap(r =>
           r.user.email ? [{ email: r.user.email, name: r.user.name }] : [],
@@ -489,11 +492,13 @@ export const adRouter = {
 
       const advertiserEmail = ad.subscription.advertiser.email
       if (advertiserEmail) {
-        const { html, text } = await renderAdApproved({
-          workspaceName: workspace.name,
-          adName: ad.name,
-          approvalNote: note,
-        })
+        const { html, text } = await renderTemplate(
+          AdApproved({
+            workspaceName: workspace.name,
+            adName: ad.name,
+            approvalNote: note,
+          }),
+        )
 
         await emails.send({
           to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
@@ -544,11 +549,13 @@ export const adRouter = {
 
         const advertiserEmail = ad.subscription.advertiser.email
         if (advertiserEmail) {
-          const { html, text } = await renderAdRejected({
-            workspaceName: workspace.name,
-            adName: ad.name,
-            rejectionNote: note,
-          })
+          const { html, text } = await renderTemplate(
+            AdRejected({
+              workspaceName: workspace.name,
+              adName: ad.name,
+              rejectionNote: note,
+            }),
+          )
 
           await emails.send({
             to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
@@ -578,11 +585,13 @@ export const adRouter = {
 
       const advertiserEmail = ad.subscription.advertiser.email
       if (advertiserEmail) {
-        const { html, text } = await renderAdChangesRequested({
-          workspaceName: workspace.name,
-          adName: ad.name,
-          changesNote: note,
-        })
+        const { html, text } = await renderTemplate(
+          AdChangesRequested({
+            workspaceName: workspace.name,
+            adName: ad.name,
+            changesNote: note,
+          }),
+        )
 
         await emails.send({
           to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
