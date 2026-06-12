@@ -1,5 +1,5 @@
 import { db } from "@openads/db"
-import { Prisma, StripeConnectStatus } from "@openads/db/client"
+import { Prisma, StripeConnectStatus, SubscriptionStatus } from "@openads/db/client"
 import {
   mapStripeSubscriptionStatus,
   readSubscriptionMetadata,
@@ -200,7 +200,7 @@ const markSubscriptionCanceled = async (
       workspace: { stripeConnectId: connectedAccountId },
     },
     data: {
-      status: "Canceled",
+      status: SubscriptionStatus.Canceled,
       cancelAtPeriodEnd: false,
     },
   })
