@@ -20,7 +20,7 @@ const inputVariants = cva({
 
 type InputProps = Omit<ComponentProps<"input">, "size"> &
   VariantProps<typeof inputVariants> &
-  VariantProps<typeof boxVariants>
+  Pick<VariantProps<typeof boxVariants>, "hover" | "focus">
 
 const Input = ({ className, size, hover = false, focus = true, ...props }: InputProps) => {
   return (
