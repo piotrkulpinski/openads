@@ -26,11 +26,9 @@ const themeLabels: Record<Theme, string> = {
 const PREVIEW_HEIGHT = 640
 
 export const EmbedSnippet = ({ slug }: EmbedSnippetProps) => {
-  const clipboard = useClipboard({ timeout: 2000 })
   const [theme, setTheme] = useState<Theme>("auto")
-  const [copiedSnippet, setCopiedSnippet] = useState("")
 
-  const baseUrl = env.VITE_BASE_URL || (typeof window !== "undefined" ? window.location.origin : "")
+  const baseUrl = env.VITE_BASE_URL
   const apiUrl = env.VITE_API_URL
 
   const url = `${baseUrl}/embed/${slug}?${new URLSearchParams({ theme })}`
@@ -100,11 +98,6 @@ export const Ads = () => (
   </OpenAdsProvider>
 )`
 
-  const copySnippet = (id: string, value: string) => {
-    setCopiedSnippet(id)
-    clipboard.copy(value)
-  }
-
   return (
     <Card>
       <Card.Section>
@@ -159,36 +152,20 @@ export const Ads = () => (
 
       <Card.Section>
         <Stack direction="column" size="sm" className="w-full">
-          <SnippetBlock
-            id="embed-iframe-snippet"
-            label="Iframe embed"
-            value={iframeSnippet}
-            copied={clipboard.copied && copiedSnippet === "iframe"}
-            onCopy={() => copySnippet("iframe", iframeSnippet)}
-          />
+          <SnippetBlock id="embed-iframe-snippet" label="Iframe embed" value={iframeSnippet} />
 
-          <SnippetBlock
-            id="embed-script-snippet"
-            label="Script embed"
-            value={scriptSnippet}
-            copied={clipboard.copied && copiedSnippet === "script"}
-            onCopy={() => copySnippet("script", scriptSnippet)}
-          />
+          <SnippetBlock id="embed-script-snippet" label="Script embed" value={scriptSnippet} />
 
           <SnippetBlock
             id="sdk-server-snippet"
             label="Server-side ad fetching"
             value={serverSnippet}
-            copied={clipboard.copied && copiedSnippet === "server"}
-            onCopy={() => copySnippet("server", serverSnippet)}
           />
 
           <SnippetBlock
             id="react-tracking-snippet"
             label="React fetching and tracking"
             value={reactSnippet}
-            copied={clipboard.copied && copiedSnippet === "react"}
-            onCopy={() => copySnippet("react", reactSnippet)}
           />
         </Stack>
       </Card.Section>
@@ -200,11 +177,11 @@ type SnippetBlockProps = {
   id: string
   label: string
   value: string
-  copied: boolean
-  onCopy: () => void
 }
 
-const SnippetBlock = ({ id, label, value, copied, onCopy }: SnippetBlockProps) => {
+const SnippetBlock = ({ id, label, value }: SnippetBlockProps) => {
+  const clipboard = useClipboard({ timeout: 2000 })
+
   return (
     <Stack direction="column" size="sm" className="w-full">
       <Label htmlFor={id}>{label}</Label>
@@ -221,12 +198,11 @@ const SnippetBlock = ({ id, label, value, copied, onCopy }: SnippetBlockProps) =
         <Button
           size="sm"
           variant="secondary"
-          prefix={copied ? <CheckIcon className="text-green-500" /> : <CopyIcon />}
-          onClick={onCopy}
-          disabled={!value}
+          prefix={clipboard.copied ? <CheckIcon className="text-green-500" /> : <CopyIcon />}
+          onClick={() => clipboard.copy(value)}
           className="absolute top-2 right-2"
         >
-          {copied ? "Copied" : "Copy"}
+          {clipboard.copied ? "Copied" : "Copy"}
         </Button>
       </div>
     </Stack>
