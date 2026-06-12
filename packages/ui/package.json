@@ -5,7 +5,6 @@
   "sideEffects": false,
   "exports": {
     "./*": "./src/components/*.tsx",
-    "./hooks": "./src/hooks/index.ts",
     "./cva": "./src/lib/cva.ts",
     "./classes": "./src/lib/classes.ts"
   },
@@ -13,16 +12,13 @@
     "check-types": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "cmdk": "^1.1.1",
     "cva": "^1.0.0-beta.4",
     "lucide-react": "^1.16.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.6",
-    "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.6",
     "react-hook-form": "^7.75.0",
     "recharts": "^3.8.1",
-    "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
