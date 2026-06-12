@@ -51,9 +51,7 @@ type BadgeProps = Omit<ComponentProps<"span">, "prefix"> &
     suffix?: ReactNode
   }
 
-const badgeAffixVariants = cva({
-  base: "shrink-0 size-[1.1em]",
-})
+const badgeAffixClasses = "shrink-0 size-[1.1em]"
 
 const Badge = ({
   children,
@@ -73,9 +71,9 @@ const Badge = ({
       <Slottable child={children} asChild={asChild}>
         {child => (
           <>
-            {prefix && <Slot.Root className={cx(badgeAffixVariants())}>{prefix}</Slot.Root>}
+            {prefix && <Slot.Root className={badgeAffixClasses}>{prefix}</Slot.Root>}
             {child}
-            {suffix && <Slot.Root className={cx(badgeAffixVariants())}>{suffix}</Slot.Root>}
+            {suffix && <Slot.Root className={badgeAffixClasses}>{suffix}</Slot.Root>}
           </>
         )}
       </Slottable>
