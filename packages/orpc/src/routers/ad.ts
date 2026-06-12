@@ -12,6 +12,7 @@ import { z } from "zod"
 import { adMw, authProcedure, type Context, publicProcedure, workspaceMw } from "../index"
 import { findServingAds, servingAdSchema } from "../lib/ad-serving"
 import { recordAdClick, recordAdImpression } from "../lib/ad-tracking"
+import { startOfUtcDay } from "../lib/date"
 
 const createFromCheckoutInput = z.object({
   workspaceId: z.string().min(1),
@@ -45,7 +46,7 @@ const getConnectedCheckoutSession = async ({
 }: Pick<Context, "db" | "stripe"> & { workspaceId: string; sessionId: string }) => {
   const workspace = await db.workspace.findUnique({
     where: { id: workspaceId },
-    select: { id: true, stripeConnectId: true },
+    select: { id: true, name: true, slug: true, faviconUrl: true, stripeConnectId: true },
   })
 
   if (!workspace?.stripeConnectId) {
@@ -64,7 +65,7 @@ const getConnectedCheckoutSession = async ({
     throw new ORPCError("BAD_REQUEST", { message: "Checkout workspace mismatch." })
   }
 
-  return { session, connectedAccountId: workspace.stripeConnectId }
+  return { session, workspace, connectedAccountId: workspace.stripeConnectId }
 }
 
 // ---- SDK-facing public procedures (re-exported via `publicRouter`) ----
@@ -156,7 +157,7 @@ export const recordClick = publicProcedure
 const getCheckoutInfo = publicProcedure
   .input(checkoutSessionInput)
   .handler(async ({ context: { db, stripe }, input: { workspaceId, sessionId } }) => {
-    const { session } = await getConnectedCheckoutSession({
+    const { session, workspace } = await getConnectedCheckoutSession({
       db,
       stripe,
       workspaceId,
@@ -176,13 +177,11 @@ const getCheckoutInfo = publicProcedure
       throw new ORPCError("BAD_REQUEST", { message: "Missing checkout metadata." })
     }
 
-    const [workspace, tierPrice, fields, existingAd] = await Promise.all([
-      db.workspace.findUnique({
-        where: { id: workspaceId },
-        select: { id: true, name: true, slug: true, faviconUrl: true },
-      }),
-      db.tierPrice.findUnique({
-        where: { id: tierPriceId },
+    const [tierPrice, fields, existingAd] = await Promise.all([
+      // Scoped to the workspace — session metadata is publisher-controlled,
+      // so an unscoped lookup would let it point at another tenant's price.
+      db.tierPrice.findFirst({
+        where: { id: tierPriceId, tier: { workspaceId } },
         select: {
           id: true,
           interval: true,
@@ -205,12 +204,19 @@ const getCheckoutInfo = publicProcedure
       })(),
     ])
 
-    if (!workspace || !tierPrice) {
+    if (!tierPrice) {
       throw new ORPCError("NOT_FOUND")
     }
 
     return {
-      workspace,
+      // Picked shape — this is an unauthenticated procedure, so the helper's
+      // `stripeConnectId` must not leak into the response.
+      workspace: {
+        id: workspace.id,
+        name: workspace.name,
+        slug: workspace.slug,
+        faviconUrl: workspace.faviconUrl,
+      },
       tier: tierPrice.tier,
       tierPrice,
       fields,
@@ -229,7 +235,7 @@ const createFromCheckout = publicProcedure
       context: { db, emails, logger, s3, stripe, env },
       input: { workspaceId, sessionId, name, websiteUrl, meta },
     }) => {
-      const { connectedAccountId, session } = await getConnectedCheckoutSession({
+      const { connectedAccountId, session, workspace } = await getConnectedCheckoutSession({
         db,
         stripe,
         workspaceId,
@@ -385,12 +391,7 @@ const createFromCheckout = publicProcedure
         include: { user: { select: { email: true, name: true } } },
       })
 
-      const workspace = await db.workspace.findUnique({
-        where: { id: workspaceId },
-        select: { id: true, name: true },
-      })
-
-      if (workspace && reviewers.length > 0) {
+      if (reviewers.length > 0) {
         const { html, text } = await renderAdPendingReview({
           workspaceName: workspace.name,
           advertiserName: advertiser.name,
@@ -453,9 +454,7 @@ export const adRouter = {
     .input(adIdentitySchema.extend({ days: z.number().int().min(1).max(180).default(30) }))
     .use(adMw)
     .handler(async ({ context: { ad, db }, input: { days } }) => {
-      const since = new Date()
-      since.setUTCHours(0, 0, 0, 0)
-      since.setUTCDate(since.getUTCDate() - (days - 1))
+      const since = startOfUtcDay(days - 1)
 
       const rows = await db.adStat.findMany({
         where: { adId: ad.id, date: { gte: since } },
