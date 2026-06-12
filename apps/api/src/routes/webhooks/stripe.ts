@@ -13,14 +13,6 @@ import { stripe } from "~/services/stripe"
 
 export const stripeWebhookRoute = new Hono()
 
-// Must be the async variant: under the Bun runtime the Stripe SDK uses the
-// SubtleCrypto provider, whose HMAC is async-only — the synchronous
-// `constructEvent` throws "cannot be used in a synchronous context", which
-// would 400 every real webhook and break subscription sync.
-const constructStripeEvent = (body: string, signature: string) => {
-  return stripe.webhooks.constructEventAsync(body, signature, env.STRIPE_CONNECT_WEBHOOK_SECRET)
-}
-
 stripeWebhookRoute.post("/", async c => {
   const body = await c.req.text()
   const signature = c.req.header("stripe-signature")
@@ -31,10 +23,19 @@ stripeWebhookRoute.post("/", async c => {
 
   let event: Stripe.Event
 
+  // Must be the async variant: under the Bun runtime the Stripe SDK uses the
+  // SubtleCrypto provider, whose HMAC is async-only — the synchronous
+  // `constructEvent` throws "cannot be used in a synchronous context", which
+  // would 400 every real webhook and break subscription sync.
   try {
-    event = await constructStripeEvent(body, signature)
+    event = await stripe.webhooks.constructEventAsync(
+      body,
+      signature,
+      env.STRIPE_CONNECT_WEBHOOK_SECRET,
+    )
   } catch (err) {
-    return c.text(`Invalid signature: ${err}`, 400)
+    logger.warn("stripe webhook signature verification failed", { err })
+    return c.text("Invalid signature", 400)
   }
 
   try {
