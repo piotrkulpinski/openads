@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "sideEffects": false,
-  "main": "src/index.ts",
   "exports": {
-    "./server": "./src/server.ts",
-    "./client": "./src/client.tsx",
-    "./events": "./src/events.ts"
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -17,15 +14,11 @@
     "typecheck": "bun run check-types"
   },
   "dependencies": {
-    "@openpanel/nextjs": "^1.5.1",
-    "@t3-oss/env-core": "^0.13.11",
-    "react": "^19.2.6",
-    "zod": "^4.4.3"
+    "@openpanel/web": "^1.4.1"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
     "@types/node": "^25.8.0",
-    "@types/react": "^19.2.14",
     "typescript": "^6.0.3"
   }
 }
