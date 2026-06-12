@@ -1,3 +1,5 @@
+import { createS3BucketClientFromEnv } from "@openads/s3"
+import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { db } from "../src/index"
 
 /**
@@ -28,6 +30,30 @@ const mulberry32 = (seed: number) => () => {
 const utcDate = (daysAgo: number) => {
   const d = new Date(Date.now() - daysAgo * DAY)
   return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+}
+
+const s3 = createS3BucketClientFromEnv()
+
+/**
+ * Runs the same favicon pipeline as the create procedures: fetch from the
+ * logo service, re-host on R2, return the CDN URL. Keys are domain-based
+ * (not id-based) so re-runs overwrite instead of orphaning objects. Returns
+ * "" when offline or unconfigured — the UI falls back to initials.
+ */
+const seedFavicon = async (websiteUrl: string): Promise<string> => {
+  const logoLinkClientId = process.env.LOGO_LINK_CLIENT_ID
+  if (!logoLinkClientId) {
+    console.warn("LOGO_LINK_CLIENT_ID not set — seeding without favicons")
+    return ""
+  }
+
+  const url = await fetchAndUploadFavicon(s3, {
+    websiteUrl,
+    logoLinkClientId,
+    key: `seed/favicons/${new URL(websiteUrl).hostname}.png`,
+  }).catch(() => null)
+
+  return url ?? ""
 }
 
 const seed = async () => {
@@ -67,7 +93,7 @@ const seed = async () => {
       name: "Acme Directory",
       slug: WORKSPACE_SLUG,
       websiteUrl: "https://acme.directory",
-      faviconUrl: "https://www.google.com/s2/favicons?sz=64&domain=directories.dev",
+      faviconUrl: await seedFavicon("https://acme.directory"),
       stripeConnectId: "acct_seed0000000000000001",
       stripeConnectStatus: "Active",
       stripeConnectEnabled: true,
@@ -350,6 +376,16 @@ const seed = async () => {
     },
   ]
 
+  // Prefetch all ad favicons concurrently (real domains get logos, fake
+  // `.example` domains get generated monograms).
+  const faviconUrls = new Map(
+    await Promise.all(
+      adSeeds.map(
+        async item => [item.ad.websiteUrl, await seedFavicon(item.ad.websiteUrl)] as const,
+      ),
+    ),
+  )
+
   let subSeq = 0
   let totalStats = 0
 
@@ -392,6 +428,7 @@ const seed = async () => {
       data: {
         name: item.ad.name,
         websiteUrl: item.ad.websiteUrl,
+        faviconUrl: faviconUrls.get(item.ad.websiteUrl) ?? "",
         status: item.ad.status,
         createdAt: submittedAt,
         approvedAt:

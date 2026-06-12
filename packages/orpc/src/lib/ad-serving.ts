@@ -45,10 +45,6 @@ type FindServingAdsProps = FindServingAdProps & {
   count?: number
 }
 
-const getFaviconUrl = (websiteUrl: string): string => {
-  return `https://www.google.com/s2/favicons?sz=128&domain_url=${encodeURIComponent(websiteUrl)}`
-}
-
 const getMetaRecord = (fields: Array<ServingFieldValue>): Record<string, unknown> => {
   return Object.fromEntries(fields.map(field => [field.name, field.value]))
 }
@@ -81,6 +77,7 @@ const fetchEligibleAds = async ({
       id: true,
       name: true,
       websiteUrl: true,
+      faviconUrl: true,
       subscription: { select: { tier: { select: { weight: true } } } },
       meta: {
         select: {
@@ -103,7 +100,7 @@ const fetchEligibleAds = async ({
       id: row.id,
       name: row.name,
       websiteUrl: row.websiteUrl,
-      faviconUrl: getFaviconUrl(row.websiteUrl),
+      faviconUrl: row.faviconUrl,
       weight: row.subscription.tier.weight,
       meta: getMetaRecord(fields),
       fields,

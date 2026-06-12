@@ -42,14 +42,6 @@ const adStatusVariant: Record<DashboardAd["status"], "secondary" | "success" | "
   Rejected: "danger",
 }
 
-const faviconUrl = (websiteUrl: string) => {
-  try {
-    return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(websiteUrl).hostname}`
-  } catch {
-    return undefined
-  }
-}
-
 function DashboardPage() {
   const workspace = useWorkspace()
   const navigate = useNavigate({ from: Route.fullPath })
@@ -291,8 +283,10 @@ const DashboardAdRow = ({ workspaceId, ad, showStatus, children }: DashboardAdRo
     <div className="relative flex items-center gap-3 px-4 py-3 hover:bg-muted/50">
       <span className="relative shrink-0">
         <Avatar className="size-9 rounded-md border">
-          <AvatarImage src={faviconUrl(ad.websiteUrl)} className="p-1" />
-          <AvatarFallback className="rounded-none text-xs">{getInitials(ad.name)}</AvatarFallback>
+          <AvatarImage src={ad.faviconUrl || undefined} className="p-1" />
+          <AvatarFallback className="rounded-none text-xs">
+            {getInitials(ad.name, 3)}
+          </AvatarFallback>
         </Avatar>
 
         <span

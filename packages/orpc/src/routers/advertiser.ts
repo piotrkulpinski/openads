@@ -111,6 +111,7 @@ export const advertiserRouter = {
                 name: latestAd.name,
                 status: latestAd.status,
                 websiteUrl: latestAd.websiteUrl,
+                faviconUrl: latestAd.faviconUrl,
               }
             : null,
           latestTier: latestSubscription
@@ -199,6 +200,7 @@ export const advertiserRouter = {
               name: ad.name,
               status: ad.status,
               websiteUrl: ad.websiteUrl,
+              faviconUrl: ad.faviconUrl,
               createdAt: ad.createdAt,
               updatedAt: ad.updatedAt,
               approvedAt: ad.approvedAt,

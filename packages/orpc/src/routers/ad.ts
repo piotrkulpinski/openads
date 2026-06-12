@@ -329,9 +329,12 @@ const createFromCheckout = publicProcedure
         },
       })
 
-      // Best-effort — failure is logged but doesn't block ad creation.
-      await fetchAndUploadFavicon(s3, {
+      // Best-effort — failure is logged but doesn't block ad creation. The
+      // R2 URL is persisted so serving and dashboards never reference the
+      // third-party logo service directly.
+      const faviconUrl = await fetchAndUploadFavicon(s3, {
         websiteUrl,
+        logoLinkClientId: env.LOGO_LINK_CLIENT_ID,
         key: `workspaces/${workspaceId}/ads/${ad.id}/favicon.png`,
       }).catch(err => {
         logger.warn("ad.createFromCheckout: favicon fetch failed", {
@@ -341,6 +344,10 @@ const createFromCheckout = publicProcedure
         })
         return null
       })
+
+      if (faviconUrl) {
+        await db.ad.update({ where: { id: ad.id }, data: { faviconUrl } })
+      }
 
       // Transactional replace so concurrent reads never see an ad with zero
       // meta rows between the delete and the recreate. Always runs — an empty

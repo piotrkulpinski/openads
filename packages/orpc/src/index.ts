@@ -26,6 +26,7 @@ export type Context = {
   env: {
     APP_URL: string
     API_URL: string
+    LOGO_LINK_CLIENT_ID: string
     STRIPE_CONNECT_CLIENT_ID?: string
     STRIPE_PLATFORM_FEE_PERCENT: number
   }
