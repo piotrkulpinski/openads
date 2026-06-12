@@ -13,7 +13,7 @@ const createContext = ({
       isActive: true,
       workspace: {
         id: "ws_openads",
-        stripeConnectEnabled: true,
+        stripeConnectStatus: "Active",
         stripeConnectId: "acct_publisher",
       },
     },
@@ -99,7 +99,7 @@ describe("tier.public.createCheckout", () => {
         tier: {
           id: "tier_gold",
           isActive: false,
-          workspace: { stripeConnectEnabled: true, stripeConnectId: "acct_publisher" },
+          workspace: { stripeConnectStatus: "Active", stripeConnectId: "acct_publisher" },
         },
       },
     })
@@ -137,7 +137,7 @@ describe("tier.public.createCheckout", () => {
         tier: {
           id: "tier_gold",
           isActive: true,
-          workspace: { stripeConnectEnabled: false, stripeConnectId: null },
+          workspace: { stripeConnectStatus: null, stripeConnectId: null },
         },
       },
     })

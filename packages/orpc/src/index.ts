@@ -1,6 +1,6 @@
 import type { Session } from "@openads/auth/server"
 import { Prisma, type db } from "@openads/db"
-import type { Workspace } from "@openads/db/client"
+import { StripeConnectStatus, type Workspace } from "@openads/db/client"
 import type { EmailClient } from "@openads/emails"
 import type { Logger } from "@openads/logger"
 import type { RedisClient } from "@openads/redis"
@@ -154,7 +154,10 @@ export const connectEnabledMw = os
   .middleware(({ context, next }) => {
     const { workspace } = context
 
-    if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
+    if (
+      workspace.stripeConnectStatus !== StripeConnectStatus.Active ||
+      !workspace.stripeConnectId
+    ) {
       throw new ORPCError("PRECONDITION_FAILED", {
         message: "Connect your Stripe account before creating tiers.",
       })
