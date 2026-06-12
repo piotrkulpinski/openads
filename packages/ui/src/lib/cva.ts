@@ -1,10 +1,8 @@
 import { defineConfig } from "cva"
-import { extendTailwindMerge } from "tailwind-merge"
-
-const customTwMerge = extendTailwindMerge({})
+import { twMerge } from "tailwind-merge"
 
 export const { cva, cx, compose } = defineConfig({
-  hooks: { onComplete: className => customTwMerge(className) },
+  hooks: { onComplete: twMerge },
 })
 
 export type { VariantProps } from "cva"
