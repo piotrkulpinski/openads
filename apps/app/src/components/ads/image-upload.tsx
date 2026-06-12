@@ -3,9 +3,9 @@ import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
 import { useMutation } from "@tanstack/react-query"
 import { ImageIcon, Loader2Icon, TrashIcon } from "lucide-react"
-import { type ChangeEvent, type ComponentProps, useRef, useState } from "react"
+import { type ChangeEvent, type ComponentProps, useRef } from "react"
 import { toast } from "sonner"
-import { orpc } from "~/lib/orpc"
+import { client } from "~/lib/orpc"
 
 type ImageUploadProps = Omit<ComponentProps<"div">, "onChange"> & {
   workspaceId: string
@@ -27,22 +27,10 @@ export const ImageUpload = ({
   ...props
 }: ImageUploadProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
-  const [isUploading, setIsUploading] = useState(false)
 
-  const createUpload = useMutation(orpc.storage.public.createAdvertiserUpload.mutationOptions())
-
-  const handlePick = () => inputRef.current?.click()
-
-  const handleClear = () => onChange(null)
-
-  const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    event.target.value = "" // allow re-picking the same file
-    if (!file) return
-
-    try {
-      setIsUploading(true)
-      const presigned = await createUpload.mutateAsync({
+  const upload = useMutation({
+    mutationFn: async (file: File) => {
+      const presigned = await client.storage.public.createAdvertiserUpload({
         workspaceId,
         sessionId,
         fileName: file.name,
@@ -52,23 +40,30 @@ export const ImageUpload = ({
 
       // Presigned PUT: send the file as the raw body with the signed headers.
       // The browser sets Content-Length from the body, which the URL also signs.
-      const uploadResponse = await fetch(presigned.uploadUrl, {
+      const res = await fetch(presigned.uploadUrl, {
         method: "PUT",
         headers: presigned.headers,
         body: file,
       })
 
-      if (!uploadResponse.ok) {
-        throw new Error(`Upload failed (${uploadResponse.status})`)
+      if (!res.ok) {
+        throw new Error(`Upload failed (${res.status})`)
       }
 
-      onChange(presigned.publicUrl)
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed"
-      toast.error(message)
-    } finally {
-      setIsUploading(false)
-    }
+      return presigned.publicUrl
+    },
+    onSuccess: url => onChange(url),
+    onError: err => toast.error(err instanceof Error ? err.message : "Upload failed"),
+  })
+
+  const handlePick = () => inputRef.current?.click()
+
+  const handleClear = () => onChange(null)
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = "" // allow re-picking the same file
+    if (file) upload.mutate(file)
   }
 
   return (
@@ -103,11 +98,11 @@ export const ImageUpload = ({
         <Button
           type="button"
           variant="secondary"
-          prefix={isUploading ? <Loader2Icon className="animate-spin" /> : <ImageIcon />}
+          prefix={upload.isPending ? <Loader2Icon className="animate-spin" /> : <ImageIcon />}
           onClick={handlePick}
-          disabled={isUploading}
+          disabled={upload.isPending}
         >
-          {isUploading ? "Uploading…" : "Upload image"}
+          {upload.isPending ? "Uploading…" : "Upload image"}
         </Button>
       )}
     </div>
