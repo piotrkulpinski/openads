@@ -4,13 +4,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
-import { Skeleton } from "@openads/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { ArrowUpRightIcon, MailIcon } from "lucide-react"
 import type { ComponentProps } from "react"
-import { getServingState, ServingDot } from "~/components/ads/serving-state"
+import { AdAvatar } from "~/components/ads/ad-avatar"
+import { getServingState, isPaid } from "~/components/ads/serving-state"
+import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
 import { QueryCell } from "~/components/query-cell"
+import { formatCtr, Metric } from "~/components/stats/metric"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5 } from "~/components/ui/heading"
@@ -30,26 +32,6 @@ export const Route = createFileRoute("/$workspaceId/advertisers/$advertiserId")(
 type Advertiser = RouterOutputs["advertiser"]["getById"]
 type AdvertiserAd = Advertiser["ads"][number]
 
-const adStatusVariant: Record<AdvertiserAd["status"], "secondary" | "success" | "danger"> = {
-  Pending: "secondary",
-  Approved: "success",
-  Rejected: "danger",
-}
-
-const subscriptionVariant: Record<
-  AdvertiserAd["subscription"]["status"],
-  "secondary" | "success" | "warning" | "danger"
-> = {
-  Trialing: "success",
-  Active: "success",
-  PastDue: "warning",
-  Canceled: "secondary",
-  Unpaid: "danger",
-  Incomplete: "warning",
-  IncompleteExpired: "secondary",
-  Paused: "secondary",
-}
-
 const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
   Day: 1 / 30,
   Week: 7 / 30,
@@ -62,9 +44,7 @@ const MONTHS_PER_INTERVAL: Record<BillingInterval, number> = {
  * number a publisher actually thinks in. Assumes one currency per workspace.
  */
 const getMonthlyRevenue = (ads: AdvertiserAd[]) => {
-  const paid = ads.filter(
-    ad => ad.subscription.status === "Active" || ad.subscription.status === "Trialing",
-  )
+  const paid = ads.filter(ad => isPaid(ad.subscription.status))
   if (paid.length === 0) return null
 
   const cents = paid.reduce((total, { subscription: { tierPrice } }) => {
@@ -89,7 +69,6 @@ function AdvertiserDetailPage() {
   return (
     <QueryCell
       query={advertiserQuery}
-      pending={() => <Skeleton className="h-96" />}
       error={() => (
         <Callout variant="danger">
           <CalloutText>Could not load advertiser.</CalloutText>
@@ -97,7 +76,6 @@ function AdvertiserDetailPage() {
       )}
       success={({ data: advertiser }) => {
         const { totals } = advertiser
-        const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : null
         const monthlyRevenue = getMonthlyRevenue(advertiser.ads)
 
         return (
@@ -161,7 +139,7 @@ function AdvertiserDetailPage() {
               <Metric label="30d clicks" value={totals.clicks} />
               <Metric
                 label="30d CTR"
-                value={ctr === null ? "—" : `${ctr.toFixed(2)}%`}
+                value={formatCtr(totals)}
                 className="col-span-2 border-t sm:col-span-1 sm:border-t-0"
               />
             </div>
@@ -185,24 +163,6 @@ function AdvertiserDetailPage() {
   )
 }
 
-type MetricProps = ComponentProps<"div"> & {
-  label: string
-  value: string | number
-  hint?: string
-}
-
-const Metric = ({ label, value, hint, className, ...props }: MetricProps) => {
-  return (
-    <div className={cx("min-w-0 p-4", className)} {...props}>
-      <p className="text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
-      <p className="mt-1 truncate font-display text-2xl font-semibold tabular-nums">
-        {typeof value === "number" ? formatNumber(value, "standard") : value}
-      </p>
-      {hint && <p className="truncate text-muted-foreground text-xs">{hint}</p>}
-    </div>
-  )
-}
-
 type AdvertiserAdRowProps = ComponentProps<"div"> & {
   workspaceId: string
   ad: AdvertiserAd
@@ -211,7 +171,7 @@ type AdvertiserAdRowProps = ComponentProps<"div"> & {
 const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdRowProps) => {
   const { subscription } = ad
   const serving = getServingState(ad)
-  const paid = subscription.status === "Active" || subscription.status === "Trialing"
+  const paid = isPaid(subscription.status)
 
   return (
     <div
@@ -226,27 +186,12 @@ const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdR
         params={{ workspaceId, adId: ad.id }}
         className="flex min-w-0 items-center gap-3"
       >
-        <span className="relative shrink-0">
-          <Avatar className="size-9 rounded-md border">
-            <AvatarImage src={ad.faviconUrl || undefined} className="p-1" />
-            <AvatarFallback className="rounded-none text-xs">
-              {getInitials(ad.name, 3)}
-            </AvatarFallback>
-          </Avatar>
-
-          {/* Presence-style serving indicator, anchored to the favicon */}
-          <span
-            className="-right-0.5 -bottom-0.5 absolute rounded-full bg-background p-0.5"
-            title={serving.detail}
-          >
-            <ServingDot state={serving} />
-          </span>
-        </span>
+        <AdAvatar ad={ad} serving={serving} />
 
         <span className="min-w-0">
           <span className="flex items-center gap-2">
             <H5 className="truncate">{ad.name}</H5>
-            <Badge variant={adStatusVariant[ad.status]}>{ad.status}</Badge>
+            <AdStatusBadge status={ad.status} />
           </span>
           <span className="block truncate text-muted-foreground text-sm">{ad.websiteUrl}</span>
         </span>
@@ -263,7 +208,7 @@ const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdR
 
       <div className="min-w-0 text-sm">
         <p>
-          <Badge variant={subscriptionVariant[subscription.status]}>{subscription.status}</Badge>
+          <SubscriptionStatusBadge status={subscription.status} />
         </p>
         {subscription.currentPeriodEnd && paid && (
           <p className="mt-1 truncate text-muted-foreground tabular-nums">

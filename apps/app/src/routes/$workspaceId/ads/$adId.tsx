@@ -9,7 +9,8 @@ import { ArrowUpRightIcon, CheckIcon, MessageSquareIcon, XIcon } from "lucide-re
 import { type ReactNode, useState } from "react"
 import { toast } from "sonner"
 import { AdStats } from "~/components/ads/ad-stats"
-import { getServingState, ServingDot } from "~/components/ads/serving-state"
+import { getServingState, isPaid, ServingDot } from "~/components/ads/serving-state"
+import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5, H6 } from "~/components/ui/heading"
@@ -32,26 +33,6 @@ export const Route = createFileRoute("/$workspaceId/ads/$adId")({
 type Ad = NonNullable<RouterOutputs["ad"]["getById"]>
 type FieldList = RouterOutputs["field"]["getAll"]
 
-const statusVariant: Record<Ad["status"], "secondary" | "success" | "danger"> = {
-  Pending: "secondary",
-  Approved: "success",
-  Rejected: "danger",
-}
-
-const subscriptionVariant: Record<
-  Ad["subscription"]["status"],
-  "secondary" | "success" | "warning" | "danger"
-> = {
-  Trialing: "success",
-  Active: "success",
-  PastDue: "warning",
-  Canceled: "secondary",
-  Unpaid: "danger",
-  Incomplete: "warning",
-  IncompleteExpired: "secondary",
-  Paused: "secondary",
-}
-
 function AdReviewPage() {
   const { workspaceId, adId } = Route.useParams()
   const { ad: initial, fields } = Route.useLoaderData()
@@ -59,7 +40,7 @@ function AdReviewPage() {
   const adQuery = useQuery(
     orpc.ad.getById.queryOptions({ input: { workspaceId, adId }, initialData: initial }),
   )
-  const ad = adQuery.data ?? initial
+  const ad = adQuery.data
   const serving = getServingState(ad)
 
   const [note, setNote] = useState("")
@@ -124,9 +105,7 @@ function AdReviewPage() {
         </div>
 
         <HeaderActions>
-          <Badge variant={statusVariant[ad.status]} size="lg">
-            {ad.status}
-          </Badge>
+          <AdStatusBadge status={ad.status} size="lg" />
 
           {isValidUrl(ad.websiteUrl) && (
             <Button variant="secondary" suffix={<ArrowUpRightIcon />} asChild>
@@ -173,16 +152,13 @@ function AdReviewPage() {
                 <DetailRow label="Billing">
                   <span className="flex flex-wrap items-center gap-2 tabular-nums">
                     {formatTierPrice(tierPrice)}
-                    <Badge variant={subscriptionVariant[subscription.status]}>
-                      {subscription.status}
-                    </Badge>
-                    {subscription.currentPeriodEnd &&
-                      ["Active", "Trialing"].includes(subscription.status) && (
-                        <span className="text-muted-foreground">
-                          {subscription.cancelAtPeriodEnd ? "ends" : "renews"}{" "}
-                          {formatDate(subscription.currentPeriodEnd, "medium", "en-US")}
-                        </span>
-                      )}
+                    <SubscriptionStatusBadge status={subscription.status} />
+                    {subscription.currentPeriodEnd && isPaid(subscription.status) && (
+                      <span className="text-muted-foreground">
+                        {subscription.cancelAtPeriodEnd ? "ends" : "renews"}{" "}
+                        {formatDate(subscription.currentPeriodEnd, "medium", "en-US")}
+                      </span>
+                    )}
                   </span>
                 </DetailRow>
 
@@ -355,7 +331,7 @@ type MetaValueProps = {
 }
 
 const MetaValue = ({ meta, type, name }: MetaValueProps) => {
-  const value = meta?.value as unknown
+  const value = meta?.value
 
   if (value === undefined || value === null || value === "") {
     return <span className="text-muted-foreground">—</span>
