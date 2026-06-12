@@ -7,16 +7,6 @@ const booleanString = z.stringbool({
   case: "sensitive",
 })
 
-const numberFromString = z.preprocess(value => {
-  if (typeof value === "number") return value
-  if (typeof value === "string" && value.trim() !== "") {
-    const parsed = Number(value)
-    if (Number.isFinite(parsed)) return parsed
-  }
-
-  return undefined
-}, z.number().positive().optional())
-
 export const env = createEnv({
   server: {
     S3_ENDPOINT: z.url().optional(),
@@ -26,8 +16,9 @@ export const env = createEnv({
     S3_BUCKET: z.string(),
     S3_PUBLIC_URL: z.url().optional(),
     S3_FORCE_PATH_STYLE: booleanString.optional(),
-    S3_SIGNED_URL_TTL: numberFromString,
+    S3_SIGNED_URL_TTL: z.coerce.number().positive().optional(),
   },
 
   runtimeEnv: process.env,
+  emptyStringAsUndefined: true,
 })
