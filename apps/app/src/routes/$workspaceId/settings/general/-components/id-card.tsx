@@ -10,7 +10,7 @@ import { Prose } from "~/components/ui/prose"
 import { siteConfig } from "~/config/site"
 import { useWorkspace } from "~/contexts/workspace-context"
 
-export const IdForm = ({ ...props }: ComponentProps<"div">) => {
+export const WorkspaceIdCard = ({ ...props }: ComponentProps<"div">) => {
   const workspace = useWorkspace()
   const clipboard = useClipboard({ timeout: 3000 })
 
