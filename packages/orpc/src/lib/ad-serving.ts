@@ -1,6 +1,8 @@
 import type { db } from "@openads/db"
 import { FieldType } from "@openads/db/client"
+import { SERVING_SUBSCRIPTION_STATUSES } from "@openads/db/lib/subscription"
 import { z } from "zod"
+import { startOfUtcDay } from "./date"
 
 // Single source of truth for the ad-serving shape. The SDK `/v1` endpoint
 // `.output()`, the embed serving shape, and the runtime types all derive from
@@ -67,7 +69,7 @@ const fetchEligibleAds = async ({
       ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
       subscription: {
         workspaceId,
-        status: { in: ["Active", "Trialing"] },
+        status: { in: SERVING_SUBSCRIPTION_STATUSES },
         // Weight is sourced live from the tier — applying the floor here
         // means tier weight edits affect placement targeting immediately.
         ...(weightGte !== undefined ? { tier: { weight: { gte: weightGte } } } : {}),
@@ -121,9 +123,7 @@ const fetchImpressionsByAd = async ({
   adIds: Array<string>
   fairnessWindowDays: number
 }): Promise<Map<string, number>> => {
-  const since = new Date()
-  since.setUTCHours(0, 0, 0, 0)
-  since.setUTCDate(since.getUTCDate() - Math.max(0, fairnessWindowDays - 1))
+  const since = startOfUtcDay(fairnessWindowDays - 1)
 
   const stats = await db.adStat.groupBy({
     by: ["adId"],
@@ -184,26 +184,8 @@ const pickWeightedAd = (
  * e.g. ask for `weight >= 2.5` for premium banner positions, anything for
  * regular cards. OpenAds doesn't carry a placement concept itself.
  */
-export const findServingAd = async ({
-  db,
-  workspaceId,
-  weightGte,
-  excludeIds = [],
-  leastServedBoostMax = 1.2,
-  fairnessWindowDays = 1,
-}: FindServingAdProps): Promise<ServingAd | null> => {
-  const ads = await fetchEligibleAds({ db, workspaceId, weightGte, excludeIds })
-
-  if (ads.length === 0) return null
-  if (ads.length === 1) return ads[0] ?? null
-
-  const impressionsByAd = await fetchImpressionsByAd({
-    db,
-    adIds: ads.map(ad => ad.id),
-    fairnessWindowDays,
-  })
-
-  return pickWeightedAd(ads, impressionsByAd, leastServedBoostMax)
+export const findServingAd = async (props: FindServingAdProps): Promise<ServingAd | null> => {
+  return (await findServingAds({ ...props, count: 1 }))[0] ?? null
 }
 
 /**

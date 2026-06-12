@@ -1,11 +1,10 @@
-import { AdStatus, SubscriptionStatus } from "@openads/db/client"
+import { AdStatus } from "@openads/db/client"
+import { isServingSubscription, SERVING_SUBSCRIPTION_STATUSES } from "@openads/db/lib/subscription"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
 import { authProcedure, workspaceMw } from "../index"
-
-const isActiveSubscriptionStatus = (status: SubscriptionStatus) => {
-  return status === SubscriptionStatus.Active || status === SubscriptionStatus.Trialing
-}
+import { startOfUtcDay } from "../lib/date"
+import { sumMonthlyCents } from "../lib/revenue"
 
 export const advertiserRouter = {
   getAll: authProcedure
@@ -17,23 +16,22 @@ export const advertiserRouter = {
     )
     .use(workspaceMw)
     .handler(async ({ context: { db, workspace }, input: { query } }) => {
-      const search = query?.trim()
       const subscriptionFilter = { workspaceId: workspace.id, ad: { isNot: null } }
 
       const advertisers = await db.advertiser.findMany({
         where: {
           workspaceId: workspace.id,
           subscriptions: { some: subscriptionFilter },
-          ...(search
+          ...(query
             ? {
                 OR: [
-                  { name: { contains: search, mode: "insensitive" } },
-                  { email: { contains: search, mode: "insensitive" } },
+                  { name: { contains: query, mode: "insensitive" } },
+                  { email: { contains: query, mode: "insensitive" } },
                   {
                     subscriptions: {
                       some: {
                         workspaceId: workspace.id,
-                        ad: { is: { name: { contains: search, mode: "insensitive" } } },
+                        ad: { is: { name: { contains: query, mode: "insensitive" } } },
                       },
                     },
                   },
@@ -59,7 +57,6 @@ export const advertiserRouter = {
       })
 
       const advertiserIds = advertisers.map(advertiser => advertiser.id)
-      const activeStatuses = [SubscriptionStatus.Active, SubscriptionStatus.Trialing]
 
       const [activeSubscriptionCounts, activeAdCounts] = advertiserIds.length
         ? await Promise.all([
@@ -68,7 +65,7 @@ export const advertiserRouter = {
               where: {
                 ...subscriptionFilter,
                 advertiserId: { in: advertiserIds },
-                status: { in: activeStatuses },
+                status: { in: SERVING_SUBSCRIPTION_STATUSES },
               },
               _count: true,
             }),
@@ -77,7 +74,7 @@ export const advertiserRouter = {
               where: {
                 workspaceId: workspace.id,
                 advertiserId: { in: advertiserIds },
-                status: { in: activeStatuses },
+                status: { in: SERVING_SUBSCRIPTION_STATUSES },
                 ad: { is: { status: AdStatus.Approved } },
               },
               _count: true,
@@ -134,9 +131,7 @@ export const advertiserRouter = {
     )
     .use(workspaceMw)
     .handler(async ({ context: { db, workspace }, input: { advertiserId } }) => {
-      const since = new Date()
-      since.setUTCHours(0, 0, 0, 0)
-      since.setUTCDate(since.getUTCDate() - 29)
+      const since = startOfUtcDay(29)
 
       const advertiser = await db.advertiser.findFirst({
         where: {
@@ -170,7 +165,7 @@ export const advertiserRouter = {
               tier: true,
               tierPrice: true,
             },
-            orderBy: { createdAt: "desc" },
+            orderBy: [{ ad: { updatedAt: "desc" } }, { createdAt: "desc" }],
           },
         },
       })
@@ -179,63 +174,61 @@ export const advertiserRouter = {
         throw new ORPCError("NOT_FOUND")
       }
 
-      const ads = advertiser.subscriptions
-        .flatMap(subscription => {
-          const ad = subscription.ad
-          if (!ad) return []
+      const ads = advertiser.subscriptions.flatMap(subscription => {
+        const ad = subscription.ad
+        if (!ad) return []
 
-          const stats = ad.stats.reduce(
-            (total, row) => {
-              return {
-                impressions: total.impressions + row.impressions,
-                clicks: total.clicks + row.clicks,
-              }
-            },
-            { impressions: 0, clicks: 0 },
-          )
+        const stats = ad.stats.reduce(
+          (total, row) => {
+            return {
+              impressions: total.impressions + row.impressions,
+              clicks: total.clicks + row.clicks,
+            }
+          },
+          { impressions: 0, clicks: 0 },
+        )
 
-          return [
-            {
-              id: ad.id,
-              name: ad.name,
-              status: ad.status,
-              websiteUrl: ad.websiteUrl,
-              faviconUrl: ad.faviconUrl,
-              createdAt: ad.createdAt,
-              updatedAt: ad.updatedAt,
-              approvedAt: ad.approvedAt,
-              rejectedAt: ad.rejectedAt,
-              rejectionNote: ad.rejectionNote,
-              stats,
-              subscription: {
-                id: subscription.id,
-                status: subscription.status,
-                cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-                currentPeriodStart: subscription.currentPeriodStart,
-                currentPeriodEnd: subscription.currentPeriodEnd,
-                createdAt: subscription.createdAt,
-                updatedAt: subscription.updatedAt,
-                tier: subscription.tier,
-                tierPrice: subscription.tierPrice,
-              },
+        return [
+          {
+            id: ad.id,
+            name: ad.name,
+            status: ad.status,
+            websiteUrl: ad.websiteUrl,
+            faviconUrl: ad.faviconUrl,
+            createdAt: ad.createdAt,
+            updatedAt: ad.updatedAt,
+            approvedAt: ad.approvedAt,
+            rejectedAt: ad.rejectedAt,
+            rejectionNote: ad.rejectionNote,
+            stats,
+            subscription: {
+              id: subscription.id,
+              status: subscription.status,
+              cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+              currentPeriodStart: subscription.currentPeriodStart,
+              currentPeriodEnd: subscription.currentPeriodEnd,
+              createdAt: subscription.createdAt,
+              updatedAt: subscription.updatedAt,
+              tier: subscription.tier,
+              tierPrice: subscription.tierPrice,
             },
-          ]
-        })
-        .sort((first, second) => {
-          return second.updatedAt.getTime() - first.updatedAt.getTime()
-        })
+          },
+        ]
+      })
+
+      const paid = ads.filter(ad => isServingSubscription(ad.subscription.status))
 
       const totals = ads.reduce(
         (total, ad) => {
           const isActive =
-            ad.status === AdStatus.Approved && isActiveSubscriptionStatus(ad.subscription.status)
+            ad.status === AdStatus.Approved && isServingSubscription(ad.subscription.status)
 
           return {
+            ...total,
             ads: total.ads + 1,
             activeAds: total.activeAds + (isActive ? 1 : 0),
             activeSubscriptions:
-              total.activeSubscriptions +
-              (isActiveSubscriptionStatus(ad.subscription.status) ? 1 : 0),
+              total.activeSubscriptions + (isServingSubscription(ad.subscription.status) ? 1 : 0),
             impressions: total.impressions + ad.stats.impressions,
             clicks: total.clicks + ad.stats.clicks,
           }
@@ -246,6 +239,10 @@ export const advertiserRouter = {
           activeSubscriptions: 0,
           impressions: 0,
           clicks: 0,
+          // Normalized monthly revenue across paid subscriptions, matching
+          // the dashboard's revenue figure for this advertiser's slice.
+          monthlyCents: sumMonthlyCents(paid.map(ad => ad.subscription)),
+          currency: paid[0]?.subscription.tierPrice.currency ?? "usd",
         },
       )
 
