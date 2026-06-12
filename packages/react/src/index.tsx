@@ -7,6 +7,7 @@ import {
   type OpenAdsClientOptions,
   type OpenAdsPlacementListOptions,
   type OpenAdsPlacementOptions,
+  type OpenAdsSerializableRequestOptions,
 } from "@openads/sdk"
 import {
   createContext,
@@ -22,7 +23,16 @@ import {
   useState,
 } from "react"
 
-type OpenAdsProviderProps = PropsWithChildren<OpenAdsClientOptions>
+// The provider and hooks memoize on `JSON.stringify(request)`, so they accept
+// only the serializable subset — a `signal` or `Headers` instance would
+// stringify to a constant and never invalidate the memo.
+type SerializableRequest = {
+  request?: OpenAdsSerializableRequestOptions
+}
+
+type OpenAdsProviderProps = PropsWithChildren<
+  Omit<OpenAdsClientOptions, "request"> & SerializableRequest
+>
 
 type OpenAdsQueryState<TData> = {
   data: TData
@@ -31,13 +41,15 @@ type OpenAdsQueryState<TData> = {
   refetch: () => Promise<TData>
 }
 
-type OpenAdsAdOptions = OpenAdsPlacementOptions & {
-  enabled?: boolean
-}
+type OpenAdsAdOptions = Omit<OpenAdsPlacementOptions, "request"> &
+  SerializableRequest & {
+    enabled?: boolean
+  }
 
-type OpenAdsAdsOptions = OpenAdsPlacementListOptions & {
-  enabled?: boolean
-}
+type OpenAdsAdsOptions = Omit<OpenAdsPlacementListOptions, "request"> &
+  SerializableRequest & {
+    enabled?: boolean
+  }
 
 type OpenAdsTrackingOptions = {
   disabled?: boolean
@@ -241,4 +253,5 @@ export type {
   OpenAdsPlacementListOptions,
   OpenAdsPlacementOptions,
   OpenAdsRequestOptions,
+  OpenAdsSerializableRequestOptions,
 } from "@openads/sdk"

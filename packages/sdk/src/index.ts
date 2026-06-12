@@ -23,16 +23,27 @@ export type OpenAdsAd = {
   fields: Array<OpenAdsFieldValue>
 }
 
-/**
- * Extra `fetch` options merged into every request.
- *
- * Must be JSON-serializable — the React bindings memoize the client and hook
- * fetches on `JSON.stringify(request)`. Pass plain objects and arrays only
- * (e.g. `headers` as a plain record); `Headers` instances, `AbortSignal`,
- * streams, and other non-serializable `RequestInit` values are not supported.
- */
+/** Extra `fetch` options merged into every request. */
 export type OpenAdsRequestOptions = RequestInit & {
   /** Next.js `fetch` extension (App Router caching). Ignored by other runtimes. */
+  next?: { revalidate?: number | false; tags?: Array<string> }
+}
+
+/**
+ * The JSON-serializable subset of `OpenAdsRequestOptions`. The React bindings
+ * memoize the client and hook fetches on `JSON.stringify(request)`, so they
+ * accept only this shape — `Headers` instances, `AbortSignal`, streams, and
+ * other non-serializable `RequestInit` values would silently never invalidate
+ * the memo.
+ */
+export type OpenAdsSerializableRequestOptions = {
+  method?: string
+  headers?: Record<string, string>
+  cache?: RequestCache
+  credentials?: RequestCredentials
+  mode?: RequestMode
+  keepalive?: boolean
+  referrerPolicy?: ReferrerPolicy
   next?: { revalidate?: number | false; tags?: Array<string> }
 }
 
@@ -158,39 +169,22 @@ export const createOpenAdsClient = ({
     return response.ads
   }
 
-  const getAd = async ({
-    request: placementRequest,
-    ...options
-  }: OpenAdsPlacementOptions = {}): Promise<OpenAdsAd | null> => {
-    const response = await fetchJson<CurrentAdsResponse>(
-      buildCurrentAdsPath({ ...options, count: 1 }),
-      placementRequest,
-    )
-
-    return response.ads[0] ?? null
+  const getAd = async (options: OpenAdsPlacementOptions = {}): Promise<OpenAdsAd | null> => {
+    const ads = await getAds({ ...options, count: 1 })
+    return ads[0] ?? null
   }
 
-  const recordImpression = async (
-    adId: string,
-    options: OpenAdsTrackOptions = {},
-  ): Promise<TrackResponse> => {
-    return await fetchJson<TrackResponse>(`/v1/ads/${encodeURIComponent(adId)}/impression`, {
-      method: "POST",
-      keepalive: true,
-      ...options.request,
-    })
-  }
+  const recordEvent =
+    (kind: "impression" | "click") =>
+    (adId: string, options: OpenAdsTrackOptions = {}): Promise<TrackResponse> =>
+      fetchJson<TrackResponse>(`/v1/ads/${encodeURIComponent(adId)}/${kind}`, {
+        method: "POST",
+        keepalive: true,
+        ...options.request,
+      })
 
-  const recordClick = async (
-    adId: string,
-    options: OpenAdsTrackOptions = {},
-  ): Promise<TrackResponse> => {
-    return await fetchJson<TrackResponse>(`/v1/ads/${encodeURIComponent(adId)}/click`, {
-      method: "POST",
-      keepalive: true,
-      ...options.request,
-    })
-  }
+  const recordImpression = recordEvent("impression")
+  const recordClick = recordEvent("click")
 
   return {
     getAd,
