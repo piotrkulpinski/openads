@@ -1,4 +1,4 @@
-import type { AppRouter, AppRouterClient, RouterInputs, RouterOutputs } from "@openads/orpc/router"
+import type { AppRouterClient, RouterOutputs } from "@openads/orpc/router"
 import { createORPCClient, ORPCError } from "@orpc/client"
 import { RPCLink } from "@orpc/client/fetch"
 import { SimpleCsrfProtectionLinkPlugin } from "@orpc/client/plugins"
@@ -37,4 +37,4 @@ export const queryClient = new QueryClient({
   }),
 })
 
-export type { AppRouter, RouterInputs, RouterOutputs }
+export type { RouterOutputs }
