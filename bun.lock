@@ -193,6 +193,7 @@
       "name": "@openads/events",
       "version": "1.0.0",
       "dependencies": {
+        "@openpanel/sdk": "^1.0.1",
         "@openpanel/web": "^1.4.1",
       },
       "devDependencies": {

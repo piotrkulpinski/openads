@@ -4,7 +4,9 @@
   "private": true,
   "sideEffects": false,
   "exports": {
-    "./client": "./src/client.ts"
+    "./server": "./src/server.ts",
+    "./client": "./src/client.ts",
+    "./events": "./src/events.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -14,6 +16,7 @@
     "typecheck": "bun run check-types"
   },
   "dependencies": {
+    "@openpanel/sdk": "^1.0.1",
     "@openpanel/web": "^1.4.1"
   },
   "devDependencies": {
