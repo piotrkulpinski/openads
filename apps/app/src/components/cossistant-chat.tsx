@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query"
 import { orpc } from "~/lib/orpc"
 
 export const CossistantChat = () => {
-  const { data: user } = useQuery(
-    orpc.user.me.queryOptions({ staleTime: Number.POSITIVE_INFINITY }),
-  )
+  const { data: user } = useQuery(orpc.user.me.queryOptions())
 
   return (
     <>

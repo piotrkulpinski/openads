@@ -3,9 +3,6 @@ import type { BillingInterval } from "@openads/db/client"
 /** Convert a whole-unit integer (e.g. `19` for $19) to cents (`1900`). */
 export const wholeToCents = (whole: number): number => Math.round(whole * 100)
 
-/** Convert cents (e.g. `1900`) to whole units (`19`). Truncates fractional cents. */
-export const centsToWhole = (cents: number): number => Math.floor(cents / 100)
-
 /** Format cents as a localized currency string. */
 export const formatPrice = (cents: number, currency: string): string =>
   new Intl.NumberFormat("en-US", {

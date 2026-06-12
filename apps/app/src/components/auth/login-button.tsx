@@ -4,21 +4,19 @@ import { siteConfig } from "~/config/site"
 import { authClient } from "~/lib/auth"
 
 type LoginButtonProps = ButtonProps & {
-  provider: "google" | "github"
+  provider: "google"
   callbackURL?: string
 }
 
 export const LoginButton = ({
   provider,
   variant = "secondary",
-  prefix,
   callbackURL = siteConfig.url,
   ...props
 }: LoginButtonProps) => {
   return (
     <Button
       variant={variant}
-      prefix={prefix}
       onClick={() => authClient.signIn.social({ provider, callbackURL })}
       {...props}
     >
