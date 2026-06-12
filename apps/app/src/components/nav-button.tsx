@@ -16,7 +16,7 @@ const NavButton = ({ className, avatar, title, subtitle, ...props }: NavButtonPr
     <Button size="sm" variant="ghost" className={cx("gap-3", className)} {...props}>
       <Avatar className="size-8 md:size-10">
         <AvatarImage src={avatar} />
-        <AvatarFallback>{getInitials(title)}</AvatarFallback>
+        <AvatarFallback>{getInitials(title, 3)}</AvatarFallback>
       </Avatar>
 
       <div className="grid gap-1 flex-1 text-left text-sm/tight">
