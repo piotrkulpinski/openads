@@ -1,8 +1,9 @@
 import { randomUUID } from "node:crypto"
 import { Prisma, StripeConnectStatus } from "@openads/db/client"
+import { SERVING_SUBSCRIPTION_STATUSES } from "@openads/db/lib/subscription"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { authProcedure, type Context, workspaceMw } from "../index"
+import { authProcedure, type Context, findMemberWorkspace, workspaceMw } from "../index"
 
 const STRIPE_OAUTH_STATE_TTL_SECONDS = 60 * 10
 
@@ -29,20 +30,13 @@ const hasDirectStripeData = (data: Prisma.JsonValue | null) => {
 }
 
 const resetWorkspaceStripeObjects = async (db: Context["db"], workspaceId: string) => {
-  const tiers = await db.tier.findMany({
-    where: { workspaceId },
-    select: { id: true },
-  })
-
-  const tierIds = tiers.map(tier => tier.id)
-
   await db.$transaction([
     db.tier.updateMany({
       where: { workspaceId },
       data: { stripeProductId: null },
     }),
     db.tierPrice.updateMany({
-      where: { tierId: { in: tierIds } },
+      where: { tier: { workspaceId } },
       data: { stripePriceId: null },
     }),
   ])
@@ -74,7 +68,8 @@ export const stripeRouter = {
 
     callback: authProcedure
       .input(z.object({ code: z.string().min(1), state: z.string().min(1) }))
-      .handler(async ({ context: { db, redis, stripe, user }, input: { code, state } }) => {
+      .handler(async ({ context, input: { code, state } }) => {
+        const { db, redis, stripe, user } = context
         const stateKey = getOAuthStateKey(state)
         const storedState = await redis.get(stateKey)
 
@@ -92,13 +87,7 @@ export const stripeRouter = {
           throw new ORPCError("FORBIDDEN")
         }
 
-        const workspace = await db.workspace.findFirst({
-          where: { AND: [{ id: parsedState.workspaceId }, db.workspace.belongsTo(user.id)] },
-        })
-
-        if (!workspace) {
-          throw new ORPCError("FORBIDDEN")
-        }
+        const workspace = await findMemberWorkspace(context, parsedState.workspaceId)
 
         const token = await stripe.oauth.token({
           grant_type: "authorization_code",
@@ -150,7 +139,7 @@ export const stripeRouter = {
         const activeSubscriptions = await db.subscription.count({
           where: {
             workspaceId: workspace.id,
-            status: { in: ["Active", "Trialing"] },
+            status: { in: SERVING_SUBSCRIPTION_STATUSES },
           },
         })
 

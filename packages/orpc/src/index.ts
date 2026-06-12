@@ -1,5 +1,6 @@
 import type { Session } from "@openads/auth/server"
 import { Prisma, type db } from "@openads/db"
+import type { Workspace } from "@openads/db/client"
 import type { EmailClient } from "@openads/emails"
 import type { Logger } from "@openads/logger"
 import type { RedisClient } from "@openads/redis"
@@ -103,7 +104,16 @@ export const authProcedure = publicProcedure.use(({ context, next }) => {
   return next({ context: { user: context.auth.user } })
 })
 
-const findMemberWorkspace = async (context: Context & { user: AuthUser }, workspaceId: string) => {
+/**
+ * Resolves a workspace the user is a member of, or throws FORBIDDEN. Exported
+ * for the rare handlers that can't use `workspaceMw` because the workspace id
+ * doesn't come from procedure input (e.g. the Stripe OAuth callback reads it
+ * from Redis state).
+ */
+export const findMemberWorkspace = async (
+  context: Context & { user: AuthUser },
+  workspaceId: string,
+) => {
   const workspace = await context.db.workspace.findFirst({
     where: { AND: [{ id: workspaceId }, context.db.workspace.belongsTo(context.user.id)] },
   })
@@ -133,8 +143,6 @@ export const workspaceMw = os
 
     return next({ context: { workspace } })
   })
-
-type Workspace = NonNullable<Awaited<ReturnType<typeof db.workspace.findFirst>>>
 
 /**
  * Layered on top of `workspaceMw`: assumes `workspace` is in context, refuses
