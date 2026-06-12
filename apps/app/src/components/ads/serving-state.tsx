@@ -9,7 +9,7 @@ type ServingInput = {
 
 export type ServingState = ReturnType<typeof getServingState>
 
-const isPaid = (status: SubscriptionStatus) => status === "Active" || status === "Trialing"
+export const isPaid = (status: SubscriptionStatus) => status === "Active" || status === "Trialing"
 
 /**
  * An ad serves only when the creative is approved AND the subscription is

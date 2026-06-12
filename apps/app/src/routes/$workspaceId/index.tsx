@@ -1,17 +1,18 @@
-import { formatDate, formatNumber, getInitials } from "@dirstack/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
+import { formatDate, formatNumber } from "@dirstack/utils"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
-import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router"
 import { CheckIcon, CodeXmlIcon } from "lucide-react"
-import type { ComponentProps, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { z } from "zod"
-import { getServingState, ServingDot } from "~/components/ads/serving-state"
+import { AdAvatar } from "~/components/ads/ad-avatar"
+import { getServingState } from "~/components/ads/serving-state"
+import { AdStatusBadge } from "~/components/ads/status-badge"
 import { WelcomeModal } from "~/components/modals/welcome-modal"
 import { QueryCell } from "~/components/query-cell"
+import { formatCtr, Metric } from "~/components/stats/metric"
 import { PerformanceChart } from "~/components/stats/performance-chart"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Card } from "~/components/ui/card"
@@ -35,12 +36,6 @@ export const Route = createFileRoute("/$workspaceId/")({
 
 type Dashboard = RouterOutputs["dashboard"]["get"]
 type DashboardAd = Dashboard["recentAds"][number]
-
-const adStatusVariant: Record<DashboardAd["status"], "secondary" | "success" | "danger"> = {
-  Pending: "secondary",
-  Approved: "success",
-  Rejected: "danger",
-}
 
 function DashboardPage() {
   const workspace = useWorkspace()
@@ -97,7 +92,6 @@ function DashboardPage() {
 
 const DashboardBody = ({ workspaceId, data }: { workspaceId: string; data: Dashboard }) => {
   const { revenue, counts, totals, series, pendingAds, recentAds } = data
-  const ctr = totals.impressions > 0 ? (totals.clicks / totals.impressions) * 100 : null
 
   return (
     <>
@@ -122,7 +116,7 @@ const DashboardBody = ({ workspaceId, data }: { workspaceId: string; data: Dashb
           hint={pendingAds.length > 0 ? "needs your decision" : "all caught up"}
         />
         <Metric label="30d impressions" value={totals.impressions} />
-        <Metric label="30d CTR" value={ctr === null ? "—" : `${ctr.toFixed(2)}%`} />
+        <Metric label="30d CTR" value={formatCtr(totals)} />
       </div>
 
       <Card className="animate-slide-up-and-fade [animation-delay:75ms] [animation-fill-mode:backwards]">
@@ -221,24 +215,6 @@ const DashboardBody = ({ workspaceId, data }: { workspaceId: string; data: Dashb
   )
 }
 
-type MetricProps = ComponentProps<"div"> & {
-  label: string
-  value: string | number
-  hint?: string
-}
-
-const Metric = ({ label, value, hint, className, ...props }: MetricProps) => {
-  return (
-    <div className={cx("min-w-0 p-4", className)} {...props}>
-      <p className="text-muted-foreground text-xs uppercase tracking-wide">{label}</p>
-      <p className="mt-1 truncate font-display text-2xl font-semibold tabular-nums">
-        {typeof value === "number" ? formatNumber(value, "standard") : value}
-      </p>
-      {hint && <p className="truncate text-muted-foreground text-xs">{hint}</p>}
-    </div>
-  )
-}
-
 type ListCardProps = {
   title: string
   count: number
@@ -281,21 +257,7 @@ const DashboardAdRow = ({ workspaceId, ad, showStatus, children }: DashboardAdRo
 
   return (
     <div className="relative flex items-center gap-3 px-4 py-3 hover:bg-muted/50">
-      <span className="relative shrink-0">
-        <Avatar className="size-9 rounded-md border">
-          <AvatarImage src={ad.faviconUrl || undefined} className="p-1" />
-          <AvatarFallback className="rounded-none text-xs">
-            {getInitials(ad.name, 3)}
-          </AvatarFallback>
-        </Avatar>
-
-        <span
-          className="-right-0.5 -bottom-0.5 absolute rounded-full bg-background p-0.5"
-          title={serving.detail}
-        >
-          <ServingDot state={serving} />
-        </span>
-      </span>
+      <AdAvatar ad={ad} serving={serving} />
 
       <Link
         to="/$workspaceId/ads/$adId"
@@ -304,7 +266,7 @@ const DashboardAdRow = ({ workspaceId, ad, showStatus, children }: DashboardAdRo
       >
         <span className="flex items-center gap-2">
           <H5 className="truncate">{ad.name}</H5>
-          {showStatus && <Badge variant={adStatusVariant[ad.status]}>{ad.status}</Badge>}
+          {showStatus && <AdStatusBadge status={ad.status} />}
         </span>
         <span className="block truncate text-muted-foreground text-sm">{children}</span>
         <span className="absolute inset-0" />

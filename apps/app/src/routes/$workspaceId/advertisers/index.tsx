@@ -10,6 +10,7 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { SearchIcon, UsersIcon, XIcon } from "lucide-react"
 import { type ComponentProps, useRef, useState } from "react"
 import { z } from "zod"
+import { AdStatusBadge } from "~/components/ads/status-badge"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
@@ -54,15 +55,6 @@ const AdvertiserSearch = ({ value, onChange }: AdvertiserSearchProps) => {
   )
 }
 
-const statusVariant: Record<
-  NonNullable<Advertiser["latestAd"]>["status"],
-  "secondary" | "success" | "danger"
-> = {
-  Pending: "secondary",
-  Approved: "success",
-  Rejected: "danger",
-}
-
 type AdvertiserRowProps = ComponentProps<"div"> & {
   workspaceId: string
   advertiser: Advertiser
@@ -90,11 +82,7 @@ const AdvertiserRow = ({ workspaceId, advertiser, className, ...props }: Adverti
           <div className="min-w-0">
             <Stack size="sm">
               <H5 className="truncate">{advertiser.name}</H5>
-              {advertiser.latestAd && (
-                <Badge variant={statusVariant[advertiser.latestAd.status]}>
-                  {advertiser.latestAd.status}
-                </Badge>
-              )}
+              {advertiser.latestAd && <AdStatusBadge status={advertiser.latestAd.status} />}
             </Stack>
             <p className="truncate text-muted-foreground text-sm">
               {advertiser.email ?? "No email"} · Latest activity{" "}
