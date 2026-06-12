@@ -3,14 +3,16 @@ import { slugify } from "@dirstack/utils"
 import { ALLOWED_IMAGE_TYPES, MAX_UPLOAD_BYTES } from "@openads/db/schema"
 import { ORPCError } from "@orpc/server"
 import { z } from "zod"
-import { authProcedure, publicProcedure, workspaceMw } from "../index"
+import { authProcedure, publicProcedure } from "../index"
 
 const uploadImageInput = z.object({
-  file: z.string().trim().min(1, "File data is required"),
+  file: z
+    .string()
+    .trim()
+    .min(1, "File data is required")
+    .regex(/^data:[^;,]+;base64,/, "Expected a base64-encoded data URL"),
   fileName: z.string().trim().min(1, "File name is required"),
   contentType: z.string().trim().optional(),
-  cacheControl: z.string().trim().optional(),
-  metadata: z.record(z.string(), z.string()).optional(),
 })
 
 const generateObjectKey = (fileName: string) => {
@@ -30,42 +32,34 @@ const ADVERTISER_UPLOAD_WINDOW_SECONDS = 60 * 60
 export const storageRouter = {
   uploadUserImage: authProcedure
     .input(uploadImageInput)
-    .handler(
-      async ({ context: { s3, user }, input: { file, fileName, contentType, ...props } }) => {
-        // Same guardrails as the advertiser upload: derive the content type
-        // (explicit input wins over the data-URL prefix) and enforce the
-        // allowlist + size cap before anything touches storage.
-        const resolvedContentType = contentType || file.match(/^data:([^;,]+)[;,]/)?.[1]
+    .handler(async ({ context: { s3, user }, input: { file, fileName, contentType } }) => {
+      // Same guardrails as the advertiser upload: derive the content type
+      // (explicit input wins over the data-URL prefix) and enforce the
+      // allowlist + size cap before anything touches storage.
+      const resolvedContentType = contentType || file.match(/^data:([^;,]+)[;,]/)?.[1]
 
-        if (!resolvedContentType || !allowedImageTypes.has(resolvedContentType)) {
-          throw new ORPCError("BAD_REQUEST", {
-            message: "Unsupported file type. Use PNG, JPEG, or WebP.",
-          })
-        }
+      if (!resolvedContentType || !allowedImageTypes.has(resolvedContentType)) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Unsupported file type. Use PNG, JPEG, or WebP.",
+        })
+      }
 
-        const body = Buffer.from(file.split(",")[1]!, "base64")
+      const body = Buffer.from(file.slice(file.indexOf(",") + 1), "base64")
 
-        if (body.byteLength > MAX_UPLOAD_BYTES) {
-          throw new ORPCError("BAD_REQUEST", {
-            message: "File is too large. Maximum upload size is 2 MB.",
-          })
-        }
+      if (body.byteLength > MAX_UPLOAD_BYTES) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "File is too large. Maximum upload size is 2 MB.",
+        })
+      }
 
-        const key = `users/${user.id}/${generateObjectKey(fileName)}`
+      const key = `users/${user.id}/${generateObjectKey(fileName)}`
 
-        return s3.uploadObject({ key, body, contentType: resolvedContentType, ...props })
-      },
-    ),
-
-  deleteUser: authProcedure.handler(async ({ context: { s3, user } }) => {
-    return await s3.deletePrefix({ prefix: `users/${user.id}` })
-  }),
-
-  deleteWorkspace: authProcedure
-    .input(z.object({ workspaceId: z.string() }))
-    .use(workspaceMw)
-    .handler(async ({ context: { s3, workspace } }) => {
-      return await s3.deletePrefix({ prefix: `workspaces/${workspace.id}` })
+      return s3.uploadObject({
+        key,
+        body,
+        contentType: resolvedContentType,
+        cacheControl: "public, max-age=31536000",
+      })
     }),
 
   // Anonymous endpoint: the Stripe Checkout session is the only auth, so
@@ -98,6 +92,20 @@ export const storageRouter = {
             })
           }
 
+          // Metered before the DB and Stripe round trips so replaying a known
+          // session id never gets unmetered upstream calls. Random-id probing
+          // would need a per-IP limit — out of scope here.
+          const rateKey = `storage:advertiser-upload:${sessionId}`
+          const count = await redis.incr(rateKey)
+          if (count === 1) {
+            await redis.expire(rateKey, ADVERTISER_UPLOAD_WINDOW_SECONDS)
+          }
+          if (count > ADVERTISER_UPLOAD_RATE_LIMIT) {
+            throw new ORPCError("TOO_MANY_REQUESTS", {
+              message: "Too many uploads from this checkout. Please try again later.",
+            })
+          }
+
           const workspace = await db.workspace.findUnique({
             where: { id: workspaceId },
             select: { id: true, stripeConnectId: true },
@@ -123,17 +131,6 @@ export const storageRouter = {
 
           if (session.metadata?.workspaceId !== workspaceId) {
             throw new ORPCError("BAD_REQUEST", { message: "Missing checkout metadata." })
-          }
-
-          const rateKey = `storage:advertiser-upload:${sessionId}`
-          const count = await redis.incr(rateKey)
-          if (count === 1) {
-            await redis.expire(rateKey, ADVERTISER_UPLOAD_WINDOW_SECONDS)
-          }
-          if (count > ADVERTISER_UPLOAD_RATE_LIMIT) {
-            throw new ORPCError("TOO_MANY_REQUESTS", {
-              message: "Too many uploads from this checkout. Please try again later.",
-            })
           }
 
           // Scoped to the workspace; the random key guarantees uniqueness. We don't

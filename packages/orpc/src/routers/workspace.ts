@@ -90,10 +90,17 @@ export const workspaceRouter = {
   delete: authProcedure
     .input(z.object({ workspaceId: z.string() }))
     .use(workspaceMw)
-    .handler(async ({ context: { db }, input: { workspaceId } }) => {
+    .handler(async ({ context: { db, s3, logger }, input: { workspaceId } }) => {
       const workspace = await db.workspace.delete({
         where: { id: workspaceId },
       })
+
+      // Best-effort R2 cleanup of everything re-hosted under the workspace
+      // prefix (favicons, advertiser uploads). Runs after the DB delete so a
+      // failed delete never destroys live assets, and never fails the mutation.
+      await s3
+        .deletePrefix({ prefix: `workspaces/${workspaceId}` })
+        .catch(err => logger.warn("workspace: R2 cleanup failed", { err, workspaceId }))
 
       return workspace
     }),
