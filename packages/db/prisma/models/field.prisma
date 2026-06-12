@@ -39,6 +39,5 @@ model Meta {
 
   // Indexes
   @@unique([adId, fieldId])
-  @@index([adId])
   @@index([fieldId])
 }
