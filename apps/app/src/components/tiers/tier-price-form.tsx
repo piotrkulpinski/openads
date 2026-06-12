@@ -1,15 +1,13 @@
 import { BillingInterval } from "@openads/db/client"
 import { tierPriceSchema } from "@openads/db/schema"
 import { cx } from "@openads/ui/cva"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
-import { Input } from "@openads/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
+import { Form } from "@openads/ui/form"
 import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { FormButton } from "~/components/form-button"
-import { CurrencySelect } from "~/components/tiers/currency-select"
+import { TierPriceFields } from "~/components/tiers/tier-price-fields"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
 import { handleMutationError } from "~/lib/handle-mutation-error"
@@ -26,13 +24,6 @@ export const tierPriceFormSchema = z.object({
 })
 
 type TierPriceFormValues = z.infer<typeof tierPriceFormSchema>
-
-export const intervalLabels: Record<BillingInterval, string> = {
-  [BillingInterval.Day]: "Per day",
-  [BillingInterval.Week]: "Per week",
-  [BillingInterval.Month]: "Per month",
-  [BillingInterval.Year]: "Per year",
-}
 
 type TierPriceFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
@@ -81,8 +72,6 @@ export const TierPriceForm = ({
     })
   }
 
-  const currencyLabel = form.watch("currency")?.toUpperCase()
-
   return (
     <Form {...form}>
       <form
@@ -91,67 +80,9 @@ export const TierPriceForm = ({
         noValidate
         {...props}
       >
-        <FormField
+        <TierPriceFields
           control={form.control}
-          name="interval"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs">Interval</FormLabel>
-              <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.values(BillingInterval).map(value => (
-                      <SelectItem key={value} value={value}>
-                        {intervalLabels[value]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="amountWhole"
-          render={({ field: { onChange, ...field } }) => (
-            <FormItem>
-              <FormLabel className="text-xs">
-                Price{currencyLabel ? ` (${currencyLabel})` : ""}
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  step={1}
-                  inputMode="numeric"
-                  placeholder="19"
-                  onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="currency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs">Currency</FormLabel>
-              <FormControl>
-                <CurrencySelect value={field.value} onValueChange={field.onChange} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          names={{ interval: "interval", amountWhole: "amountWhole", currency: "currency" }}
         />
 
         <FormButton size="sm" isPending={createPrice.isPending}>

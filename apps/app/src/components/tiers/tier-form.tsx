@@ -6,7 +6,6 @@ import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
 import { Label } from "@openads/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@openads/ui/select"
 import { Stack } from "@openads/ui/stack"
 import { Textarea } from "@openads/ui/textarea"
 import { useMutation } from "@tanstack/react-query"
@@ -18,8 +17,8 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
-import { CurrencySelect } from "~/components/tiers/currency-select"
-import { intervalLabels, tierPriceFormSchema } from "~/components/tiers/tier-price-form"
+import { TierPriceFields } from "~/components/tiers/tier-price-fields"
+import { tierPriceFormSchema } from "~/components/tiers/tier-price-form"
 import { WeightInfoDialog } from "~/components/tiers/weight-info-dialog"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
@@ -205,7 +204,7 @@ export const TierForm = ({
                   step="0.1"
                   min={0.1}
                   placeholder="1.0"
-                  onChange={e => onChange?.(Number.parseFloat(e.target.value))}
+                  onChange={e => onChange(Number.parseFloat(e.target.value))}
                   {...field}
                 />
               </FormControl>
@@ -225,7 +224,7 @@ export const TierForm = ({
                   type="number"
                   min={0}
                   placeholder="0"
-                  onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
+                  onChange={e => onChange(Number.parseInt(e.target.value, 10))}
                   {...field}
                 />
               </FormControl>
@@ -313,70 +312,13 @@ export const TierForm = ({
                 key={row.id}
                 className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-2 rounded-md border p-3"
               >
-                <FormField
+                <TierPriceFields
                   control={form.control}
-                  name={`initialPrices.${index}.interval`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs">Interval</FormLabel>
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.values(BillingInterval).map(value => (
-                              <SelectItem key={value} value={value}>
-                                {intervalLabels[value]}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name={`initialPrices.${index}.amountWhole`}
-                  render={({ field: { onChange, ...field } }) => {
-                    const currency = form.watch(`initialPrices.${index}.currency`)?.toUpperCase()
-                    return (
-                      <FormItem>
-                        <FormLabel className="text-xs">
-                          Price{currency ? ` (${currency})` : ""}
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            min={0}
-                            step={1}
-                            inputMode="numeric"
-                            placeholder="19"
-                            onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )
+                  names={{
+                    interval: `initialPrices.${index}.interval`,
+                    amountWhole: `initialPrices.${index}.amountWhole`,
+                    currency: `initialPrices.${index}.currency`,
                   }}
-                />
-
-                <FormField
-                  control={form.control}
-                  name={`initialPrices.${index}.currency`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs">Currency</FormLabel>
-                      <FormControl>
-                        <CurrencySelect value={field.value} onValueChange={field.onChange} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
                 />
 
                 <Button
