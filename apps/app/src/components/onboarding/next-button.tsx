@@ -5,16 +5,15 @@ import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 
 type OnboardingNextButtonProps = ComponentProps<typeof Button> & {
   step: OnboardingStep
-  slug?: string
 }
 
-export const OnboardingNextButton = ({ step, slug, ...props }: OnboardingNextButtonProps) => {
+export const OnboardingNextButton = ({ step, ...props }: OnboardingNextButtonProps) => {
   const { continueTo, isPending, isSuccess } = useOnboardingProgress()
 
   return (
     <Button
       size="lg"
-      onClick={() => continueTo(step, slug)}
+      onClick={() => continueTo(step)}
       isPending={isPending || isSuccess}
       {...props}
     />
