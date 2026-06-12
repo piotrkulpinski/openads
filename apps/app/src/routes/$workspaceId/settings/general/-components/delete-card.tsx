@@ -9,7 +9,7 @@ import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { orpc, queryClient } from "~/lib/orpc"
 
-export const DeleteForm = (props: ComponentProps<"div">) => {
+export const DeleteWorkspaceCard = (props: ComponentProps<"div">) => {
   const { id, slug } = useWorkspace()
   const navigate = useNavigate()
 

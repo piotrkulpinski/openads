@@ -4,7 +4,7 @@ import { Card } from "~/components/ui/card"
 import { Header, HeaderDescription, HeaderTitle } from "~/components/ui/header"
 import { useWorkspace } from "~/contexts/workspace-context"
 
-export const StripeConnectForm = ({ ...props }: ComponentProps<"div">) => {
+export const StripeConnectCard = ({ ...props }: ComponentProps<"div">) => {
   const workspace = useWorkspace()
 
   return (
