@@ -1,5 +1,5 @@
 {
-  "extends": "@openads/tsconfig/nextjs.json",
+  "extends": "@openads/tsconfig/base.json",
   "compilerOptions": {
     "types": ["node"]
   },

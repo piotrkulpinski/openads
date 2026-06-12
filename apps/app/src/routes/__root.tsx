@@ -1,5 +1,5 @@
 import { SupportProvider } from "@cossistant/react"
-import { Provider as Analytics } from "@openads/events/client"
+import { initAnalytics } from "@openads/events/client"
 import { TooltipProvider } from "@openads/ui/tooltip"
 import { createRootRouteWithContext, Outlet, redirect, useLocation } from "@tanstack/react-router"
 import { useEffect } from "react"
@@ -39,12 +39,15 @@ function useFrameBuster() {
 function RootComponent() {
   useFrameBuster()
 
+  useEffect(() => {
+    if (env.VITE_OPENPANEL_CLIENT_ID) initAnalytics(env.VITE_OPENPANEL_CLIENT_ID)
+  }, [])
+
   return (
     <SupportProvider publicKey={env.VITE_COSSISTANT_PUBLIC_KEY}>
       <TooltipProvider delayDuration={100}>
         <Outlet />
 
-        {env.VITE_OPENPANEL_CLIENT_ID && <Analytics clientId={env.VITE_OPENPANEL_CLIENT_ID} />}
         <Toaster />
       </TooltipProvider>
     </SupportProvider>
