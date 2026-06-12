@@ -197,8 +197,7 @@ export const advertiserRouter = {
             faviconUrl: ad.faviconUrl,
             createdAt: ad.createdAt,
             updatedAt: ad.updatedAt,
-            approvedAt: ad.approvedAt,
-            rejectedAt: ad.rejectedAt,
+            reviewedAt: ad.reviewedAt,
             rejectionNote: ad.rejectionNote,
             stats,
             subscription: {

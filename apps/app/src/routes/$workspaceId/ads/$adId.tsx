@@ -229,8 +229,12 @@ function AdReviewPage() {
 
             <dl className="divide-y divide-border/60 text-sm">
               <TimelineRow label="Submitted" date={ad.createdAt} />
-              {ad.approvedAt && <TimelineRow label="Approved" date={ad.approvedAt} />}
-              {ad.rejectedAt && <TimelineRow label="Rejected" date={ad.rejectedAt} />}
+              {ad.reviewedAt && ad.status !== "Pending" && (
+                <TimelineRow
+                  label={ad.status === "Approved" ? "Approved" : "Rejected"}
+                  date={ad.reviewedAt}
+                />
+              )}
             </dl>
 
             {ad.rejectionNote && (
