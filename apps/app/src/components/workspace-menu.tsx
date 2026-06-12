@@ -18,7 +18,6 @@ import { NavButton, NavButtonSkeleton } from "~/components/nav-button"
 import { CreateWorkspaceDialog } from "~/components/workspaces/create-workspace-dialog"
 import { useWorkspace } from "~/contexts/workspace-context"
 import { orpc, queryClient } from "~/lib/orpc"
-import { getWorkspaceFaviconUrl } from "~/lib/workspaces"
 
 export const WorkspaceMenu = () => {
   const activeWorkspace = useWorkspace()
@@ -44,7 +43,7 @@ export const WorkspaceMenu = () => {
   useHotkeys(
     [...Array(9).keys()].map(index => [
       `mod+${index + 1}`,
-      e => changeWorkspace(workspaces?.[Number.parseInt(e.key, 10) - 1]),
+      () => changeWorkspace(workspaces?.[index]),
     ]),
   )
 
@@ -58,7 +57,7 @@ export const WorkspaceMenu = () => {
         <NavButton
           title={activeWorkspace.name}
           subtitle={activeWorkspace.slug}
-          avatar={getWorkspaceFaviconUrl(activeWorkspace)}
+          avatar={activeWorkspace.faviconUrl || undefined}
           suffix={<ChevronDownIcon />}
         />
       </DropdownMenuTrigger>
@@ -76,7 +75,7 @@ export const WorkspaceMenu = () => {
             )}
           >
             <Avatar className="size-5 m-0.5">
-              <AvatarImage src={getWorkspaceFaviconUrl(workspace)} />
+              <AvatarImage src={workspace.faviconUrl || undefined} />
               <AvatarFallback>{workspace.name.charAt(0)}</AvatarFallback>
             </Avatar>
 
