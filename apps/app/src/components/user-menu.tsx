@@ -85,10 +85,12 @@ export const UserMenu = ({ ...props }: ComponentProps<typeof Button>) => {
           </a>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onSelect={() => openSupport()}>
-          <LifeBuoyIcon />
-          Support
-        </DropdownMenuItem>
+        {env.VITE_COSSISTANT_PUBLIC_KEY && (
+          <DropdownMenuItem onSelect={() => openSupport()}>
+            <LifeBuoyIcon />
+            Support
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuSeparator />
 

@@ -17,49 +17,63 @@ import { NavMain, type NavMainItem } from "~/components/nav-main"
 import { UserMenu } from "~/components/user-menu"
 import { WorkspaceMenu } from "~/components/workspace-menu"
 import { useWorkspace } from "~/contexts/workspace-context"
+import type { FileRoutesByTo } from "~/routeTree.gen"
 
-const navs: NavMainItem[][] = [
+type RouteParams<TTo extends keyof FileRoutesByTo> = FileRoutesByTo[TTo]["types"]["allParams"]
+
+type WorkspaceNavPath<TTo extends keyof FileRoutesByTo = keyof FileRoutesByTo> =
+  TTo extends `/$workspaceId${string}`
+    ? RouteParams<TTo> extends { workspaceId: string }
+      ? Exclude<keyof RouteParams<TTo>, "workspaceId"> extends never
+        ? TTo
+        : never
+      : never
+    : never
+
+type WorkspaceNavItem = Omit<NavMainItem<WorkspaceNavPath>, "params">
+
+const navs = [
   [
     {
       title: "Dashboard",
-      to: "/",
+      to: "/$workspaceId",
       prefix: <LayoutDashboardIcon />,
       activeOptions: { exact: true },
     },
     {
       title: "Tiers",
-      to: "/tiers",
+      to: "/$workspaceId/tiers",
       prefix: <LayersIcon />,
     },
     {
       title: "Fields",
-      to: "/fields",
+      to: "/$workspaceId/fields",
       prefix: <Rows3Icon />,
     },
     {
       title: "Ads",
-      to: "/ads",
+      to: "/$workspaceId/ads",
       prefix: <MegaphoneIcon />,
     },
     {
       title: "Advertisers",
-      to: "/advertisers",
+      to: "/$workspaceId/advertisers",
       prefix: <UsersIcon />,
     },
     {
       title: "Settings",
-      to: "/settings",
+      to: "/$workspaceId/settings",
       prefix: <SettingsIcon />,
     },
   ],
   [
     {
       title: "Embed",
-      to: "/embed",
+      to: "/$workspaceId/embed",
       prefix: <Code2Icon />,
     },
   ],
-]
+] satisfies Array<Array<WorkspaceNavItem>>
 
 const SidebarWrapper = ({ className, ...props }: ComponentProps<"div">) => {
   return (
@@ -87,7 +101,9 @@ const Sidebar = ({ ...props }: ComponentProps<typeof SidebarWrapper>) => {
           <Separator />
 
           <Nav>
-            <NavMain items={nav.map(link => ({ ...link, to: `/${workspace.id}${link.to}` }))} />
+            <NavMain
+              items={nav.map(link => ({ ...link, params: { workspaceId: workspace.id } }))}
+            />
           </Nav>
         </Fragment>
       ))}

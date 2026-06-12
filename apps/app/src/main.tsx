@@ -3,7 +3,6 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import { LoaderIcon } from "lucide-react"
 import type { PropsWithChildren } from "react"
-import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 import { ErrorRoute } from "~/components/errors/error"
 import { NotFoundRoute } from "~/components/errors/not-found"
@@ -45,9 +44,5 @@ if (rootElement && !rootElement.innerHTML) {
       logger.error("react uncaught error", { err: error, componentStack: info.componentStack }),
     onRecoverableError: (error, info) =>
       logger.warn("react recoverable error", { err: error, componentStack: info.componentStack }),
-  }).render(
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>,
-  )
+  }).render(<RouterProvider router={router} />)
 }
