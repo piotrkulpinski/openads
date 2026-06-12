@@ -24,6 +24,14 @@ export const customIdExtension = Prisma.defineExtension({
         }
         return await query(args)
       },
+
+      // The id only applies on the insert branch — updates never touch it.
+      async upsert({ model, args, query }) {
+        const record = args.create as RecordData
+        const id = record.id || generateId(model)
+        if (id) record.id = id
+        return await query(args)
+      },
     },
   },
 })
