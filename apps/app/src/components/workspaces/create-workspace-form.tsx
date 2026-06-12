@@ -6,10 +6,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@openads/ui/input"
 import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
+import { useEffect } from "react"
 import { toast } from "sonner"
 import { init } from "zod-empty"
 import { FormButton } from "~/components/form-button"
-import { useComputedField } from "~/hooks/use-computed-field"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
@@ -49,12 +49,16 @@ export const CreateWorkspaceForm = ({
   )
 
   // Keep the editable slug in sync until the user overrides it.
-  useComputedField({
-    form,
-    sourceField: "name",
-    computedField: "slug",
-    callback: slugify,
-  })
+  const name = form.watch("name")
+
+  useEffect(() => {
+    if (!form.getFieldState("slug").isTouched) {
+      form.setValue("slug", slugify(name), {
+        shouldValidate: form.formState.isSubmitted,
+        shouldDirty: form.formState.isDirty,
+      })
+    }
+  }, [name])
 
   return (
     <Form {...form}>

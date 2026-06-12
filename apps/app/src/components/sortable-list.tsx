@@ -61,7 +61,7 @@ export const SortableList = <T extends { id: UniqueIdentifier }>({
       measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
     >
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((item, index) => children?.({ item, index }))}
+        {items.map((item, index) => children({ item, index }))}
       </SortableContext>
     </DndContext>
   )
