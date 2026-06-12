@@ -27,11 +27,7 @@ export const CreateWorkspaceForm = ({
   onSuccess,
   ...props
 }: CreateWorkspaceFormProps) => {
-  const form = useZodForm(workspaceSchema, {
-    defaultValues: {
-      ...init(workspaceSchema),
-    },
-  })
+  const form = useZodForm(workspaceSchema, { defaultValues: init(workspaceSchema) })
 
   const onSuccessHandler = async (data: RouterOutputs["workspace"]["create"]) => {
     toast.success("Workspace created successfully")

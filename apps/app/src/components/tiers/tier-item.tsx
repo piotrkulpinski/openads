@@ -15,7 +15,7 @@ import type { ComponentProps } from "react"
 import { toast } from "sonner"
 import { ConfirmModal } from "~/components/modals/confirm-modal"
 import { H5 } from "~/components/ui/heading"
-import { formatInterval, formatPrice, intervalRank } from "~/lib/currency"
+import { formatInterval, formatPrice } from "~/lib/currency"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type Tier = RouterOutputs["tier"]["getAll"][number]
@@ -25,19 +25,11 @@ type TierItemProps = ComponentProps<"div"> & {
   tier: Tier
 }
 
-// Picks the smallest-interval active price as the headline for the list row.
-// `tier.prices` is already filtered to active rows by the tier.getAll query.
-const headlinePrice = (prices: Tier["prices"]): Tier["prices"][number] | undefined => {
-  if (prices.length === 0) return undefined
-  return [...prices].sort((a, b) => {
-    const rankDiff = intervalRank(a.interval) - intervalRank(b.interval)
-    if (rankDiff !== 0) return rankDiff
-    return a.amount - b.amount
-  })[0]
-}
-
 const renderPriceLine = (tier: Tier): string => {
-  const head = headlinePrice(tier.prices)
+  // Prices arrive active-only and pre-sorted (interval asc — Postgres enum order
+  // Day < Week < Month < Year — then amount asc) by tier.getAll, so the first row
+  // is the smallest-interval, cheapest headline price.
+  const head = tier.prices[0]
   if (!head) return `No active prices · weight ${tier.weight}`
   const headLabel = `${formatPrice(head.amount, head.currency)} / ${formatInterval(head)}`
   const extra = tier.prices.length - 1
