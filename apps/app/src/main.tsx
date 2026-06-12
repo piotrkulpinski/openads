@@ -10,7 +10,7 @@ import { logger } from "~/lib/logger"
 import { orpc, queryClient } from "~/lib/orpc"
 import { routeTree } from "~/routeTree.gen"
 
-export const router = createRouter({
+const router = createRouter({
   routeTree,
   defaultPendingMinMs: 0,
   defaultStaleTime: Number.POSITIVE_INFINITY,

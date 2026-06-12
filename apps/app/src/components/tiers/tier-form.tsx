@@ -25,7 +25,6 @@ import { useZodForm } from "~/hooks/use-zod-form"
 import { wholeToCents } from "~/lib/currency"
 import { handleMutationError } from "~/lib/handle-mutation-error"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
-import type { router } from "~/main"
 
 const tierFormSchema = tierSchema.extend({
   initialPrices: z.array(tierPriceFormSchema).default([]),
@@ -38,7 +37,7 @@ const MAX_FEATURES = 15
 type TierFormProps = HTMLAttributes<HTMLFormElement> & {
   workspaceId: string
   tier?: RouterOutputs["tier"]["getAll"][number]
-  nextUrl?: NavigateOptions<typeof router>
+  nextUrl?: NavigateOptions
   onSuccess?: (data: RouterOutputs["tier"]["create"]) => void
 }
 
