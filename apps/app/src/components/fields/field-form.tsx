@@ -122,7 +122,17 @@ export const FieldForm = ({
             <FormItem>
               <FormLabel>Type</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={type => {
+                    field.onChange(type)
+                    // Clear inputs the new type hides so their stale values don't
+                    // submit. Setting "" (not resetField) makes the partial update
+                    // overwrite any previously stored value.
+                    if (NO_DEFAULT.includes(type as FieldType)) form.setValue("default", "")
+                    if (NO_PLACEHOLDER.includes(type as FieldType)) form.setValue("placeholder", "")
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
@@ -151,7 +161,7 @@ export const FieldForm = ({
                   type="number"
                   min={0}
                   placeholder="0"
-                  onChange={e => onChange?.(Number.parseInt(e.target.value, 10))}
+                  onChange={e => onChange(Number.parseInt(e.target.value, 10))}
                   {...field}
                 />
               </FormControl>
