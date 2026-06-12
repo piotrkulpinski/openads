@@ -1,5 +1,7 @@
 import type { InferRouterInputs, InferRouterOutputs, RouterClient } from "@orpc/server"
 import { adRouter, getCurrentAds, recordClick, recordImpression } from "./routers/ad"
+
+export { ADS_CURRENT_PATH } from "./routers/ad"
 import { advertiserRouter } from "./routers/advertiser"
 import { authRouter } from "./routers/auth"
 import { dashboardRouter } from "./routers/dashboard"
