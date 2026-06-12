@@ -2,32 +2,47 @@ import type { S3BucketClient } from "./client"
 
 type FetchAndUploadFaviconProps = {
   websiteUrl: string
+  /** context.dev Logo Link public client id (brandLL_...). */
+  logoLinkClientId: string
   key: string
   cacheControl?: string
 }
 
 /**
- * Fetches a favicon for the given URL via Google's s2/favicons service
- * (handles cases where the site uses `<link rel="icon">` rather than /favicon.ico)
- * and uploads it to the S3 bucket. Returns the public URL of the uploaded asset,
- * or null if the favicon could not be fetched.
+ * Builds a context.dev Logo Link URL for a website. Returns a high-quality
+ * logo when one exists and a generated SVG monogram otherwise, so the
+ * response is always a valid image.
  */
-export async function fetchAndUploadFavicon(
-  s3: S3BucketClient,
-  { websiteUrl, key, cacheControl = "public, max-age=86400" }: FetchAndUploadFaviconProps,
-): Promise<string | null> {
-  let domain: string
+const getLogoUrl = (websiteUrl: string, publicClientId: string): string | null => {
   try {
-    domain = new URL(websiteUrl).hostname
+    const domain = new URL(websiteUrl).hostname
+    return `https://logos.context.dev/?publicClientId=${publicClientId}&domain=${encodeURIComponent(domain)}`
   } catch {
     return null
   }
+}
 
-  const faviconUrl = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`
+/**
+ * Fetches a favicon for the given website from the logo service and re-hosts
+ * it on the S3 bucket, so clients never reference the third-party URL.
+ * Returns the public URL of the uploaded asset, or null if the website URL is
+ * invalid or the favicon could not be fetched.
+ */
+export async function fetchAndUploadFavicon(
+  s3: S3BucketClient,
+  {
+    websiteUrl,
+    logoLinkClientId,
+    key,
+    cacheControl = "public, max-age=86400",
+  }: FetchAndUploadFaviconProps,
+): Promise<string | null> {
+  const sourceUrl = getLogoUrl(websiteUrl, logoLinkClientId)
+  if (!sourceUrl) return null
 
   let response: Response
   try {
-    response = await fetch(faviconUrl)
+    response = await fetch(sourceUrl)
   } catch {
     return null
   }

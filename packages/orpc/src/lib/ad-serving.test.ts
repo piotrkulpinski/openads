@@ -5,6 +5,7 @@ const goldAdRow = {
   id: "ad_gold",
   name: "Acme Gold",
   websiteUrl: "https://acme.test",
+  faviconUrl: "https://cdn.acme.test/workspaces/ws_openads/ads/ad_gold/favicon.png",
   subscription: { tier: { weight: 3 } },
   meta: [
     {
@@ -18,6 +19,7 @@ const silverAdRow = {
   id: "ad_silver",
   name: "Acme Silver",
   websiteUrl: "https://silver.test",
+  faviconUrl: "",
   subscription: { tier: { weight: 1 } },
   meta: [],
 }
@@ -72,7 +74,7 @@ describe("findServingAd", () => {
       id: "ad_gold",
       name: "Acme Gold",
       websiteUrl: "https://acme.test",
-      faviconUrl: "https://www.google.com/s2/favicons?sz=128&domain_url=https%3A%2F%2Facme.test",
+      faviconUrl: "https://cdn.acme.test/workspaces/ws_openads/ads/ad_gold/favicon.png",
       weight: 3,
       meta: { description: "Modern hosting" },
       fields: [

@@ -1,11 +1,9 @@
-import { isValidUrl, slugify } from "@dirstack/utils"
+import { slugify } from "@dirstack/utils"
 import { workspaceSchema } from "@openads/db/schema"
-import { Avatar, AvatarImage } from "@openads/ui/avatar"
 import { cx } from "@openads/ui/cva"
 import { DialogFooter } from "@openads/ui/dialog"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@openads/ui/form"
 import { Input } from "@openads/ui/input"
-import { Stack } from "@openads/ui/stack"
 import { useMutation } from "@tanstack/react-query"
 import type { HTMLAttributes } from "react"
 import { toast } from "sonner"
@@ -14,7 +12,6 @@ import { FormButton } from "~/components/form-button"
 import { useComputedField } from "~/hooks/use-computed-field"
 import { useZodForm } from "~/hooks/use-zod-form"
 import { handleMutationError } from "~/lib/handle-mutation-error"
-import { getWebsiteFavicon } from "~/lib/helpers"
 import { orpc, queryClient, type RouterOutputs } from "~/lib/orpc"
 
 type CreateWorkspaceFormProps = HTMLAttributes<HTMLFormElement> & {
@@ -120,17 +117,9 @@ export const CreateWorkspaceForm = ({
             <FormItem className="col-span-full">
               <FormLabel>Website URL</FormLabel>
 
-              <Stack className="w-full" wrap={false}>
-                <FormControl>
-                  <Input type="url" placeholder="https://acme.com" {...field} />
-                </FormControl>
-
-                {isValidUrl(field.value) && (
-                  <Avatar className="size-8">
-                    <AvatarImage src={getWebsiteFavicon(field.value)} />
-                  </Avatar>
-                )}
-              </Stack>
+              <FormControl>
+                <Input type="url" placeholder="https://acme.com" {...field} />
+              </FormControl>
 
               <FormMessage />
             </FormItem>

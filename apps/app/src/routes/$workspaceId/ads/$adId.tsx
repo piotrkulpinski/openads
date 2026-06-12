@@ -52,14 +52,6 @@ const subscriptionVariant: Record<
   Paused: "secondary",
 }
 
-const faviconUrl = (websiteUrl: string) => {
-  try {
-    return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(websiteUrl).hostname}`
-  } catch {
-    return undefined
-  }
-}
-
 function AdReviewPage() {
   const { workspaceId, adId } = Route.useParams()
   const { ad: initial, fields } = Route.useLoaderData()
@@ -118,8 +110,8 @@ function AdReviewPage() {
       <Header>
         <div className="flex min-w-0 items-center gap-3">
           <Avatar className="size-11 rounded-md border">
-            <AvatarImage src={faviconUrl(ad.websiteUrl)} className="p-1.5" />
-            <AvatarFallback className="rounded-none">{getInitials(ad.name)}</AvatarFallback>
+            <AvatarImage src={ad.faviconUrl || undefined} className="p-1.5" />
+            <AvatarFallback className="rounded-none">{getInitials(ad.name, 3)}</AvatarFallback>
           </Avatar>
 
           <div className="min-w-0">

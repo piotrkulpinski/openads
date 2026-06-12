@@ -5,7 +5,7 @@ const sampleAd = {
   id: "ad_123",
   name: "Acme",
   websiteUrl: "https://acme.test",
-  faviconUrl: "https://www.google.com/s2/favicons?sz=128&domain_url=https%3A%2F%2Facme.test",
+  faviconUrl: "https://cdn.acme.test/workspaces/ws_openads/ads/ad_123/favicon.png",
   weight: 2.5,
   meta: { description: "Modern hosting" },
   fields: [

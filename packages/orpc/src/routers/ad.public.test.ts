@@ -22,6 +22,7 @@ const adRow = {
   id: "ad_live",
   name: "Acme",
   websiteUrl: "https://acme.test",
+  faviconUrl: "https://cdn.acme.test/workspaces/ws_1/ads/ad_live/favicon.png",
   subscription: { tier: { weight: 3 } },
   meta: [
     {

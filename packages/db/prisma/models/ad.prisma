@@ -11,6 +11,7 @@ model Ad {
   // Fixed creative fields. Everything else lives in Meta.
   name       String
   websiteUrl String
+  faviconUrl String @default("")
 
   approvedAt    DateTime?
   rejectedAt    DateTime?

@@ -54,6 +54,7 @@ export const dashboardRouter = {
             id: ad.id,
             name: ad.name,
             websiteUrl: ad.websiteUrl,
+            faviconUrl: ad.faviconUrl,
             status: ad.status,
             createdAt: ad.createdAt,
             advertiser: {

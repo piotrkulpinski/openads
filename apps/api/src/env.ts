@@ -15,6 +15,8 @@ export const env = createEnv({
     PORT: z.coerce.number().default(3001),
     APP_URL: z.url(),
     API_URL: z.url(),
+    // context.dev Logo Link public client id (brandLL_...), used to source favicons.
+    LOGO_LINK_CLIENT_ID: z.string().min(1),
   },
 
   runtimeEnv: process.env,

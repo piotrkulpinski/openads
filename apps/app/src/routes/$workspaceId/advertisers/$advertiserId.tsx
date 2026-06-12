@@ -75,14 +75,6 @@ const getMonthlyRevenue = (ads: AdvertiserAd[]) => {
   return formatPrice(Math.round(cents), paid[0]!.subscription.tierPrice.currency)
 }
 
-const faviconUrl = (websiteUrl: string) => {
-  try {
-    return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(websiteUrl).hostname}`
-  } catch {
-    return undefined
-  }
-}
-
 function AdvertiserDetailPage() {
   const { workspaceId, advertiserId } = Route.useParams()
   const initial = Route.useLoaderData()
@@ -115,12 +107,12 @@ function AdvertiserDetailPage() {
                 <Avatar className="size-11 rounded-md border">
                   {advertiser.latestAd && (
                     <AvatarImage
-                      src={faviconUrl(advertiser.latestAd.websiteUrl)}
+                      src={advertiser.latestAd.faviconUrl || undefined}
                       className="p-1.5"
                     />
                   )}
                   <AvatarFallback className="rounded-none">
-                    {getInitials(advertiser.name)}
+                    {getInitials(advertiser.name, 3)}
                   </AvatarFallback>
                 </Avatar>
 
@@ -236,8 +228,10 @@ const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdR
       >
         <span className="relative shrink-0">
           <Avatar className="size-9 rounded-md border">
-            <AvatarImage src={faviconUrl(ad.websiteUrl)} className="p-1" />
-            <AvatarFallback className="rounded-none text-xs">{getInitials(ad.name)}</AvatarFallback>
+            <AvatarImage src={ad.faviconUrl || undefined} className="p-1" />
+            <AvatarFallback className="rounded-none text-xs">
+              {getInitials(ad.name, 3)}
+            </AvatarFallback>
           </Avatar>
 
           {/* Presence-style serving indicator, anchored to the favicon */}
