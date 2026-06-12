@@ -1,7 +1,6 @@
 enum StripeConnectStatus {
   Pending
   Active
-  Rejected
 }
 
 model Workspace {
@@ -14,10 +13,9 @@ model Workspace {
   updatedAt  DateTime @updatedAt
 
   // Stripe Connect fields
-  stripeConnectId      String?              @unique // Stripe Connect account ID
-  stripeConnectStatus  StripeConnectStatus?
-  stripeConnectEnabled Boolean              @default(false)
-  stripeConnectData    Json? // Additional Stripe account data
+  stripeConnectId     String?              @unique // Stripe Connect account ID
+  stripeConnectStatus StripeConnectStatus?
+  stripeConnectData   Json? // Additional Stripe account data
 
   // Relations
   members       WorkspaceMember[]

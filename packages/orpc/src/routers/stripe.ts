@@ -116,11 +116,9 @@ export const stripeRouter = {
             stripeConnectStatus: account.charges_enabled
               ? StripeConnectStatus.Active
               : StripeConnectStatus.Pending,
-            stripeConnectEnabled: account.charges_enabled,
             stripeConnectData: {
               integrationMode: "direct",
               accountId: account.id,
-              chargesEnabled: account.charges_enabled,
             },
           },
         })
@@ -162,7 +160,6 @@ export const stripeRouter = {
           data: {
             stripeConnectId: null,
             stripeConnectStatus: null,
-            stripeConnectEnabled: false,
             stripeConnectData: Prisma.JsonNull,
           },
         })

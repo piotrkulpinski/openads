@@ -96,7 +96,6 @@ const seed = async () => {
       faviconUrl: await seedFavicon("https://acme.directory"),
       stripeConnectId: "acct_seed0000000000000001",
       stripeConnectStatus: "Active",
-      stripeConnectEnabled: true,
     },
   })
 

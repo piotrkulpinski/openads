@@ -1,3 +1,4 @@
+import { StripeConnectStatus } from "@openads/db/client"
 import { idSchema, tierPriceSchema, tierSchema } from "@openads/db/schema"
 import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
@@ -311,7 +312,10 @@ export const tierRouter = {
           throw new ORPCError("NOT_FOUND", { message: "Tier not available." })
         }
 
-        if (!workspace.stripeConnectEnabled || !workspace.stripeConnectId) {
+        if (
+          workspace.stripeConnectStatus !== StripeConnectStatus.Active ||
+          !workspace.stripeConnectId
+        ) {
           throw new ORPCError("PRECONDITION_FAILED", {
             message: "This publisher cannot accept payments yet.",
           })
