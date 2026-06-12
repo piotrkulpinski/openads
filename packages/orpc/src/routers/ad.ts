@@ -69,10 +69,14 @@ const getConnectedCheckoutSession = async ({
 
 // ---- SDK-facing public procedures (re-exported via `publicRouter`) ----
 
+// Exported so apps/api can derive its edge-cache path matcher from the same
+// declaration — keeping the route and the cache rule from silently drifting.
+export const ADS_CURRENT_PATH = "/workspaces/{slug}/ads/current"
+
 export const getCurrentAds = publicProcedure
   .route({
     method: "GET",
-    path: "/workspaces/{slug}/ads/current",
+    path: ADS_CURRENT_PATH,
     tags: ["Ads"],
     summary: "Fetch ads currently serving for a workspace",
   })

@@ -1,4 +1,4 @@
-import { appRouter, publicRouter } from "@openads/orpc/router"
+import { ADS_CURRENT_PATH, appRouter, publicRouter } from "@openads/orpc/router"
 import { OpenAPIHandler } from "@orpc/openapi/fetch"
 import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins"
 import { onError as onORPCError } from "@orpc/server"
@@ -87,7 +87,10 @@ app.use("/rpc/*", async (c, next) => {
   await next()
 })
 
-const adsCurrentPath = /^\/v1\/workspaces\/[^/]+\/ads\/current$/
+// Derived from the route's own path declaration so the cache rule below can't
+// silently drift if the route moves. OpenAPI `{param}` templates become
+// single-segment wildcards.
+const adsCurrentPath = new RegExp(`^/v1${ADS_CURRENT_PATH.replaceAll(/\{[^}]+\}/g, "[^/]+")}$`)
 
 // Public REST + OpenAPI surface (`/v1/openapi.json`, `/v1/docs`, plus the routed
 // procedures themselves). Consumed by `@openads/sdk` and any third-party API
