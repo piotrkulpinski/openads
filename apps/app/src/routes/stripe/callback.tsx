@@ -40,12 +40,16 @@ function StripeCallbackPage() {
 
   const errorMessage = searchError ?? completeConnection.error?.message ?? null
 
+  // `mutate` is referentially stable, so the effect only re-fires on real
+  // param changes — the ref guards against StrictMode's double invoke.
+  const { mutate } = completeConnection
+
   useEffect(() => {
     if (hasSubmitted.current || searchError || !search.code || !search.state) return
     hasSubmitted.current = true
 
-    completeConnection.mutate({ code: search.code, state: search.state })
-  }, [completeConnection, search, searchError])
+    mutate({ code: search.code, state: search.state })
+  }, [mutate, search.code, search.state, searchError])
 
   return (
     <div className="grid h-screen place-items-center px-6">
