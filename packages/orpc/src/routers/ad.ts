@@ -1,4 +1,5 @@
 import { AdStatus, type Prisma, WorkspaceMemberRole } from "@openads/db/client"
+import { adCreativeSchema } from "@openads/db/schema"
 import {
   renderAdApproved,
   renderAdChangesRequested,
@@ -14,12 +15,12 @@ import { findServingAds, servingAdSchema } from "../lib/ad-serving"
 import { recordAdClick, recordAdImpression } from "../lib/ad-tracking"
 import { startOfUtcDay } from "../lib/date"
 
-const createFromCheckoutInput = z.object({
+// oRPC allows only one `.input()` per procedure, so the full shape is declared
+// up front. `name`/`websiteUrl` validation is shared with the ad form via
+// `adCreativeSchema`.
+const createFromCheckoutInput = adCreativeSchema.extend({
   workspaceId: z.string().min(1),
   sessionId: z.string().min(1),
-  name: z.string().trim().min(2),
-  // http(s) only — rendered as hrefs in the publisher dashboard
-  websiteUrl: z.url({ protocol: /^https?$/ }),
   meta: z
     .array(z.object({ fieldId: z.string(), value: z.unknown() }))
     .optional()

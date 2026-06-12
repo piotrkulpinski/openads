@@ -7,10 +7,3 @@ export const adCreativeSchema = z.object({
 })
 
 export type AdCreativeSchema = z.infer<typeof adCreativeSchema>
-
-export const adReviewSchema = z.object({
-  id: z.string().min(1),
-  rejectionNote: z.string().trim().optional(),
-})
-
-export type AdReviewSchema = z.infer<typeof adReviewSchema>
