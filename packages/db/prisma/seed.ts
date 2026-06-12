@@ -430,9 +430,8 @@ const seed = async () => {
         faviconUrl: faviconUrls.get(item.ad.websiteUrl) ?? "",
         status: item.ad.status,
         createdAt: submittedAt,
-        approvedAt:
-          item.ad.status === "Approved" ? new Date(Date.now() - reviewedDaysAgo * DAY) : null,
-        rejectedAt: item.ad.status === "Rejected" ? new Date(Date.now() - 2 * DAY) : null,
+        reviewedAt:
+          item.ad.status === "Pending" ? null : new Date(Date.now() - reviewedDaysAgo * DAY),
         rejectionNote: item.ad.rejectionNote,
         subscriptionId: subscription.id,
       },

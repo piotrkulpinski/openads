@@ -334,8 +334,7 @@ const createFromCheckout = publicProcedure
           websiteUrl,
           // Resubmission re-enters the review queue.
           status: "Pending",
-          approvedAt: null,
-          rejectedAt: null,
+          reviewedAt: null,
           rejectionNote: null,
         },
       })
@@ -484,8 +483,7 @@ export const adRouter = {
         where: { id: ad.id },
         data: {
           status: AdStatus.Approved,
-          approvedAt: new Date(),
-          rejectedAt: null,
+          reviewedAt: new Date(),
           rejectionNote: null,
         },
       })
@@ -520,8 +518,7 @@ export const adRouter = {
           where: { id: ad.id },
           data: {
             status: AdStatus.Rejected,
-            rejectedAt: new Date(),
-            approvedAt: null,
+            reviewedAt: new Date(),
             rejectionNote: note,
           },
         })
@@ -577,8 +574,9 @@ export const adRouter = {
         where: { id: ad.id },
         data: {
           status: AdStatus.Pending,
-          approvedAt: null,
-          rejectedAt: null,
+          reviewedAt: null,
+          // Unlike a resubmission, the note stays so the advertiser can see
+          // what to change.
           rejectionNote: note,
         },
       })

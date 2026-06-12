@@ -89,8 +89,7 @@ describe("ad review actions", () => {
       where: { id: "ad_pending" },
       data: {
         status: "Approved",
-        approvedAt: expect.any(Date),
-        rejectedAt: null,
+        reviewedAt: expect.any(Date),
         rejectionNote: null,
       },
     })
@@ -114,8 +113,7 @@ describe("ad review actions", () => {
       where: { id: "ad_pending" },
       data: {
         status: "Rejected",
-        rejectedAt: expect.any(Date),
-        approvedAt: null,
+        reviewedAt: expect.any(Date),
         rejectionNote: "The landing page is not reachable.",
       },
     })
