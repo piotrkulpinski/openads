@@ -177,8 +177,7 @@ const seed = async () => {
     },
   ] as const
 
-  const tiers: Record<string, { id: string }> = {}
-  const prices: Record<string, { id: string }> = {}
+  const prices: Record<string, { id: string; tierId: string }> = {}
   let priceSeq = 0
 
   for (const [order, { prices: tierPrices, features, ...data }] of tierData.entries()) {
@@ -191,7 +190,6 @@ const seed = async () => {
         stripeProductId: `prod_seed${String(order + 1).padStart(4, "0")}`,
       },
     })
-    tiers[data.name] = tier
 
     for (const price of tierPrices) {
       priceSeq += 1
@@ -403,7 +401,6 @@ const seed = async () => {
     const price = prices[item.price]
     if (!price) throw new Error(`Unknown price key: ${item.price}`)
 
-    const tierName = item.price.split("/")[0] as string
     const periodStart = new Date(Date.now() - 10 * DAY)
     const periodEnd = new Date(periodStart.getTime() + 30 * DAY)
 
@@ -417,7 +414,7 @@ const seed = async () => {
         currentPeriodStart: periodStart,
         currentPeriodEnd: periodEnd,
         workspaceId: workspace.id,
-        tierId: tiers[tierName]!.id,
+        tierId: price.tierId,
         tierPriceId: price.id,
         advertiserId: advertiser.id,
       },
