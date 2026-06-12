@@ -84,7 +84,7 @@ function OnboardingStepPage() {
               <div className="space-y-4">
                 <StripeConnectButtons workspace={data} />
 
-                <OnboardingLaterButton step="completed" id={workspaceId}>
+                <OnboardingLaterButton step="completed" workspaceId={workspaceId}>
                   I'll connect Stripe later
                 </OnboardingLaterButton>
               </div>

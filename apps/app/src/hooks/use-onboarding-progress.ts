@@ -19,16 +19,16 @@ export const useOnboardingProgress = () => {
     }),
   )
 
-  const continueTo = async (step: OnboardingStep, id?: string) => {
+  const continueTo = async (step: OnboardingStep, workspaceId?: string) => {
     // Persist progress before navigation so refreshes resume from the next step.
     await mutateAsync({ step })
 
     if (step === "completed") {
       // A completed onboarding run should land in the created workspace when possible.
-      if (id) {
+      if (workspaceId) {
         return navigate({
           to: "/$workspaceId",
-          params: { workspaceId: id },
+          params: { workspaceId },
           search: { onboarded: true },
         })
       }
@@ -40,7 +40,7 @@ export const useOnboardingProgress = () => {
     return navigate({
       to: "/onboarding/$step",
       params: { step },
-      search: { workspaceId: preWorkspaceSteps.includes(step) ? undefined : id },
+      search: { workspaceId: preWorkspaceSteps.includes(step) ? undefined : workspaceId },
     })
   }
 

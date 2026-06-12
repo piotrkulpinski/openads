@@ -3,19 +3,24 @@ import type { OnboardingStep } from "@openads/utils"
 import type { ComponentProps } from "react"
 import { useOnboardingProgress } from "~/hooks/use-onboarding-progress"
 
-type LaterButtonProps = ComponentProps<"button"> & {
+type LaterButtonProps = ComponentProps<typeof Button> & {
   step: OnboardingStep
-  slug?: string
+  workspaceId?: string
 }
 
-export const OnboardingLaterButton = ({ children, step, slug, ...props }: LaterButtonProps) => {
+export const OnboardingLaterButton = ({
+  children,
+  step,
+  workspaceId,
+  ...props
+}: LaterButtonProps) => {
   const { continueTo, isPending } = useOnboardingProgress()
 
   return (
     <Button
       size="sm"
       variant="ghost"
-      onClick={() => continueTo(step, slug)}
+      onClick={() => continueTo(step, workspaceId)}
       isPending={isPending}
       className="mx-auto text-xs text-muted-foreground"
       {...props}
