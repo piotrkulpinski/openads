@@ -1,5 +1,6 @@
 import { StripeConnectStatus } from "@openads/db/client"
 import { idSchema, tierPriceSchema, tierSchema } from "@openads/db/schema"
+import { LogEvents } from "@openads/events/events"
 import { createSubscriptionCheckoutSession } from "@openads/stripe/checkout"
 import {
   archivePrice,
@@ -63,7 +64,7 @@ export const tierRouter = {
     .use(connectEnabledMw)
     .handler(
       async ({
-        context: { db, stripe, workspace },
+        context: { analytics, db, stripe, user, workspace },
         input: { name, description, weight, isActive, order, features, initialPrices },
       }) => {
         // Create the Tier row first so we can stamp its id onto the Stripe Product metadata.
@@ -140,6 +141,14 @@ export const tierRouter = {
           await db.tier.delete({ where: { id: tier.id } })
           throw err
         }
+
+        analytics.track({
+          event: LogEvents.CreateTier.name,
+          channel: LogEvents.CreateTier.channel,
+          profileId: user.id,
+          workspaceId: workspace.id,
+          tierId: tier.id,
+        })
 
         // Stamp the Stripe Product id back onto the Tier and return with prices nested.
         return await db.tier.update({

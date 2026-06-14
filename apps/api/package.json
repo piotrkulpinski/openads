@@ -13,6 +13,7 @@
     "@openads/auth": "*",
     "@openads/db": "*",
     "@openads/emails": "*",
+    "@openads/events": "*",
     "@openads/logger": "*",
     "@openads/orpc": "*",
     "@openads/redis": "*",

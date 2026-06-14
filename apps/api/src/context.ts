@@ -1,6 +1,7 @@
 import { db } from "@openads/db"
 import type { Context } from "@openads/orpc"
 import { env } from "~/env"
+import { analytics } from "~/services/analytics"
 import { auth as betterAuth } from "~/services/auth"
 import { emails } from "~/services/emails"
 import { logger } from "~/services/logger"
@@ -25,5 +26,5 @@ export const createContext = async ({
   const clientIp =
     headers.get("cf-connecting-ip") ?? headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null
 
-  return { auth, clientIp, db, emails, logger, redis, s3, stripe, env }
+  return { auth, clientIp, analytics, db, emails, logger, redis, s3, stripe, env }
 }

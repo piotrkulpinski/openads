@@ -2,6 +2,7 @@ import type { Session } from "@openads/auth/server"
 import { Prisma, type db } from "@openads/db"
 import { StripeConnectStatus, type Workspace } from "@openads/db/client"
 import type { EmailClient } from "@openads/emails"
+import type { AnalyticsClient } from "@openads/events/server"
 import type { Logger } from "@openads/logger"
 import type { RedisClient } from "@openads/redis"
 import type { S3BucketClient } from "@openads/s3"
@@ -18,6 +19,7 @@ type AuthUser = NonNullable<Session>["user"]
 export type Context = {
   auth: Session | null
   clientIp: string | null
+  analytics: AnalyticsClient
   db: typeof db
   emails: EmailClient
   logger: Logger

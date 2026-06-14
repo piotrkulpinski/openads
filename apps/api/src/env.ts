@@ -1,6 +1,7 @@
 import { env as auth } from "@openads/auth/env"
 import { env as db } from "@openads/db/env"
 import { env as emails } from "@openads/emails/env"
+import { env as events } from "@openads/events/env"
 import { env as redis } from "@openads/redis/env"
 import { env as s3 } from "@openads/s3/env"
 import { env as stripe } from "@openads/stripe/env"
@@ -8,7 +9,7 @@ import { createEnv } from "@t3-oss/env-core"
 import { z } from "zod"
 
 export const env = createEnv({
-  extends: [auth, db, redis, stripe, s3, emails],
+  extends: [auth, db, redis, stripe, s3, emails, events],
 
   server: {
     NODE_ENV: z.enum(["development", "production"]).default("development"),

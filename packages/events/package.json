@@ -6,7 +6,8 @@
   "exports": {
     "./server": "./src/server.ts",
     "./client": "./src/client.ts",
-    "./events": "./src/events.ts"
+    "./events": "./src/events.ts",
+    "./env": "./src/env.ts"
   },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
@@ -16,8 +17,11 @@
     "typecheck": "bun run check-types"
   },
   "dependencies": {
+    "@openads/logger": "*",
     "@openpanel/sdk": "^1.0.1",
-    "@openpanel/web": "^1.4.1"
+    "@openpanel/web": "^1.4.1",
+    "@t3-oss/env-core": "^0.13.11",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@openads/tsconfig": "*",
