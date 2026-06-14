@@ -85,6 +85,7 @@ Each Tier has many `TierPrice`s (one Stripe Product, many Stripe Prices). A tier
 - **Why**: Stripe Prices are immutable on `unit_amount` / `interval` / `currency`. Mirroring that on our side gives us an audit trail of price changes and lets old subscribers keep their grandfathered price even after the publisher raises rates. `Subscription` references a specific `TierPrice` via `Subscription.tierPriceId`, so archive ≠ break.
 - **Intervals supported**: `Day` / `Week` / `Month` / `Year` (matches `Stripe.recurring.interval`). `intervalCount` is on the schema with `default(1)` but isn't yet exposed in the form.
 - **Form input**: publishers type integer whole units (`19`); the form multiplies by 100 before submitting. DB and Stripe always see cents.
+- **One-active-price enforcement**: the "at most one active price per shape" rule is enforced in the DB by a **partial unique index** — `@@unique([tierId, interval, intervalCount, currency], where: raw("\"isActive\""))` on `TierPrice` (named `TierPrice_active_shape_key`). This needs the `partialIndexes` preview feature on the generator (Prisma ≥ 7.4) and is applied by `db:push` like any other index. `tierPrice.create` keeps a `findFirst` pre-check for the friendly error and catches `P2002` for the double-submit race.
 
 ## Out of scope at v1 (don't gold-plate)
 

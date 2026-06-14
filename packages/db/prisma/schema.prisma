@@ -4,6 +4,9 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  // Lets `@@unique` carry a `where` predicate so we can express the partial
+  // unique index on TierPrice (one active price per shape) in the schema.
+  previewFeatures = ["partialIndexes"]
 }
