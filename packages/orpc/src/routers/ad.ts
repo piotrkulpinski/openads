@@ -7,6 +7,7 @@ import {
   AdRejected,
   renderTemplate,
 } from "@openads/emails"
+import { LogEvents } from "@openads/events/events"
 import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { mapStripeSubscriptionStatus, toDate } from "@openads/stripe/subscription"
 import { ORPCError } from "@orpc/server"
@@ -234,7 +235,7 @@ const createFromCheckout = publicProcedure
   .input(createFromCheckoutInput)
   .handler(
     async ({
-      context: { db, emails, logger, s3, stripe, env },
+      context: { analytics, db, emails, logger, s3, stripe, env },
       input: { workspaceId, sessionId, name, websiteUrl, meta },
     }) => {
       const { connectedAccountId, session, workspace } = await getConnectedCheckoutSession({
@@ -294,6 +295,13 @@ const createFromCheckout = publicProcedure
           email: customerEmail,
           name: name.slice(0, 80),
         },
+      })
+
+      // Track whether this is a brand-new subscription so resubmissions (which
+      // re-run this flow with the same session) don't re-fire StartSubscription.
+      const existingSubscription = await db.subscription.findUnique({
+        where: { stripeSubscriptionId: stripeSubscription.id },
+        select: { id: true },
       })
 
       // Idempotent — the Stripe webhook may have already created this row.
@@ -414,6 +422,26 @@ const createFromCheckout = publicProcedure
         )
       }
 
+      // Advertisers are anonymous (email-only), so these events carry no
+      // profileId — they're attributed to the workspace and tier instead.
+      analytics.track({
+        event: LogEvents.SubmitAd.name,
+        channel: LogEvents.SubmitAd.channel,
+        workspaceId,
+        tierId: tier.id,
+        adId: ad.id,
+      })
+
+      if (!existingSubscription) {
+        analytics.track({
+          event: LogEvents.StartSubscription.name,
+          channel: LogEvents.StartSubscription.channel,
+          workspaceId,
+          tierId: tier.id,
+          subscriptionId: subscription.id,
+        })
+      }
+
       return { adId: ad.id, subscriptionId: subscription.id }
     },
   )
@@ -479,42 +507,55 @@ export const adRouter = {
   approve: authProcedure
     .input(adIdentitySchema.extend({ note: z.string().trim().max(500).optional() }))
     .use(adMw)
-    .handler(async ({ context: { ad, db, emails, workspace }, input: { note } }) => {
-      const updated = await db.ad.update({
-        where: { id: ad.id },
-        data: {
-          status: AdStatus.Approved,
-          reviewedAt: new Date(),
-          rejectionNote: null,
-        },
-      })
-
-      const advertiserEmail = ad.subscription.advertiser.email
-      if (advertiserEmail) {
-        const { html, text } = await renderTemplate(
-          AdApproved({
-            workspaceName: workspace.name,
-            adName: ad.name,
-            approvalNote: note,
-          }),
-        )
-
-        await emails.send({
-          to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
-          subject: `Your ad on ${workspace.name} is now live`,
-          html,
-          text,
+    .handler(
+      async ({ context: { ad, analytics, db, emails, user, workspace }, input: { note } }) => {
+        const updated = await db.ad.update({
+          where: { id: ad.id },
+          data: {
+            status: AdStatus.Approved,
+            reviewedAt: new Date(),
+            rejectionNote: null,
+          },
         })
-      }
 
-      return updated
-    }),
+        analytics.track({
+          event: LogEvents.ApproveAd.name,
+          channel: LogEvents.ApproveAd.channel,
+          profileId: user.id,
+          workspaceId: workspace.id,
+          adId: ad.id,
+        })
+
+        const advertiserEmail = ad.subscription.advertiser.email
+        if (advertiserEmail) {
+          const { html, text } = await renderTemplate(
+            AdApproved({
+              workspaceName: workspace.name,
+              adName: ad.name,
+              approvalNote: note,
+            }),
+          )
+
+          await emails.send({
+            to: { email: advertiserEmail, name: ad.subscription.advertiser.name },
+            subject: `Your ad on ${workspace.name} is now live`,
+            html,
+            text,
+          })
+        }
+
+        return updated
+      },
+    ),
 
   reject: authProcedure
     .input(adIdentitySchema.extend({ note: z.string().trim().min(1).max(500) }))
     .use(adMw)
     .handler(
-      async ({ context: { ad, db, emails, logger, stripe, workspace }, input: { note } }) => {
+      async ({
+        context: { ad, analytics, db, emails, logger, stripe, user, workspace },
+        input: { note },
+      }) => {
         const updated = await db.ad.update({
           where: { id: ad.id },
           data: {
@@ -522,6 +563,14 @@ export const adRouter = {
             reviewedAt: new Date(),
             rejectionNote: note,
           },
+        })
+
+        analytics.track({
+          event: LogEvents.RejectAd.name,
+          channel: LogEvents.RejectAd.channel,
+          profileId: user.id,
+          workspaceId: workspace.id,
+          adId: ad.id,
         })
 
         // Cancel the underlying Stripe subscription so the advertiser stops being billed.
@@ -535,6 +584,14 @@ export const adRouter = {
             {},
             { stripeAccount: workspace.stripeConnectId },
           )
+
+          analytics.track({
+            event: LogEvents.CancelSubscription.name,
+            channel: LogEvents.CancelSubscription.channel,
+            profileId: user.id,
+            workspaceId: workspace.id,
+            subscriptionId: ad.subscription.id,
+          })
         } catch (err) {
           // Subscription may already be canceled or otherwise inaccessible — leave
           // local state correct and surface the failure in logs only.

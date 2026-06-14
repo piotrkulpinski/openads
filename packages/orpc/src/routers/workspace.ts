@@ -1,5 +1,6 @@
 import { WorkspaceMemberRole } from "@openads/db/client"
 import { idSchema, workspaceSchema } from "@openads/db/schema"
+import { LogEvents } from "@openads/events/events"
 import { fetchAndUploadFavicon } from "@openads/s3/favicon"
 import { z } from "zod"
 import { authProcedure, type Context, workspaceMw } from "../index"
@@ -54,6 +55,23 @@ export const workspaceRouter = {
         ...data,
         members: { create: { userId: context.user.id, role: WorkspaceMemberRole.Owner } },
       },
+    })
+
+    // Enrich the OpenPanel profile so server events are attributable to a
+    // named user, not just an id. Idempotent — safe to repeat per workspace.
+    const [firstName, ...rest] = (context.user.name ?? "").split(" ")
+    context.analytics.identify({
+      profileId: context.user.id,
+      email: context.user.email,
+      firstName,
+      lastName: rest.join(" ") || undefined,
+    })
+
+    context.analytics.track({
+      event: LogEvents.CreateWorkspace.name,
+      channel: LogEvents.CreateWorkspace.channel,
+      profileId: context.user.id,
+      workspaceId: workspace.id,
     })
 
     const refreshed = await refreshWorkspaceFavicon(context, {

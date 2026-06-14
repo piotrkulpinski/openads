@@ -11,6 +11,7 @@ const createContext = ({
   const emailCalls: Array<unknown> = []
   const cancelCalls: Array<unknown> = []
   const warnCalls: Array<unknown> = []
+  const trackCalls: Array<{ event: string }> = []
 
   const workspace = {
     id: "ws_openads",
@@ -38,6 +39,12 @@ const createContext = ({
   const context = {
     auth: { user: { id: "user_owner" } },
     user: { id: "user_owner" },
+    analytics: {
+      track: (event: { event: string }) => {
+        trackCalls.push(event)
+      },
+      identify: () => {},
+    },
     db: {
       workspace: {
         belongsTo: () => ({}),
@@ -72,12 +79,12 @@ const createContext = ({
     },
   } as unknown as Context
 
-  return { context, updateCalls, emailCalls, cancelCalls, warnCalls }
+  return { context, updateCalls, emailCalls, cancelCalls, warnCalls, trackCalls }
 }
 
 describe("ad review actions", () => {
   it("approves an ad and emails the advertiser", async () => {
-    const { context, updateCalls, emailCalls } = createContext()
+    const { context, updateCalls, emailCalls, trackCalls } = createContext()
 
     const result = await adRouter.approve.callable({ context })({
       workspaceId: "ws_openads",
@@ -85,6 +92,7 @@ describe("ad review actions", () => {
     })
 
     expect(result.status).toBe("Approved")
+    expect(trackCalls.map(c => c.event)).toEqual(["Approve Ad"])
     expect(updateCalls[0]).toEqual({
       where: { id: "ad_pending" },
       data: {
@@ -100,7 +108,7 @@ describe("ad review actions", () => {
   })
 
   it("rejects an ad, cancels the connected-account subscription, and emails the advertiser", async () => {
-    const { context, updateCalls, emailCalls, cancelCalls } = createContext()
+    const { context, updateCalls, emailCalls, cancelCalls, trackCalls } = createContext()
 
     const result = await adRouter.reject.callable({ context })({
       workspaceId: "ws_openads",
@@ -109,6 +117,8 @@ describe("ad review actions", () => {
     })
 
     expect(result.status).toBe("Rejected")
+    // RejectAd fires immediately; CancelSubscription only after Stripe confirms.
+    expect(trackCalls.map(c => c.event)).toEqual(["Reject Ad", "Cancel Subscription"])
     expect(updateCalls[0]).toEqual({
       where: { id: "ad_pending" },
       data: {
@@ -125,7 +135,7 @@ describe("ad review actions", () => {
   })
 
   it("keeps rejection successful when Stripe cancellation fails and logs the failure", async () => {
-    const { context, warnCalls } = createContext({
+    const { context, warnCalls, trackCalls } = createContext({
       cancelSubscription: async () => {
         throw new Error("Stripe unavailable")
       },
@@ -138,6 +148,9 @@ describe("ad review actions", () => {
         note: "The creative violates our policy.",
       }),
     ).resolves.toHaveProperty("status", "Rejected")
+
+    // The ad is still rejected, but no CancelSubscription event since Stripe failed.
+    expect(trackCalls.map(c => c.event)).toEqual(["Reject Ad"])
 
     expect(warnCalls[0]).toMatchObject([
       "ad.reject: failed to cancel stripe subscription",
