@@ -49,61 +49,68 @@ export const workspaceRouter = {
       })
     }),
 
-  create: authProcedure.input(workspaceSchema).handler(async ({ context, input: data }) => {
-    const workspace = await context.db.workspace.create({
-      data: {
-        ...data,
-        members: { create: { userId: context.user.id, role: WorkspaceMemberRole.Owner } },
-      },
-    })
+  create: authProcedure
+    .input(workspaceSchema)
+    .handler(async ({ context: { analytics, db, env, logger, s3, user }, input: data }) => {
+      const workspace = await db.workspace.create({
+        data: {
+          ...data,
+          members: { create: { userId: user.id, role: WorkspaceMemberRole.Owner } },
+        },
+      })
 
-    // Enrich the OpenPanel profile so server events are attributable to a
-    // named user, not just an id. Idempotent — safe to repeat per workspace.
-    const [firstName, ...rest] = (context.user.name ?? "").split(" ")
-    context.analytics.identify({
-      profileId: context.user.id,
-      email: context.user.email,
-      firstName,
-      lastName: rest.join(" ") || undefined,
-    })
+      // Enrich the OpenPanel profile so server events are attributable to a
+      // named user, not just an id. Idempotent — safe to repeat per workspace.
+      const [firstName, ...rest] = (user.name ?? "").split(" ")
+      analytics.identify({
+        profileId: user.id,
+        email: user.email,
+        firstName,
+        lastName: rest.join(" ") || undefined,
+      })
 
-    context.analytics.track({
-      event: LogEvents.CreateWorkspace.name,
-      channel: LogEvents.CreateWorkspace.channel,
-      profileId: context.user.id,
-      workspaceId: workspace.id,
-    })
+      analytics.track({
+        event: LogEvents.CreateWorkspace.name,
+        channel: LogEvents.CreateWorkspace.channel,
+        profileId: user.id,
+        workspaceId: workspace.id,
+      })
 
-    const refreshed = await refreshWorkspaceFavicon(context, {
-      workspaceId: workspace.id,
-      websiteUrl: workspace.websiteUrl,
-    })
+      const refreshed = await refreshWorkspaceFavicon(
+        { db, s3, logger, env },
+        { workspaceId: workspace.id, websiteUrl: workspace.websiteUrl },
+      )
 
-    return refreshed ?? workspace
-  }),
+      return refreshed ?? workspace
+    }),
 
   update: authProcedure
     .input(workspaceUpdateInput)
     .use(workspaceMw)
-    .handler(async ({ context, input: { workspaceId, ...data } }) => {
-      const websiteUrlChanged = data.websiteUrl !== context.workspace.websiteUrl
+    .handler(
+      async ({
+        context: { db, env, logger, s3, workspace: current },
+        input: { workspaceId, ...data },
+      }) => {
+        const websiteUrlChanged = data.websiteUrl !== current.websiteUrl
 
-      const workspace = await context.db.workspace.update({
-        where: { id: workspaceId },
-        data,
-      })
-
-      if (websiteUrlChanged) {
-        const refreshed = await refreshWorkspaceFavicon(context, {
-          workspaceId,
-          websiteUrl: workspace.websiteUrl,
+        const workspace = await db.workspace.update({
+          where: { id: workspaceId },
+          data,
         })
 
-        return refreshed ?? workspace
-      }
+        if (websiteUrlChanged) {
+          const refreshed = await refreshWorkspaceFavicon(
+            { db, s3, logger, env },
+            { workspaceId, websiteUrl: workspace.websiteUrl },
+          )
 
-      return workspace
-    }),
+          return refreshed ?? workspace
+        }
+
+        return workspace
+      },
+    ),
 
   delete: authProcedure
     .input(z.object({ workspaceId: z.string() }))
