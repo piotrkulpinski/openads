@@ -27,7 +27,7 @@ export const AdRow = ({ workspaceId, ad, className, ...props }: AdRowProps) => {
           <H5 className="truncate">{ad.name}</H5>
           <AdStatusBadge status={ad.status} />
         </Stack>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-xs">
           {ad.subscription.advertiser.email ?? ad.subscription.advertiser.name} ·{" "}
           {ad.subscription.tier.name}
         </p>

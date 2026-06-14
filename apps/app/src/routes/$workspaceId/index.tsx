@@ -231,7 +231,7 @@ const ListCard = ({ title, count, action, children }: ListCardProps) => {
         <div className="ml-auto">{action}</div>
       </Card.Panel>
 
-      <Card.Panel>{children}</Card.Panel>
+      <Card.Panel className="p-0 md:p-0">{children}</Card.Panel>
     </Card>
   )
 }
@@ -268,7 +268,7 @@ const DashboardAdRow = ({ workspaceId, ad, showStatus, children }: DashboardAdRo
           <H5 className="truncate">{ad.name}</H5>
           {showStatus && <AdStatusBadge status={ad.status} />}
         </span>
-        <span className="block truncate text-muted-foreground text-sm">{children}</span>
+        <span className="block truncate text-muted-foreground text-xs">{children}</span>
         <span className="absolute inset-0" />
       </Link>
     </div>

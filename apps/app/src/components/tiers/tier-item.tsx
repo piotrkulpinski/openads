@@ -70,7 +70,7 @@ export const TierItem = ({ workspaceId, tier, className, ...props }: TierItemPro
           <H5 className="truncate">{tier.name}</H5>
           {!tier.isActive && <Badge variant="secondary">Archived</Badge>}
         </Stack>
-        <p className="text-sm text-muted-foreground">{renderPriceLine(tier)}</p>
+        <p className="text-muted-foreground text-xs">{renderPriceLine(tier)}</p>
         <span className="absolute inset-0" />
       </Link>
 

@@ -1,6 +1,5 @@
 import { formatDate, getInitials, isValidUrl } from "@dirstack/utils"
 import { isServingSubscription } from "@openads/db/lib/subscription"
-import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { Textarea } from "@openads/ui/textarea"
@@ -12,6 +11,7 @@ import { toast } from "sonner"
 import { AdStats } from "~/components/ads/ad-stats"
 import { getServingState, ServingDot } from "~/components/ads/serving-state"
 import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
+import { EntityAvatar } from "~/components/entity-avatar"
 import { Card } from "~/components/ui/card"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
 import { H5, H6 } from "~/components/ui/heading"
@@ -91,10 +91,11 @@ function AdReviewPage() {
     <>
       <Header>
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar className="size-11 rounded-md border">
-            <AvatarImage src={ad.faviconUrl || undefined} className="p-1.5" />
-            <AvatarFallback className="rounded-none">{getInitials(ad.name, 3)}</AvatarFallback>
-          </Avatar>
+          <EntityAvatar
+            className="size-11"
+            src={ad.faviconUrl}
+            fallback={getInitials(ad.name, 3)}
+          />
 
           <div className="min-w-0">
             <HeaderTitle className="truncate">{ad.name}</HeaderTitle>

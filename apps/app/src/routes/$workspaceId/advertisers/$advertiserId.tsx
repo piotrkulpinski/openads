@@ -1,6 +1,5 @@
 import { formatDate, formatNumber, getInitials, isValidUrl } from "@dirstack/utils"
 import { isServingSubscription } from "@openads/db/lib/subscription"
-import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { Button } from "@openads/ui/button"
 import { cx } from "@openads/ui/cva"
@@ -11,6 +10,7 @@ import type { ComponentProps } from "react"
 import { AdAvatar } from "~/components/ads/ad-avatar"
 import { getServingState } from "~/components/ads/serving-state"
 import { AdStatusBadge, SubscriptionStatusBadge } from "~/components/ads/status-badge"
+import { EntityAvatar } from "~/components/entity-avatar"
 import { QueryCell } from "~/components/query-cell"
 import { formatCtr, Metric } from "~/components/stats/metric"
 import { Callout, CalloutText } from "~/components/ui/callout"
@@ -60,17 +60,11 @@ function AdvertiserDetailPage() {
           <>
             <Header>
               <div className="flex min-w-0 items-center gap-3">
-                <Avatar className="size-11 rounded-md border">
-                  {advertiser.latestAd && (
-                    <AvatarImage
-                      src={advertiser.latestAd.faviconUrl || undefined}
-                      className="p-1.5"
-                    />
-                  )}
-                  <AvatarFallback className="rounded-none">
-                    {getInitials(advertiser.name, 3)}
-                  </AvatarFallback>
-                </Avatar>
+                <EntityAvatar
+                  className="size-11"
+                  src={advertiser.latestAd?.faviconUrl}
+                  fallback={getInitials(advertiser.name, 3)}
+                />
 
                 <div className="min-w-0">
                   <HeaderTitle className="truncate">{advertiser.name}</HeaderTitle>
@@ -171,7 +165,7 @@ const AdvertiserAdRow = ({ workspaceId, ad, className, ...props }: AdvertiserAdR
             <H5 className="truncate">{ad.name}</H5>
             <AdStatusBadge status={ad.status} />
           </span>
-          <span className="block truncate text-muted-foreground text-sm">{ad.websiteUrl}</span>
+          <span className="block truncate text-muted-foreground text-xs">{ad.websiteUrl}</span>
         </span>
 
         <span className="absolute inset-0" />

@@ -1,6 +1,5 @@
 import { formatDate, getInitials } from "@dirstack/utils"
 import { useDebouncedCallback } from "@mantine/hooks"
-import { Avatar, AvatarFallback } from "@openads/ui/avatar"
 import { Badge } from "@openads/ui/badge"
 import { cx } from "@openads/ui/cva"
 import { Skeleton } from "@openads/ui/skeleton"
@@ -11,6 +10,7 @@ import { SearchIcon, UsersIcon, XIcon } from "lucide-react"
 import { type ComponentProps, useRef, useState } from "react"
 import { z } from "zod"
 import { AdStatusBadge } from "~/components/ads/status-badge"
+import { EntityAvatar } from "~/components/entity-avatar"
 import { QueryCell } from "~/components/query-cell"
 import { Callout, CalloutText } from "~/components/ui/callout"
 import { Header, HeaderActions, HeaderTitle } from "~/components/ui/header"
@@ -75,16 +75,18 @@ const AdvertiserRow = ({ workspaceId, advertiser, className, ...props }: Adverti
         className="min-w-0 flex-1"
       >
         <div className="flex min-w-0 items-center gap-3">
-          <Avatar className="size-9">
-            <AvatarFallback>{getInitials(advertiser.name, 3)}</AvatarFallback>
-          </Avatar>
+          <EntityAvatar
+            className="size-9"
+            src={advertiser.latestAd?.faviconUrl}
+            fallback={getInitials(advertiser.name, 3)}
+          />
 
           <div className="min-w-0">
             <Stack size="sm">
               <H5 className="truncate">{advertiser.name}</H5>
               {advertiser.latestAd && <AdStatusBadge status={advertiser.latestAd.status} />}
             </Stack>
-            <p className="truncate text-muted-foreground text-sm">
+            <p className="truncate text-muted-foreground text-xs">
               {advertiser.email ?? "No email"} · Latest activity{" "}
               {formatDate(advertiser.latestActivityAt, "medium", "en-US")}
             </p>

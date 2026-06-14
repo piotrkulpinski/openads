@@ -1,8 +1,8 @@
 import { getInitials } from "@dirstack/utils"
-import { Avatar, AvatarFallback, AvatarImage } from "@openads/ui/avatar"
 import { cx } from "@openads/ui/cva"
 import type { ComponentProps } from "react"
 import { ServingDot, type ServingState } from "~/components/ads/serving-state"
+import { EntityAvatar } from "~/components/entity-avatar"
 
 type AdAvatarProps = ComponentProps<"span"> & {
   ad: { name: string; faviconUrl: string | null }
@@ -12,10 +12,7 @@ type AdAvatarProps = ComponentProps<"span"> & {
 export const AdAvatar = ({ ad, serving, className, ...props }: AdAvatarProps) => {
   return (
     <span className={cx("relative shrink-0", className)} {...props}>
-      <Avatar className="size-9 rounded-md border">
-        <AvatarImage src={ad.faviconUrl || undefined} className="p-1" />
-        <AvatarFallback className="rounded-none text-xs">{getInitials(ad.name, 3)}</AvatarFallback>
-      </Avatar>
+      <EntityAvatar className="size-9" src={ad.faviconUrl} fallback={getInitials(ad.name, 3)} />
 
       {/* Presence-style serving indicator, anchored to the favicon */}
       {serving && (

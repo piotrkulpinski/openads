@@ -5,7 +5,7 @@ import type { ComponentProps } from "react"
 type BadgeVariant = ComponentProps<typeof Badge>["variant"]
 
 const adStatusVariant: Record<AdStatus, BadgeVariant> = {
-  Pending: "secondary",
+  Pending: "warning",
   Approved: "success",
   Rejected: "danger",
 }
