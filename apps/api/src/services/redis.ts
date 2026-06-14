@@ -1,4 +1,4 @@
-import { createRedisClient, type RedisClient } from "@openads/redis"
+import { createInMemoryRedisClient, createRedisClient, type RedisClient } from "@openads/redis"
 import { env } from "~/env"
 import { logger } from "~/services/logger"
 
@@ -12,6 +12,11 @@ const globalForRedis = globalThis as typeof globalThis & {
 // Attach the error listener only on a freshly created client — re-attaching on
 // every hot reload would stack duplicate listeners on the cached singleton.
 const createClient = (): RedisClient => {
+  if (!env.REDIS_URL) {
+    logger.warn("REDIS_URL is unset — using in-memory Redis (state is per-process, dev only)")
+    return createInMemoryRedisClient()
+  }
+
   const client = createRedisClient({ url: env.REDIS_URL })
   client.on("error", err => logger.error("redis connection error", { err }))
   return client
