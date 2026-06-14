@@ -11,6 +11,8 @@ export const env = createEnv({
     VITE_API_URL: z.string(),
     // OpenAds marketing site, used for the "Powered by OpenAds" embed attribution.
     VITE_WEB_URL: z.string().default("https://openads.co"),
+    // Support contact surfaced on error pages.
+    VITE_SUPPORT_EMAIL: z.email().default("hello@openads.co"),
     // Optional third-party integrations (product analytics + support widget).
     // Omit them for a self-hosted build — both features no-op when unset.
     VITE_OPENPANEL_CLIENT_ID: z.string().min(1).optional(),
