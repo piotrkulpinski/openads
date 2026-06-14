@@ -23,4 +23,10 @@ model TierPrice {
 
   // Indexes
   @@index([tierId, isActive])
+  // At most one ACTIVE price per (interval, intervalCount, currency) shape.
+  // Amount is deliberately not part of the key — changing it is archive +
+  // create-new. The partial `where` scopes uniqueness to active rows so
+  // archived prices (grandfathered subscriptions) don't collide. This is the
+  // durable guard behind the app-level check in `tierPrice.create`.
+  @@unique([tierId, interval, intervalCount, currency], where: raw("\"isActive\""), map: "TierPrice_active_shape_key")
 }
